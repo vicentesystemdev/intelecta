@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\RolPermisoController;
+use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\AreaConocimientoController;
 use App\Http\Controllers\PlantillaEvaluacionController;
 use App\Http\Controllers\PostulanteController;
@@ -168,23 +170,22 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::prefix('sistema')->group(function () {
-            Route::get('/usuarios', function () {
-                return Inertia::render('Modulos/ModuloPlanificado', [
-                    'titulo' => 'Usuarios',
-                    'descripcion' => 'Gestión planificada de accesos institucionales para administradores, tutores y postulantes.',
-                    'moduloRelacionado' => 'Configuración General',
-                    'proximaEvolucion' => 'Control de cuentas activas del personal de admisión y perfiles de postulantes autorizados.'
-                ]);
-            })->name('admin.sistema.usuarios');
+            Route::get('/usuarios', [UsuarioController::class, 'index'])
+                ->middleware('permission:usuarios.ver')
+                ->name('admin.sistema.usuarios');
+            Route::post('/usuarios', [UsuarioController::class, 'store'])
+                ->middleware('permission:usuarios.crear')
+                ->name('admin.sistema.usuarios.store');
+            Route::put('/usuarios/{usuario}', [UsuarioController::class, 'update'])
+                ->middleware('permission:usuarios.editar')
+                ->name('admin.sistema.usuarios.update');
 
-            Route::get('/roles-permisos', function () {
-                return Inertia::render('Modulos/ModuloPlanificado', [
-                    'titulo' => 'Roles y Permisos',
-                    'descripcion' => 'Administración de perfiles de acceso y permisos por rol institucional.',
-                    'moduloRelacionado' => 'Usuarios y Seguridad',
-                    'proximaEvolucion' => 'Matriz interactiva para asociar capacidades de Spatie Permission de forma visual en tiempo real.'
-                ]);
-            })->name('admin.sistema.roles-permisos');
+            Route::get('/roles-permisos', [RolPermisoController::class, 'index'])
+                ->middleware('permission:roles.ver')
+                ->name('admin.sistema.roles-permisos');
+            Route::put('/roles-permisos/{rol}', [RolPermisoController::class, 'update'])
+                ->middleware('permission:roles.editar')
+                ->name('admin.sistema.roles-permisos.update');
 
             Route::get('/configuracion', function () {
                 return Inertia::render('Modulos/ModuloPlanificado', [

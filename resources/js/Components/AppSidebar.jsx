@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     BarChart3,
     BookCopy,
@@ -121,12 +121,14 @@ const navigationGroups = [
                 icon: Users,
                 href: '/admin/sistema/usuarios',
                 routeName: 'admin.sistema.usuarios',
+                permission: 'usuarios.ver',
             },
             {
                 label: 'Roles y Permisos',
                 icon: ShieldCheck,
                 href: '/admin/sistema/roles-permisos',
                 routeName: 'admin.sistema.roles-permisos',
+                permission: 'roles.ver',
             },
             {
                 label: 'Configuración',
@@ -139,6 +141,8 @@ const navigationGroups = [
 ];
 
 export default function AppSidebar({ open = false, onClose = () => {} }) {
+    const permissions = usePage().props.auth.permissions || [];
+
     return (
         <>
             {open && (
@@ -187,35 +191,46 @@ export default function AppSidebar({ open = false, onClose = () => {} }) {
                                 {group.label}
                             </p>
                             <div className="space-y-1">
-                                {group.items.map(
-                                    ({ label, icon: Icon, href, routeName }) => {
-                                        const active = routeName
-                                            ? route().current(routeName)
-                                            : false;
+                                {group.items
+                                    .filter(
+                                        ({ permission }) =>
+                                            !permission ||
+                                            permissions.includes(permission),
+                                    )
+                                    .map(
+                                        ({
+                                            label,
+                                            icon: Icon,
+                                            href,
+                                            routeName,
+                                        }) => {
+                                            const active = routeName
+                                                ? route().current(routeName)
+                                                : false;
 
-                                        return (
-                                        <Link
-                                            key={label}
-                                            href={href}
-                                            onClick={onClose}
-                                            className={`group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition ${
-                                                active
-                                                    ? 'bg-white text-indigo-950 shadow-lg shadow-indigo-950/20'
-                                                    : 'text-indigo-100 hover:bg-white/10 hover:text-white'
-                                            }`}
-                                        >
-                                            <Icon
-                                                className={`h-4.5 w-4.5 ${
-                                                    active
-                                                        ? 'text-indigo-600'
-                                                        : 'text-indigo-300 group-hover:text-cyan-300'
-                                                }`}
-                                            />
-                                            {label}
-                                        </Link>
-                                        );
-                                    },
-                                )}
+                                            return (
+                                                <Link
+                                                    key={label}
+                                                    href={href}
+                                                    onClick={onClose}
+                                                    className={`group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition ${
+                                                        active
+                                                            ? 'bg-white text-indigo-950 shadow-lg shadow-indigo-950/20'
+                                                            : 'text-indigo-100 hover:bg-white/10 hover:text-white'
+                                                    }`}
+                                                >
+                                                    <Icon
+                                                        className={`h-4.5 w-4.5 ${
+                                                            active
+                                                                ? 'text-indigo-600'
+                                                                : 'text-indigo-300 group-hover:text-cyan-300'
+                                                        }`}
+                                                    />
+                                                    {label}
+                                                </Link>
+                                            );
+                                        },
+                                    )}
                             </div>
                         </div>
                     ))}

@@ -12,6 +12,7 @@ export default function ConfirmModal({
     variant = 'normal',
     onConfirm,
     processing = false,
+    supportingText = 'Esta acción actualizará el estado institucional del registro.',
 }) {
     const isDanger = variant === 'danger';
 
@@ -38,7 +39,7 @@ export default function ConfirmModal({
                     )}
                 </span>
                 <p className="pt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                    Esta acción actualizará el estado institucional del registro.
+                    {supportingText}
                 </p>
             </div>
 
