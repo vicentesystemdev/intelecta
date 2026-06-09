@@ -11,9 +11,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
     'id_tem',
+    'subtema_preg',
     'enunciado_preg',
     'tipo_preg',
     'dificultad_preg',
+    'exigencia_preg',
+    'habilidad_preg',
+    'tiempo_estimado_seg_preg',
+    'relacion_ingenieria_preg',
     'puntaje_preg',
     'explicacion_preg',
     'estado_preg',
@@ -26,7 +31,10 @@ class Pregunta extends Model
 
     protected function casts(): array
     {
-        return ['puntaje_preg' => 'decimal:2'];
+        return [
+            'puntaje_preg' => 'decimal:2',
+            'tiempo_estimado_seg_preg' => 'integer',
+        ];
     }
 
     public function tema(): BelongsTo

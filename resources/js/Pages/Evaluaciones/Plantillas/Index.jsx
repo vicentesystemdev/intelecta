@@ -13,9 +13,10 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Clock3, Eye, FileCheck2, Pencil, Plus, Search, ToggleLeft } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Index({ plantillas, preguntasDisponibles = [], filtros = {}, permisos }) {
+export default function Index({ plantillas, preguntasDisponibles = [], materias = [], filtros = {}, permisos }) {
     const [filters, setFilters] = useState({ 
         buscar: filtros.buscar || '', 
+        id_mat: filtros.id_mat || '',
         estado_plan: filtros.estado_plan || '' 
     });
 
@@ -53,6 +54,15 @@ export default function Index({ plantillas, preguntasDisponibles = [], filtros =
         return plantilla.preguntas.reduce((sum, pregunta) => sum + Number(pregunta.pivot?.puntaje_pp || 0), 0);
     };
 
+    const compositionBySubject = (plantilla) => {
+        const counts = new Map();
+        (plantilla?.preguntas || []).forEach((pregunta) => {
+            const name = pregunta.tema?.area?.materia?.nombre_mat || 'Sin materia';
+            counts.set(name, (counts.get(name) || 0) + 1);
+        });
+        return [...counts.entries()];
+    };
+
     return (
         <AdminLayout title="Plantillas de Evaluación" subtitle="Instrumentos académicos reutilizables construidos desde el banco institucional.">
             <Head title="Plantillas de evaluación" />
@@ -71,11 +81,15 @@ export default function Index({ plantillas, preguntasDisponibles = [], filtros =
 
             <Card className="mb-5 border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/50 dark:ring-slate-800">
                 <CardContent className="p-4">
-                    <form onSubmit={submit} className="flex flex-col gap-3 sm:flex-row">
+                    <form onSubmit={submit} className="grid gap-3 md:grid-cols-[1fr_220px_190px_auto]">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                             <Input className="pl-9 bg-white dark:bg-slate-950 dark:border-slate-800 text-slate-900 dark:text-slate-100" value={filters.buscar} onChange={(e) => setFilters({ ...filters, buscar: e.target.value })} placeholder="Buscar plantilla por nombre" />
                         </div>
+                        <select className="h-10 rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm" value={filters.id_mat} onChange={(e) => setFilters({ ...filters, id_mat: e.target.value })}>
+                            <option value="">Todas las materias</option>
+                            {materias.map((materia) => <option key={materia.id_mat} value={materia.id_mat}>{materia.codigo_mat} · {materia.nombre_mat}</option>)}
+                        </select>
                         <select className="h-10 rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm sm:w-48" value={filters.estado_plan} onChange={(e) => setFilters({ ...filters, estado_plan: e.target.value })}>
                             <option value="">Todos los estados</option>
                             <option value="activa">Activas</option>
@@ -89,6 +103,7 @@ export default function Index({ plantillas, preguntasDisponibles = [], filtros =
             <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
                 {plantillas.data.map((plantilla) => {
                     const totalPuntaje = Number(plantilla.puntaje_total || 0);
+                    const composition = compositionBySubject(plantilla);
                     return (
                         <Card key={plantilla.id_plan} className="h-full min-h-[230px] flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                             <div className="h-1.5 bg-gradient-to-r from-indigo-600 to-cyan-400 shrink-0" />
@@ -115,6 +130,14 @@ export default function Index({ plantillas, preguntasDisponibles = [], filtros =
                                 >
                                     {plantilla.descripcion_plan || 'Instrumento académico institucional.'}
                                 </p>
+
+                                <div className="flex min-h-7 flex-wrap gap-1.5">
+                                    {composition.map(([name, count]) => (
+                                        <Badge key={name} variant="outline" className="text-[10px]">
+                                            {name} · {count}
+                                        </Badge>
+                                    ))}
+                                </div>
                                 
                                 <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-50 dark:bg-slate-950 p-3 text-center">
                                     <div>
@@ -227,6 +250,7 @@ export default function Index({ plantillas, preguntasDisponibles = [], filtros =
             >
                 {detailModal.plantilla && (() => {
                     const total = calculateTotalScore(detailModal.plantilla);
+                    const composition = compositionBySubject(detailModal.plantilla);
                     return (
                         <div className="space-y-5">
                             <Card className="gap-0 overflow-hidden border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/50 dark:ring-slate-800">
@@ -240,6 +264,13 @@ export default function Index({ plantillas, preguntasDisponibles = [], filtros =
                                             </div>
                                             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">{detailModal.plantilla.nombre_plan}</h3>
                                             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{detailModal.plantilla.descripcion_plan || 'Sin descripción detallada.'}</p>
+                                            <div className="mt-4 flex flex-wrap gap-2">
+                                                {composition.map(([name, count]) => (
+                                                    <Badge key={name} variant="outline">
+                                                        {name}: {count} preguntas
+                                                    </Badge>
+                                                ))}
+                                            </div>
                                             
                                             {detailModal.plantilla.objetivo_plan && (
                                                 <div className="mt-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 p-4">
@@ -290,7 +321,7 @@ export default function Index({ plantillas, preguntasDisponibles = [], filtros =
                                             <div>
                                                 <p className="font-medium leading-6 text-slate-900 dark:text-slate-100">{pregunta.enunciado_preg}</p>
                                                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                                    {pregunta.tema?.area?.nombre_area || 'Área general'} · {pregunta.tema?.nombre_tem || 'Sin tema'}
+                                                    {pregunta.tema?.area?.materia?.nombre_mat || 'Materia general'} · {pregunta.tema?.area?.nombre_area || 'Área general'} · {pregunta.tema?.nombre_tem || 'Sin tema'}
                                                 </p>
                                             </div>
                                             <div className="text-right">

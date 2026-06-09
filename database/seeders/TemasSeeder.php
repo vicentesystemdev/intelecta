@@ -35,6 +35,16 @@ class TemasSeeder extends Seeder
                 'Problemas contextualizados', 'Interpretación de enunciados',
                 'Modelado con ecuaciones', 'Comparación de magnitudes',
             ],
+            'Física Preuniversitaria' => [
+                'Metrología e introducción', 'Vectores', 'Movimiento en una dimensión',
+                'Movimiento en dos dimensiones', 'Dinámica de la partícula', 'Estática',
+                'Trabajo, energía y potencia', 'Electricidad básica',
+            ],
+            'Química Preuniversitaria' => [
+                'Conceptos fundamentales', 'Estructura atómica', 'Tabla periódica',
+                'Nomenclatura inorgánica', 'Gases ideales', 'Reacciones químicas',
+                'Estequiometría básica',
+            ],
         ];
 
         foreach ($temas as $nombreArea => $nombres) {

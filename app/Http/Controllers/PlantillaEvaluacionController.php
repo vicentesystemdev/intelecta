@@ -25,17 +25,19 @@ class PlantillaEvaluacionController extends Controller
     ): Response {
         $filters = $request->validate([
             'buscar' => ['nullable', 'string', 'max:160'],
+            'id_mat' => ['nullable', 'integer', 'exists:materias,id_mat'],
             'estado_plan' => ['nullable', 'in:activa,inactiva'],
         ]);
 
         $data = $action->execute($filters);
         if (isset($data['plantillas'])) {
-            $data['plantillas']->getCollection()->load(['preguntas.tema.area', 'preguntas.alternativas']);
+            $data['plantillas']->getCollection()->load(['preguntas.tema.area.materia', 'preguntas.alternativas']);
         }
 
         return Inertia::render('Evaluaciones/Plantillas/Index', [
             ...$data,
             'preguntasDisponibles' => $service->questions(),
+            'materias' => $service->subjects(),
             'filtros' => $filters,
             'permisos' => $this->permissions($request),
         ]);

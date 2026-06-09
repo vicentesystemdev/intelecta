@@ -22,6 +22,7 @@ const typeLabel = {
 export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
     const [filters, setFilters] = useState({
         buscar: filtros.buscar || '', 
+        id_mat: filtros.id_mat || '',
         id_area: filtros.id_area || '', 
         id_tem: filtros.id_tem || '',
         dificultad_preg: filtros.dificultad_preg || '', 
@@ -34,6 +35,11 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
     const [statusModal, setStatusModal] = useState({ open: false, pregunta: null });
     const [changingStatus, setChangingStatus] = useState(false);
 
+    const areas = useMemo(() =>
+        opciones.areas.filter((area) => !filters.id_mat || String(area.id_mat) === String(filters.id_mat)),
+        [filters.id_mat, opciones.areas]
+    );
+
     const temas = useMemo(() => 
         opciones.temas.filter((tema) => !filters.id_area || String(tema.id_area) === String(filters.id_area)), 
         [filters.id_area, opciones.temas]
@@ -45,7 +51,7 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
     };
 
     const reset = () => { 
-        setFilters({ buscar: '', id_area: '', id_tem: '', dificultad_preg: '', tipo_preg: '', estado_preg: '' }); 
+        setFilters({ buscar: '', id_mat: '', id_area: '', id_tem: '', dificultad_preg: '', tipo_preg: '', estado_preg: '' });
         router.get(route('preguntas.index')); 
     };
 
@@ -68,7 +74,7 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
     };
 
     return (
-        <AdminLayout title="Banco de Preguntas" subtitle="Repositorio académico para evaluaciones lógico-matemáticas preuniversitarias.">
+        <AdminLayout title="Banco de Preguntas" subtitle="Repositorio académico multiasignatura para la preparación preuniversitaria en Ingeniería.">
             <Head title="Banco de preguntas" />
             <div className="mb-5 flex items-center justify-between">
                 <p className="text-sm text-slate-500">{preguntas.total} preguntas registradas</p>
@@ -89,11 +95,15 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                             <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                             <Input className="pl-9 bg-white dark:bg-slate-950 dark:border-slate-800 text-slate-900 dark:text-slate-100 w-full h-10" value={filters.buscar} onChange={(e) => setFilters({ ...filters, buscar: e.target.value })} placeholder="Buscar por contenido del enunciado" />
                         </div>
+                        <select className="h-10 w-full rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm px-3" value={filters.id_mat} onChange={(e) => setFilters({ ...filters, id_mat: e.target.value, id_area: '', id_tem: '' })}>
+                            <option value="">Todas las materias</option>
+                            {opciones.materias.map((materia) => <option key={materia.id_mat} value={materia.id_mat}>{materia.codigo_mat} · {materia.nombre_mat}</option>)}
+                        </select>
                         <select className="h-10 w-full rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm px-3" value={filters.id_area} onChange={(e) => setFilters({ ...filters, id_area: e.target.value, id_tem: '' })}>
                             <option value="">Todas las áreas</option>
-                            {opciones.areas.map((area) => <option key={area.id_area} value={area.id_area}>{area.nombre_area}</option>)}
+                            {areas.map((area) => <option key={area.id_area} value={area.id_area}>{area.nombre_area}</option>)}
                         </select>
-                        <select className="h-10 w-full rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm px-3 xl:col-span-2" value={filters.id_tem} onChange={(e) => setFilters({ ...filters, id_tem: e.target.value })}>
+                        <select className="h-10 w-full rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm px-3" value={filters.id_tem} onChange={(e) => setFilters({ ...filters, id_tem: e.target.value })}>
                             <option value="">Todos los temas</option>
                             {temas.map((tema) => <option key={tema.id_tem} value={tema.id_tem}>{tema.nombre_tem}</option>)}
                         </select>
@@ -126,6 +136,7 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                         <TableHeader>
                             <TableRow className="bg-slate-50/80 dark:bg-slate-900/80">
                                 <TableHead className="pl-5">Enunciado</TableHead>
+                                <TableHead>Materia</TableHead>
                                 <TableHead>Área / Tema</TableHead>
                                 <TableHead>Tipo</TableHead>
                                 <TableHead>Dificultad</TableHead>
@@ -154,6 +165,14 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                                                 Código P-{String(pregunta.id_preg).padStart(4, '0')}
                                             </p>
                                         </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 dark:bg-indigo-950 dark:text-indigo-200">
+                                            {pregunta.tema?.area?.materia?.codigo_mat || 'General'}
+                                        </Badge>
+                                        <p className="mt-1 text-xs text-slate-500">
+                                            {pregunta.tema?.area?.materia?.nombre_mat || 'Sin materia'}
+                                        </p>
                                     </TableCell>
                                     <TableCell>
                                         <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{pregunta.tema?.area?.nombre_area || 'Área general'}</p>
@@ -239,6 +258,9 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                         <Card className="gap-0 border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/50 dark:ring-slate-800">
                             <CardHeader className="border-b p-5 dark:border-slate-800">
                                 <div className="flex flex-wrap items-center gap-2">
+                                    <Badge className="bg-indigo-700">
+                                        {detailModal.pregunta.tema?.area?.materia?.nombre_mat || 'Materia general'}
+                                    </Badge>
                                     <Badge>{detailModal.pregunta.tema?.area?.nombre_area || 'Área general'}</Badge>
                                     <Badge variant="outline">{detailModal.pregunta.tema?.nombre_tem || 'Sin tema'}</Badge>
                                     <Badge variant="outline" className="capitalize">{detailModal.pregunta.dificultad_preg}</Badge>
@@ -250,6 +272,35 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                                 <p className="text-lg font-semibold leading-8 text-slate-900 dark:text-slate-100">
                                     {detailModal.pregunta.enunciado_preg}
                                 </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="gap-0 border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/50 dark:ring-slate-800">
+                            <CardContent className="grid gap-4 p-5 sm:grid-cols-2">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Habilidad evaluada</p>
+                                    <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-200">{detailModal.pregunta.habilidad_preg || 'Clasificación pendiente'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Referencia de exigencia</p>
+                                    <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-200">{detailModal.pregunta.exigencia_preg || 'Contenido común'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Subtema</p>
+                                    <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-200">{detailModal.pregunta.subtema_preg || 'No especificado'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Tiempo estimado</p>
+                                    <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-200">
+                                        {detailModal.pregunta.tiempo_estimado_seg_preg ? `${detailModal.pregunta.tiempo_estimado_seg_preg} segundos` : 'No especificado'}
+                                    </p>
+                                </div>
+                                {detailModal.pregunta.relacion_ingenieria_preg && (
+                                    <div className="sm:col-span-2">
+                                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Relación con Ingeniería</p>
+                                        <p className="mt-1 text-sm leading-6 text-slate-700 dark:text-slate-300">{detailModal.pregunta.relacion_ingenieria_preg}</p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
 

@@ -14,7 +14,12 @@ import {
     GraduationCap,
     HelpCircle,
     ChevronRight,
-    TrendingUp
+    TrendingUp,
+    Atom,
+    FlaskConical,
+    Calculator,
+    BrainCircuit,
+    Layers3
 } from 'lucide-react';
 
 const examQuestions = [
@@ -62,12 +67,46 @@ const examQuestions = [
     }
 ];
 
+const evaluationTypes = [
+    {
+        id: 'diagnostico',
+        name: 'Diagnóstico General',
+        description: 'Lectura inicial de Matemática, ciencias exactas y razonamiento académico.',
+        icon: BrainCircuit,
+    },
+    {
+        id: 'matematica',
+        name: 'Matemática',
+        description: 'Aritmética, álgebra, geometría, estadística y resolución cuantitativa.',
+        icon: Calculator,
+    },
+    {
+        id: 'fisica',
+        name: 'Física',
+        description: 'Magnitudes, movimiento, fuerzas, energía y electricidad básica.',
+        icon: Atom,
+    },
+    {
+        id: 'quimica',
+        name: 'Química',
+        description: 'Materia, estructura atómica, reacciones y estequiometría.',
+        icon: FlaskConical,
+    },
+    {
+        id: 'mixta',
+        name: 'Mixta Ingeniería',
+        description: 'Cobertura integrada de Matemática, Física y Química.',
+        icon: Layers3,
+    },
+];
+
 export default function StudentEvaluaciones() {
     // Etapas: 1 (Inicio), 2 (Resolución), 3 (Resultado preliminar)
     const [step, setStep] = useState(1);
     const [answers, setAnswers] = useState({});
     const [secondsLeft, setSecondsLeft] = useState(900); // 15 minutos
     const [isActive, setIsActive] = useState(false);
+    const [selectedEvaluation, setSelectedEvaluation] = useState(evaluationTypes[0]);
     
     // Temporizador
     useEffect(() => {
@@ -159,11 +198,47 @@ export default function StudentEvaluaciones() {
                                     Evaluación Activa
                                 </span>
                                 <h1 className="text-2xl sm:text-3xl font-black">
-                                    Evaluación Diagnóstica Lógico-Matemática
+                                    {selectedEvaluation.name}
                                 </h1>
                                 <p className="text-sm text-indigo-100 max-w-2xl leading-relaxed">
-                                    Esta evaluación estructurada está diseñada para medir el nivel lógico-matemático actual. Responderás reactivos específicos y recibirás un informe con sugerencias de nivelación.
+                                    {selectedEvaluation.description} Selecciona el instrumento académico y realiza el recorrido guiado para obtener recomendaciones de nivelación.
                                 </p>
+                            </div>
+                        </section>
+
+                        <section>
+                            <div className="mb-3">
+                                <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Evaluaciones disponibles</h2>
+                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Elige el enfoque académico que deseas revisar.</p>
+                            </div>
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                                {evaluationTypes.map((evaluation) => {
+                                    const Icon = evaluation.icon;
+                                    const selected = selectedEvaluation.id === evaluation.id;
+
+                                    return (
+                                        <button
+                                            key={evaluation.id}
+                                            type="button"
+                                            onClick={() => setSelectedEvaluation(evaluation)}
+                                            className={`rounded-2xl border p-4 text-left transition ${
+                                                selected
+                                                    ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-500/15 dark:bg-indigo-950/40'
+                                                    : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800'
+                                            }`}
+                                        >
+                                            <span className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${
+                                                selected
+                                                    ? 'bg-indigo-600 text-white'
+                                                    : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                                            }`}>
+                                                <Icon className="h-5 w-5" />
+                                            </span>
+                                            <span className="block text-sm font-bold text-slate-900 dark:text-slate-100">{evaluation.name}</span>
+                                            <span className="mt-1 block text-[11px] leading-4 text-slate-500 dark:text-slate-400">{evaluation.description}</span>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </section>
 
@@ -199,8 +274,8 @@ export default function StudentEvaluaciones() {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-base font-black text-slate-800">Aritmética, Álgebra, Lógica</p>
-                                    <p className="text-xs text-slate-500 mt-1">Competencias lógico-matemáticas</p>
+                                    <p className="text-base font-black text-slate-800">{selectedEvaluation.name}</p>
+                                    <p className="text-xs text-slate-500 mt-1">Recorrido académico preliminar</p>
                                 </CardContent>
                             </Card>
                         </div>
@@ -233,7 +308,7 @@ export default function StudentEvaluaciones() {
                                     E2
                                 </span>
                                 <div>
-                                    <h2 className="text-sm font-bold text-slate-900">Evaluación Diagnóstica</h2>
+                                    <h2 className="text-sm font-bold text-slate-900">{selectedEvaluation.name}</h2>
                                     <p className="text-xs text-slate-400">Responde de manera guiada cada reactivo.</p>
                                 </div>
                             </div>

@@ -16,24 +16,30 @@ class PreguntasSeeder extends Seeder
                 ['enunciado_preg' => $item['enunciado']],
                 [
                     'id_tem'          => $tema->id_tem,
+                    'subtema_preg'    => $item['tema'],
                     'tipo_preg'       => 'opcion_multiple',
                     'dificultad_preg' => $item['dificultad'],
+                    'exigencia_preg'  => 'Contenido Común',
+                    'habilidad_preg'  => 'Cálculo Operativo',
+                    'tiempo_estimado_seg_preg' => 120,
+                    'relacion_ingenieria_preg' => 'Fortalece la base cuantitativa requerida para resolver problemas de Ingeniería.',
                     'puntaje_preg'    => 1,
                     'explicacion_preg'=> $item['explicacion'],
                     'estado_preg'     => 'activo',
                 ],
             );
 
-            $pregunta->alternativas()->delete();
-
             foreach ($item['alternativas'] as $index => $texto) {
-                $pregunta->alternativas()->create([
-                    'texto_alt'     => $texto,
-                    'letra_alt'     => chr(65 + $index),
-                    'es_correcta_alt' => $index === $item['correcta'],
-                    'orden_alt'     => $index + 1,
-                    'estado_alt'    => 'activo',
-                ]);
+                $letra = chr(65 + $index);
+                $pregunta->alternativas()->updateOrCreate(
+                    ['letra_alt' => $letra],
+                    [
+                        'texto_alt' => $texto,
+                        'es_correcta_alt' => $index === $item['correcta'],
+                        'orden_alt' => $index + 1,
+                        'estado_alt' => 'activo',
+                    ],
+                );
             }
         }
     }

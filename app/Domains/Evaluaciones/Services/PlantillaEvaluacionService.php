@@ -42,4 +42,9 @@ class PlantillaEvaluacionService
     {
         return $this->repository->questions();
     }
+
+    public function subjects()
+    {
+        return $this->repository->subjects();
+    }
 }

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
 use App\Domains\Evaluaciones\Models\Pregunta;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class PlantillasEvaluacionSeeder extends Seeder
 {
@@ -110,5 +111,121 @@ class PlantillasEvaluacionSeeder extends Seeder
             }
             $plantilla->preguntas()->sync($sync);
         }
+
+        $this->crearPlantillasCurriculares();
+    }
+
+    private function crearPlantillasCurriculares(): void
+    {
+        $matematica = $this->preguntasPorMateria('MAT');
+        $razonamiento = $this->preguntasPorMateria('PAA');
+        $fisica = $this->preguntasPorMateria('FIS');
+        $quimica = $this->preguntasPorMateria('QMC');
+
+        $plantillas = [
+            [
+                'nombre_plan' => 'INTELECTA-DIA-01: Diagnóstico General de Aptitud para Ingeniería',
+                'descripcion_plan' => 'Lectura inicial de competencias cuantitativas y científicas para orientar la preparación preuniversitaria.',
+                'objetivo_plan' => 'Identificar vacíos iniciales en Matemática, Razonamiento Académico, Física y Química.',
+                'duracion_minutos_plan' => 60,
+                'dificultad_plan' => 'basica-media',
+                'preguntas' => collect()
+                    ->concat($matematica->take(5))
+                    ->concat($razonamiento->take(4))
+                    ->concat($fisica->take(3))
+                    ->concat($quimica->take(3)),
+            ],
+            [
+                'nombre_plan' => 'INTELECTA-MAT-PREU: Evaluación de Matemática Preuniversitaria',
+                'descripcion_plan' => 'Evaluación curricular de cálculo operativo, modelado y fundamentos matemáticos.',
+                'objetivo_plan' => 'Valorar el dominio matemático necesario para iniciar la preparación de ingreso a Ingeniería.',
+                'duracion_minutos_plan' => 90,
+                'dificultad_plan' => 'media-alta',
+                'preguntas' => $matematica->take(10),
+            ],
+            [
+                'nombre_plan' => 'INTELECTA-FIS-PREU: Evaluación de Física Preuniversitaria',
+                'descripcion_plan' => 'Evaluación de magnitudes, movimiento, fuerzas, energía y electricidad básica.',
+                'objetivo_plan' => 'Valorar la comprensión y aplicación de modelos físicos preuniversitarios.',
+                'duracion_minutos_plan' => 90,
+                'dificultad_plan' => 'media-alta',
+                'preguntas' => $fisica->take(10),
+            ],
+            [
+                'nombre_plan' => 'INTELECTA-QMC-PREU: Evaluación de Química Preuniversitaria',
+                'descripcion_plan' => 'Evaluación de materia, estructura atómica, reacciones y cálculo químico.',
+                'objetivo_plan' => 'Valorar fundamentos químicos y capacidad de resolución estequiométrica.',
+                'duracion_minutos_plan' => 90,
+                'dificultad_plan' => 'media-alta',
+                'preguntas' => $quimica->take(10),
+            ],
+            [
+                'nombre_plan' => 'INTELECTA-MIX-STEM: Evaluación Mixta de Ciencias Exactas',
+                'descripcion_plan' => 'Instrumento integrado para revisar la cobertura académica de Matemática, Física y Química.',
+                'objetivo_plan' => 'Observar el desempeño transversal en las materias centrales para carreras de Ingeniería.',
+                'duracion_minutos_plan' => 100,
+                'dificultad_plan' => 'media-alta',
+                'preguntas' => collect()
+                    ->concat($matematica->skip(5)->take(5))
+                    ->concat($fisica->skip(5)->take(5))
+                    ->concat($quimica->skip(5)->take(5)),
+            ],
+            [
+                'nombre_plan' => 'INTELECTA-SIM-OFICIAL: Simulacro Integral de Preparación Preuniversitaria',
+                'descripcion_plan' => 'Instrumento integral de cierre para revisar preparación cuantitativa, científica y de razonamiento.',
+                'objetivo_plan' => 'Consolidar una lectura académica integral y orientar el seguimiento previo a procesos de admisión.',
+                'duracion_minutos_plan' => 120,
+                'dificultad_plan' => 'avanzada',
+                'preguntas' => collect()
+                    ->concat($matematica->skip(10)->take(5))
+                    ->concat($fisica->skip(10)->take(5))
+                    ->concat($quimica->skip(10)->take(5))
+                    ->concat($razonamiento->skip(4)->take(5)),
+            ],
+        ];
+
+        foreach ($plantillas as $item) {
+            $preguntas = $item['preguntas']->values();
+            unset($item['preguntas']);
+
+            $plantilla = PlantillaEvaluacion::updateOrCreate(
+                ['nombre_plan' => $item['nombre_plan']],
+                [...$item, 'estado_plan' => 'activa'],
+            );
+
+            $plantilla->preguntas()->sync($this->ponderar($preguntas));
+        }
+    }
+
+    private function preguntasPorMateria(string $codigo): Collection
+    {
+        return Pregunta::query()
+            ->whereHas('tema.area.materia', fn ($query) => $query->where('codigo_mat', $codigo))
+            ->orderBy('dificultad_preg')
+            ->orderBy('id_preg')
+            ->pluck('id_preg');
+    }
+
+    private function ponderar(Collection $preguntas): array
+    {
+        if ($preguntas->isEmpty()) {
+            return [];
+        }
+
+        $puntajeBase = floor(10000 / $preguntas->count()) / 100;
+        $sync = [];
+
+        foreach ($preguntas as $index => $idPregunta) {
+            $puntaje = $index === $preguntas->count() - 1
+                ? round(100 - ($puntajeBase * ($preguntas->count() - 1)), 2)
+                : $puntajeBase;
+
+            $sync[$idPregunta] = [
+                'orden_pp' => $index + 1,
+                'puntaje_pp' => $puntaje,
+            ];
+        }
+
+        return $sync;
     }
 }

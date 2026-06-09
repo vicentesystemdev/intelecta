@@ -143,6 +143,22 @@ Los modelos futuros no deben escribir directamente sobre datos académicos opera
 Sus resultados deben tratarse como indicadores o recomendaciones, conservar su versión
 y permitir revisión institucional.
 
+## Evaluaciones multiasignatura
+
+INTELECTA organiza el banco académico mediante la jerarquía
+`Materia → Área de conocimiento → Tema → Pregunta`. La fase actual incorpora
+Matemática, Física, Química y Razonamiento Académico como base para evaluaciones
+diagnósticas y plantillas de preparación preuniversitaria orientadas a Ingeniería.
+
+Las preguntas pueden registrar subtema, referencia de exigencia, habilidad evaluada,
+tiempo estimado y relación con la preparación para Ingeniería. Estas variables permiten
+ampliar posteriormente el seguimiento por materia, tema, dificultad, tiempo y resultado
+sin afirmar predicciones en la fase actual.
+
+La capa avanzada de Learning Analytics queda preparada para una siguiente fase, cuando
+existan aplicaciones de evaluaciones y resultados históricos suficientes para construir
+indicadores académicos validados.
+
 ## Reglas para nuevos módulos
 
 1. Definir primero el dominio y el caso de uso en lenguaje institucional.

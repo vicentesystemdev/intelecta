@@ -41,11 +41,19 @@ export default function PreguntaForm({
     }));
     const initialType = pregunta?.tipo_preg || 'opcion_multiple';
     const { data, setData, post, put, processing, errors } = useForm({
+        id_mat: pregunta?.tema?.area?.id_mat || '',
         id_area: pregunta?.tema?.id_area || '',
         id_tem: pregunta?.id_tem || '',
+        subtema_preg: pregunta?.subtema_preg || '',
         enunciado_preg: pregunta?.enunciado_preg || '',
         tipo_preg: initialType,
         dificultad_preg: pregunta?.dificultad_preg || 'media',
+        exigencia_preg: pregunta?.exigencia_preg || 'Contenido Común',
+        habilidad_preg: pregunta?.habilidad_preg || 'Conceptual',
+        tiempo_estimado_seg_preg:
+            pregunta?.tiempo_estimado_seg_preg || 120,
+        relacion_ingenieria_preg:
+            pregunta?.relacion_ingenieria_preg || '',
         puntaje_preg: pregunta?.puntaje_preg || 1,
         explicacion_preg: pregunta?.explicacion_preg || '',
         estado_preg: pregunta?.estado_preg || 'activo',
@@ -53,6 +61,16 @@ export default function PreguntaForm({
             existing ||
             makeAlternatives(initialType === 'verdadero_falso' ? 2 : 5),
     });
+
+    const areas = useMemo(
+        () =>
+            opciones.areas.filter(
+                (area) =>
+                    !data.id_mat ||
+                    String(area.id_mat) === String(data.id_mat),
+            ),
+        [data.id_mat, opciones.areas],
+    );
 
     const temas = useMemo(
         () =>
@@ -96,6 +114,32 @@ export default function PreguntaForm({
                 </CardHeader>
                 <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
                     <div>
+                        <Label htmlFor="id_mat">Materia</Label>
+                        <select
+                            id="id_mat"
+                            className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
+                            value={data.id_mat}
+                            onChange={(event) =>
+                                setData({
+                                    ...data,
+                                    id_mat: event.target.value,
+                                    id_area: '',
+                                    id_tem: '',
+                                })
+                            }
+                        >
+                            <option value="">Seleccione una materia</option>
+                            {opciones.materias.map((materia) => (
+                                <option
+                                    key={materia.id_mat}
+                                    value={materia.id_mat}
+                                >
+                                    {materia.codigo_mat} · {materia.nombre_mat}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
                         <Label htmlFor="id_area">Área de conocimiento</Label>
                         <select
                             id="id_area"
@@ -109,8 +153,8 @@ export default function PreguntaForm({
                                 })
                             }
                         >
-                            <option value="">Todas las áreas</option>
-                            {opciones.areas.map((area) => (
+                            <option value="">Seleccione un área</option>
+                            {areas.map((area) => (
                                 <option key={area.id_area} value={area.id_area}>
                                     {area.nombre_area}
                                 </option>
@@ -135,6 +179,17 @@ export default function PreguntaForm({
                             ))}
                         </select>
                         <InputError className="mt-1" message={errors.id_tem} />
+                    </div>
+                    <div>
+                        <Label htmlFor="subtema_preg">Subtema</Label>
+                        <Input
+                            id="subtema_preg"
+                            className="mt-1.5"
+                            value={data.subtema_preg}
+                            onChange={(event) =>
+                                setData('subtema_preg', event.target.value)
+                            }
+                        />
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="enunciado_preg">Enunciado *</Label>
@@ -207,6 +262,77 @@ export default function PreguntaForm({
                         />
                     </div>
                     <div>
+                        <Label htmlFor="exigencia_preg">
+                            Referencia de exigencia
+                        </Label>
+                        <select
+                            id="exigencia_preg"
+                            className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
+                            value={data.exigencia_preg}
+                            onChange={(event) =>
+                                setData('exigencia_preg', event.target.value)
+                            }
+                        >
+                            {[
+                                'Contenido Común',
+                                'UMSA Prefacultativo',
+                                'UMSA PSA',
+                                'EMI PSA',
+                                'UPEA Suficiencia',
+                                'UCB PAA',
+                                'UPB PAA',
+                            ].map((value) => (
+                                <option key={value} value={value}>
+                                    {value}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <Label htmlFor="habilidad_preg">
+                            Habilidad evaluada
+                        </Label>
+                        <select
+                            id="habilidad_preg"
+                            className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
+                            value={data.habilidad_preg}
+                            onChange={(event) =>
+                                setData('habilidad_preg', event.target.value)
+                            }
+                        >
+                            {[
+                                'Procedimental',
+                                'Modelado Fenomenológico',
+                                'Aptitud Psicométrica',
+                                'Conceptual',
+                                'Cálculo Operativo',
+                            ].map((value) => (
+                                <option key={value} value={value}>
+                                    {value}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <Label htmlFor="tiempo_estimado_seg_preg">
+                            Tiempo estimado (segundos)
+                        </Label>
+                        <Input
+                            id="tiempo_estimado_seg_preg"
+                            type="number"
+                            min="15"
+                            max="7200"
+                            className="mt-1.5"
+                            value={data.tiempo_estimado_seg_preg}
+                            onChange={(event) =>
+                                setData(
+                                    'tiempo_estimado_seg_preg',
+                                    event.target.value,
+                                )
+                            }
+                        />
+                    </div>
+                    <div>
                         <Label htmlFor="estado_preg">Estado</Label>
                         <select
                             id="estado_preg"
@@ -230,6 +356,22 @@ export default function PreguntaForm({
                             value={data.explicacion_preg}
                             onChange={(event) =>
                                 setData('explicacion_preg', event.target.value)
+                            }
+                        />
+                    </div>
+                    <div className="sm:col-span-2">
+                        <Label htmlFor="relacion_ingenieria_preg">
+                            Relación con la preparación para Ingeniería
+                        </Label>
+                        <Textarea
+                            id="relacion_ingenieria_preg"
+                            className="mt-1.5 min-h-20"
+                            value={data.relacion_ingenieria_preg}
+                            onChange={(event) =>
+                                setData(
+                                    'relacion_ingenieria_preg',
+                                    event.target.value,
+                                )
                             }
                         />
                     </div>

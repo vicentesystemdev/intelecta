@@ -52,20 +52,48 @@ export default function PlantillaEvaluacionForm({
         preguntas: selected,
     });
     const [search, setSearch] = useState('');
+    const [subject, setSubject] = useState('');
+    const subjects = useMemo(() => {
+        const values = new Map();
+        preguntasDisponibles.forEach((pregunta) => {
+            const materia = pregunta.tema?.area?.materia;
+            if (materia) values.set(materia.id_mat, materia);
+        });
+        return [...values.values()].sort((a, b) =>
+            a.nombre_mat.localeCompare(b.nombre_mat),
+        );
+    }, [preguntasDisponibles]);
     const filtered = useMemo(
         () =>
-            preguntasDisponibles.filter((pregunta) =>
-                `${pregunta.enunciado_preg} ${pregunta.tema?.nombre_tem || ''} ${pregunta.tema?.area?.nombre_area || ''}`
-                    .toLowerCase()
-                    .includes(search.toLowerCase()),
-            ),
-        [preguntasDisponibles, search],
+            preguntasDisponibles.filter((pregunta) => {
+                const materia = pregunta.tema?.area?.materia;
+                const matchesSubject =
+                    !subject || String(materia?.id_mat) === String(subject);
+                const matchesSearch =
+                    `${pregunta.enunciado_preg} ${pregunta.tema?.nombre_tem || ''} ${pregunta.tema?.area?.nombre_area || ''} ${materia?.nombre_mat || ''}`
+                        .toLowerCase()
+                        .includes(search.toLowerCase());
+                return matchesSubject && matchesSearch;
+            }),
+        [preguntasDisponibles, search, subject],
     );
     const total = data.preguntas.reduce(
         (sum, item) => sum + Number(item.puntaje_pp || 0),
         0,
     );
     const selectedIds = new Set(data.preguntas.map((item) => item.id_preg));
+    const composition = useMemo(() => {
+        const counts = new Map();
+        data.preguntas.forEach((item) => {
+            const pregunta = preguntasDisponibles.find(
+                (candidate) => candidate.id_preg === item.id_preg,
+            );
+            const name =
+                pregunta?.tema?.area?.materia?.nombre_mat || 'Sin materia';
+            counts.set(name, (counts.get(name) || 0) + 1);
+        });
+        return [...counts.entries()];
+    }, [data.preguntas, preguntasDisponibles]);
 
     const toggle = (id) => {
         const next = selectedIds.has(id)
@@ -205,6 +233,15 @@ export default function PlantillaEvaluacionForm({
                                 La ponderación se distribuye automáticamente y
                                 puede ajustarse.
                             </p>
+                            {composition.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                    {composition.map(([name, count]) => (
+                                        <Badge key={name} variant="outline">
+                                            {name}: {count}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                         <div className="min-w-64">
                             <div className="mb-2 flex justify-between text-sm font-semibold">
@@ -224,14 +261,33 @@ export default function PlantillaEvaluacionForm({
                     </div>
                 </CardHeader>
                 <CardContent className="p-5">
-                    <div className="relative mb-4">
-                        <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                        <Input
-                            className="pl-9"
-                            value={search}
-                            onChange={(event) => setSearch(event.target.value)}
-                            placeholder="Buscar por enunciado, tema o área"
-                        />
+                    <div className="mb-4 grid gap-3 md:grid-cols-[220px_1fr]">
+                        <select
+                            className="h-10 rounded-lg border-slate-200 text-sm"
+                            value={subject}
+                            onChange={(event) => setSubject(event.target.value)}
+                        >
+                            <option value="">Todas las materias</option>
+                            {subjects.map((materia) => (
+                                <option
+                                    key={materia.id_mat}
+                                    value={materia.id_mat}
+                                >
+                                    {materia.codigo_mat} · {materia.nombre_mat}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="relative">
+                            <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                            <Input
+                                className="pl-9"
+                                value={search}
+                                onChange={(event) =>
+                                    setSearch(event.target.value)
+                                }
+                                placeholder="Buscar por enunciado, materia, tema o área"
+                            />
+                        </div>
                     </div>
                     <div className="max-h-[34rem] space-y-2 overflow-y-auto pr-1">
                         {filtered.map((pregunta) => {
@@ -258,6 +314,10 @@ export default function PlantillaEvaluacionForm({
                                             {pregunta.enunciado_preg}
                                         </p>
                                         <div className="mt-2 flex flex-wrap gap-1.5">
+                                            <Badge className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50">
+                                                {pregunta.tema?.area?.materia
+                                                    ?.codigo_mat || 'General'}
+                                            </Badge>
                                             <Badge variant="outline">
                                                 {pregunta.tema?.area
                                                     ?.nombre_area ||

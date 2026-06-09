@@ -22,6 +22,7 @@ class PreguntaController extends Controller
     {
         $filters = $request->validate([
             'buscar' => ['nullable', 'string', 'max:160'],
+            'id_mat' => ['nullable', 'integer', 'exists:materias,id_mat'],
             'id_area' => ['nullable', 'integer', 'exists:areas_conocimiento,id_area'],
             'id_tem' => ['nullable', 'integer', 'exists:temas,id_tem'],
             'dificultad_preg' => ['nullable', 'in:basica,media,avanzada'],

@@ -4,6 +4,7 @@ namespace App\Domains\Evaluaciones\Repositories;
 
 use App\Domains\Evaluaciones\DTOs\PreguntaData;
 use App\Domains\Evaluaciones\Models\AreaConocimiento;
+use App\Domains\Evaluaciones\Models\Materia;
 use App\Domains\Evaluaciones\Models\Pregunta;
 use App\Domains\Evaluaciones\Models\Tema;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -14,10 +15,21 @@ class PreguntaRepository
     public function paginate(array $filters): LengthAwarePaginator
     {
         return Pregunta::query()
-            ->with(['tema:id_tem,id_area,nombre_tem', 'tema.area:id_area,nombre_area'])
+            ->with([
+                'tema:id_tem,id_area,nombre_tem',
+                'tema.area:id_area,id_mat,nombre_area',
+                'tema.area.materia:id_mat,codigo_mat,nombre_mat,color_mat',
+            ])
             ->when($filters['buscar'] ?? null, function (Builder $query, string $search) {
                 $query->whereRaw('LOWER(enunciado_preg) LIKE ?', ['%'.mb_strtolower($search).'%']);
             })
+            ->when(
+                $filters['id_mat'] ?? null,
+                fn (Builder $query, int|string $id) => $query->whereHas(
+                    'tema.area',
+                    fn (Builder $query) => $query->where('id_mat', $id)
+                )
+            )
             ->when(
                 $filters['id_area'] ?? null,
                 fn (Builder $query, int|string $id) => $query->whereHas(
@@ -42,7 +54,7 @@ class PreguntaRepository
         $pregunta = Pregunta::create($data->questionAttributes());
         $this->replaceAlternatives($pregunta, $data->alternativas);
 
-        return $pregunta->load(['tema.area', 'alternativas']);
+        return $pregunta->load(['tema.area.materia', 'alternativas']);
     }
 
     public function update(Pregunta $pregunta, PreguntaData $data): Pregunta
@@ -50,7 +62,7 @@ class PreguntaRepository
         $pregunta->update($data->questionAttributes());
         $this->replaceAlternatives($pregunta, $data->alternativas);
 
-        return $pregunta->refresh()->load(['tema.area', 'alternativas']);
+        return $pregunta->refresh()->load(['tema.area.materia', 'alternativas']);
     }
 
     public function changeStatus(Pregunta $pregunta, string $estado): Pregunta
@@ -62,13 +74,21 @@ class PreguntaRepository
 
     public function find(int $id): Pregunta
     {
-        return Pregunta::with(['tema.area', 'alternativas', 'plantillas'])->findOrFail($id);
+        return Pregunta::with(['tema.area.materia', 'alternativas', 'plantillas'])->findOrFail($id);
     }
 
     public function options(): array
     {
         return [
-            'areas' => AreaConocimiento::query()->where('estado_area', 'activo')->orderBy('nombre_area')->get(['id_area', 'nombre_area']),
+            'materias' => Materia::query()
+                ->where('estado_mat', 'activo')
+                ->orderBy('nombre_mat')
+                ->get(['id_mat', 'codigo_mat', 'nombre_mat', 'color_mat']),
+            'areas' => AreaConocimiento::query()
+                ->with('materia:id_mat,codigo_mat,nombre_mat')
+                ->where('estado_area', 'activo')
+                ->orderBy('nombre_area')
+                ->get(['id_area', 'id_mat', 'nombre_area']),
             'temas' => Tema::query()->with('area:id_area,nombre_area')->where('estado_tem', 'activo')->orderBy('nombre_tem')->get(['id_tem', 'id_area', 'nombre_tem']),
         ];
     }

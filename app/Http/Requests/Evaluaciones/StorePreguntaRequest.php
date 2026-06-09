@@ -16,9 +16,14 @@ class StorePreguntaRequest extends FormRequest
     {
         return [
             'id_tem' => ['nullable', 'integer', 'exists:temas,id_tem'],
+            'subtema_preg' => ['nullable', 'string', 'max:255'],
             'enunciado_preg' => ['required', 'string', 'max:5000'],
             'tipo_preg' => ['required', 'in:opcion_multiple,verdadero_falso,respuesta_corta'],
             'dificultad_preg' => ['nullable', 'in:basica,media,avanzada'],
+            'exigencia_preg' => ['nullable', 'string', 'max:255'],
+            'habilidad_preg' => ['nullable', 'string', 'max:255'],
+            'tiempo_estimado_seg_preg' => ['nullable', 'integer', 'min:15', 'max:7200'],
+            'relacion_ingenieria_preg' => ['nullable', 'string', 'max:2000'],
             'puntaje_preg' => ['required', 'numeric', 'min:0.01', 'max:100'],
             'explicacion_preg' => ['nullable', 'string', 'max:5000'],
             'estado_preg' => ['required', 'in:activo,inactivo'],
