@@ -40,12 +40,14 @@ export default function Index({
     postulantesList = []
 }) {
     // Estados para el Buscador y Filtros locales de Postulantes
+    const PAGE_SIZE = 15;
     const [searchQuery, setSearchQuery] = useState('');
     const [filterUni, setFilterUni] = useState('');
     const [filterCarrera, setFilterCarrera] = useState('');
     const [filterExigencia, setFilterExigencia] = useState('');
     const [filterEstado, setFilterEstado] = useState('');
     const [expandedPostulanteId, setExpandedPostulanteId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
     // Obtener valores únicos para poblar los selects de filtros
     const universidadesUnicas = Array.from(new Set(postulantesList.map(p => p.universidad).filter(Boolean)));
@@ -68,6 +70,17 @@ export default function Index({
 
         return matchesSearch && matchesUni && matchesCarrera && matchesExigencia && matchesEstado;
     });
+
+    // Paginación de postulantes
+    const totalPages = Math.max(1, Math.ceil(filteredPostulantes.length / PAGE_SIZE));
+    const pagedPostulantes = filteredPostulantes.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+    const isFiltered = searchQuery || filterUni || filterCarrera || filterExigencia || filterEstado;
+
+    const handleFilterChange = (setter) => (e) => {
+        setter(e.target.value);
+        setCurrentPage(1);
+        setExpandedPostulanteId(null);
+    };
 
     const toggleExpandPostulante = (id) => {
         setExpandedPostulanteId(prev => (prev === id ? null : id));
@@ -637,7 +650,7 @@ export default function Index({
                                 type="text"
                                 placeholder="Buscar postulante, colegio, universidad o carrera..."
                                 value={searchQuery}
-                                onChange={e => setSearchQuery(e.target.value)}
+                                onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); setExpandedPostulanteId(null); }}
                                 className="pl-10 h-10 w-full rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                             />
                         </div>
@@ -645,7 +658,7 @@ export default function Index({
                         {/* Filtro Universidad */}
                         <select
                             value={filterUni}
-                            onChange={e => setFilterUni(e.target.value)}
+                            onChange={handleFilterChange(setFilterUni)}
                             className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         >
                             <option value="">Universidad (Todas)</option>
@@ -657,7 +670,7 @@ export default function Index({
                         {/* Filtro Carrera */}
                         <select
                             value={filterCarrera}
-                            onChange={e => setFilterCarrera(e.target.value)}
+                            onChange={handleFilterChange(setFilterCarrera)}
                             className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         >
                             <option value="">Carrera (Todas)</option>
@@ -669,7 +682,7 @@ export default function Index({
                         {/* Filtro Exigencia */}
                         <select
                             value={filterExigencia}
-                            onChange={e => setFilterExigencia(e.target.value)}
+                            onChange={handleFilterChange(setFilterExigencia)}
                             className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         >
                             <option value="">Exigencia (Todas)</option>
@@ -682,6 +695,18 @@ export default function Index({
 
                     {/* Tabla de Postulantes */}
                     <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 overflow-hidden">
+                        {/* Barra de estado de filtros */}
+                        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/60">
+                            <p className="text-[11px] font-semibold text-slate-500">
+                                {isFiltered
+                                    ? <span className="text-indigo-700">Mostrando resultados filtrados — {filteredPostulantes.length} de {postulantesList.length} postulantes</span>
+                                    : <span>Total: <strong>{postulantesList.length}</strong> postulantes registrados</span>
+                                }
+                            </p>
+                            <p className="text-[11px] font-semibold text-slate-400">
+                                Página {currentPage} de {totalPages}
+                            </p>
+                        </div>
                         <CardContent className="p-0 overflow-x-auto">
                             {filteredPostulantes.length === 0 ? (
                                 <div className="text-center py-10 space-y-2">
@@ -703,7 +728,7 @@ export default function Index({
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {filteredPostulantes.map((post) => {
+                                        {pagedPostulantes.map((post) => {
                                             const isExpanded = expandedPostulanteId === post.id_post;
                                             
                                             // Badges de exigencia
@@ -802,6 +827,28 @@ export default function Index({
                                 </Table>
                             )}
                         </CardContent>
+                        {/* Controles de paginación */}
+                        {totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-2 px-5 py-4 border-t border-slate-100">
+                                <button
+                                    onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); setExpandedPostulanteId(null); }}
+                                    disabled={currentPage === 1}
+                                    className="px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                >
+                                    ← Anterior
+                                </button>
+                                <span className="text-xs font-bold text-slate-500 px-2">
+                                    {currentPage} / {totalPages}
+                                </span>
+                                <button
+                                    onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); setExpandedPostulanteId(null); }}
+                                    disabled={currentPage === totalPages}
+                                    className="px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                >
+                                    Siguiente →
+                                </button>
+                            </div>
+                        )}
                     </Card>
                 </section>
 
