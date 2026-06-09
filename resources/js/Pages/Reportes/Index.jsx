@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import MetricCard from '@/Components/MetricCard';
@@ -27,6 +27,22 @@ import {
     Calendar,
     Users
 } from 'lucide-react';
+import {
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    Tooltip,
+    Legend,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    AreaChart,
+    Area
+} from 'recharts';
+
 
 export default function Index({
     metricas,
@@ -48,6 +64,65 @@ export default function Index({
     const [filterEstado, setFilterEstado] = useState('');
     const [expandedPostulanteId, setExpandedPostulanteId] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+
+    // Detección dinámica de modo oscuro
+    const [isDark, setIsDark] = useState(() => 
+        typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+    );
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setIsDark(document.documentElement.classList.contains('dark'));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        return () => observer.disconnect();
+    }, []);
+
+    // Colores y temas de los gráficos
+    const gridColor = isDark ? '#334155' : '#e2e8f0'; // slate-700 / slate-200
+    const axisColor = isDark ? '#94a3b8' : '#64748b'; // slate-400 / slate-500
+    const CHART_COLORS = ['#6366f1', '#06b6d4', '#a855f7', '#3b82f6', '#f59e0b', '#10b981', '#f43f5e', '#64748b'];
+
+    // Tooltip personalizado
+    const CustomTooltip = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            const item = payload[0];
+            const value = Number(item.value) || 0;
+            const name = item.name || item.payload?.name || '';
+            const percentage = item.payload?.percent !== undefined 
+                ? Math.round(item.payload.percent * 100) 
+                : (item.payload?.porcentaje ?? undefined);
+
+            return (
+                <div className={`rounded-xl border p-3 shadow-lg text-xs font-semibold ${
+                    isDark 
+                        ? 'bg-slate-950 border-slate-800 text-slate-100' 
+                        : 'bg-white border-slate-200 text-slate-900'
+                }`}>
+                    <p className="font-black mb-1">{item.payload?.fullName || name}</p>
+                    <p className="flex justify-between items-center gap-4 text-indigo-600 dark:text-indigo-400">
+                        <span>Cantidad:</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-200">{value}</span>
+                    </p>
+                    {percentage !== undefined && (
+                        <p className="flex justify-between items-center gap-4 text-[10px] text-slate-400 dark:text-slate-500 font-bold mt-0.5">
+                            <span>Porcentaje:</span>
+                            <span>{percentage}%</span>
+                        </p>
+                    )}
+                </div>
+            );
+        }
+        return null;
+    };
+
+    // Estado vacío para los gráficos
+    const EmptyState = ({ message = "No hay datos disponibles para mostrar" }) => (
+        <div className="flex flex-col items-center justify-center h-72 w-full text-slate-400 dark:text-slate-500 bg-slate-50/30 dark:bg-slate-800/10 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 p-6">
+            <Activity className="h-8 w-8 mb-2 animate-pulse text-slate-300 dark:text-slate-700" />
+            <p className="text-xs font-semibold text-center">{message}</p>
+        </div>
+    );
+
 
     // Obtener valores únicos para poblar los selects de filtros
     const universidadesUnicas = Array.from(new Set(postulantesList.map(p => p.universidad).filter(Boolean)));
@@ -173,28 +248,125 @@ export default function Index({
         }
     };
 
+    // Mapeos de datos para Recharts
+    const dataUni = (postulantesPorUniversidad ?? []).map((uni, idx) => ({
+        name: uni.sigla_uni,
+        fullName: uni.sigla_uni,
+        value: Number(uni.total) || 0,
+        percent: (metricas?.totalPostulantes ?? 0) > 0 ? (uni.total / metricas.totalPostulantes) : 0
+    }));
+
+    const topCarreras = (postulantesPorCarrera ?? []).slice(0, 8).map((car, idx) => ({
+        name: car.nombre_car.length > 20 ? car.nombre_car.substring(0, 20) + '...' : car.nombre_car,
+        fullName: car.nombre_car,
+        total: Number(car.total) || 0,
+        isTop: idx === 0
+    }));
+
+    const topColegios = (postulantesPorColegio ?? []).slice(0, 8).map((col, idx) => ({
+        name: col.nombre_col.length > 20 ? col.nombre_col.substring(0, 20) + '...' : col.nombre_col,
+        fullName: col.nombre_col,
+        total: Number(col.total) || 0
+    }));
+
+    const dataAreas = (preguntasPorArea ?? []).map(area => ({
+        name: area.nombre_area.length > 15 ? area.nombre_area.substring(0, 15) + '...' : area.nombre_area,
+        fullName: area.nombre_area,
+        total: Number(area.total) || 0
+    }));
+
+    const DIFICULTAD_MAP = {
+        'basica': 'Básica',
+        'media': 'Media',
+        'avanzada': 'Avanzada'
+    };
+    const DIFICULTAD_COLORS = {
+        'basica': '#10b981', // emerald
+        'media': '#f59e0b', // amber
+        'avanzada': '#f43f5e' // rose
+    };
+    const dataDificultad = (preguntasPorDificultad ?? []).map(dif => {
+        const name = DIFICULTAD_MAP[dif.dificultad_preg.toLowerCase()] || dif.dificultad_preg;
+        return {
+            name,
+            fullName: `Reactivos de dificultad ${name}`,
+            value: Number(dif.total) || 0,
+            color: DIFICULTAD_COLORS[dif.dificultad_preg.toLowerCase()] || '#64748b',
+            percent: (metricas?.totalPreguntas ?? 0) > 0 ? (dif.total / metricas.totalPreguntas) : 0
+        };
+    });
+
+    const EXIGENCIA_LABELS = {
+        'alta': 'Alta',
+        'media-alta': 'Media-Alta',
+        'media': 'Media',
+        'baja-media': 'Baja-Media'
+    };
+    const EXIGENCIA_COLORS = {
+        'Alta': '#f43f5e',
+        'Media-Alta': '#f59e0b',
+        'Media': '#3b82f6',
+        'Baja-Media': '#10b981'
+    };
+    
+    // Normalizar y agrupar exigencias
+    const exigenciaMap = {};
+    (postulantesPorExigenciaMatematica ?? []).forEach(ex => {
+        if (!ex.nivel) return;
+        const key = ex.nivel.toLowerCase().replace('_', '-');
+        const label = EXIGENCIA_LABELS[key] || ex.nivel;
+        exigenciaMap[label] = (exigenciaMap[label] || 0) + (Number(ex.total) || 0);
+    });
+    
+    const orderedExigenciaKeys = ['Alta', 'Media-Alta', 'Media', 'Baja-Media'];
+    const dataExigencia = orderedExigenciaKeys.map(key => {
+        const val = exigenciaMap[key] || 0;
+        return {
+            name: key,
+            fullName: `Exigencia matemática ${key}`,
+            total: val,
+            porcentaje: (metricas?.totalPostulantes ?? 0) > 0 ? Math.round((val / metricas.totalPostulantes) * 100) : 0,
+            color: EXIGENCIA_COLORS[key] || '#94a3b8'
+        };
+    });
+
+    // Síntesis institucional conceptual
+    const dataSintesis = [
+        { name: 'Áreas', cantidad: Number(metricas?.totalAreas) || 0, fullName: 'Áreas de Conocimiento' },
+        { name: 'Plantillas', cantidad: Number(metricas?.totalPlantillas) || 0, fullName: 'Plantillas Académicas' },
+        { name: 'Colegios', cantidad: Number(metricas?.totalColegios) || 0, fullName: 'Colegios Registrados' },
+        { name: 'Carreras', cantidad: Number(metricas?.totalCarreras) || 0, fullName: 'Carreras de Interés' },
+        { name: 'Postulantes', cantidad: Number(metricas?.totalPostulantes) || 0, fullName: 'Postulantes Activos' },
+        { name: 'Reactivos', cantidad: Number(metricas?.totalPreguntas) || 0, fullName: 'Reactivos en el Banco' }
+    ];
+
     return (
+
         <AdminLayout
             title="Reportes Académicos"
             subtitle="Indicadores institucionales para el seguimiento del desempeño lógico-matemático preuniversitario."
+            wide
         >
             <Head title="Reportes Académicos - INTELECTA" />
 
-            <div className="space-y-8 max-w-7xl mx-auto">
+            <div className="space-y-8">
                 
                 {/* 1. Tarjeta de lectura rápida */}
-                <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6
+                    dark:border-slate-800 dark:bg-slate-900">
                     <div className="space-y-2">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-700/10">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-700/10
+                            dark:bg-indigo-950 dark:text-indigo-300 dark:ring-indigo-800">
                             <Sparkles className="h-3 w-3 animate-pulse" />
                             Lectura Rápida
                         </span>
-                        <p className="text-sm text-slate-650 max-w-4xl leading-relaxed">
+                        <p className="text-sm text-slate-600 max-w-4xl leading-relaxed dark:text-slate-400">
                             Este panel consolida información de postulantes, universidades, carreras, colegios, banco de preguntas y plantillas académicas para apoyar la toma de decisiones del instituto. Permite un análisis modular de competencias y procedencias estudiantiles.
                         </p>
                     </div>
                     <Link href="/dashboard" className="shrink-0 w-full md:w-auto">
-                        <button className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold h-10 px-4 transition">
+                        <button className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold h-10 px-4 transition
+                            dark:bg-slate-700 dark:hover:bg-slate-600">
                             Volver al Dashboard
                         </button>
                     </Link>
@@ -215,19 +387,20 @@ export default function Index({
                             if (metric.accent === 'amber') cardColor = 'text-amber-600 bg-amber-50/50 hover:ring-amber-300';
 
                             return (
-                                <Card key={metric.title} className={`border-0 bg-white shadow-sm ring-1 ring-slate-200/80 transition duration-300 ${cardColor}`}>
+                                <Card key={metric.title} className={`border-0 bg-white shadow-sm ring-1 ring-slate-200/80 transition duration-300 ${cardColor}
+                                    dark:bg-slate-900 dark:ring-slate-800`}>
                                     <CardHeader className="p-4 pb-2">
                                         <div className="flex items-center justify-between">
-                                            <CardDescription className="text-[10px] font-bold uppercase tracking-wider text-slate-500 truncate max-w-[120px]">
+                                            <CardDescription className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
                                                 {metric.title}
                                             </CardDescription>
-                                            <span className="p-1 rounded-lg bg-white shadow-sm">
+                                            <span className="p-1 rounded-lg bg-white shadow-sm dark:bg-slate-800">
                                                 <Icon className="h-4 w-4" />
                                             </span>
                                         </div>
                                     </CardHeader>
                                     <CardContent className="p-4 pt-0">
-                                        <p className="text-2xl font-black text-slate-900 leading-none">{metric.value}</p>
+                                        <p className="text-2xl font-black text-slate-900 dark:text-slate-100 leading-none">{metric.value}</p>
                                         <p className="text-[9px] text-slate-400 mt-1 font-semibold leading-none">{metric.detail}</p>
                                     </CardContent>
                                 </Card>
@@ -238,69 +411,69 @@ export default function Index({
 
                 {/* 3. Panel Estado general del instituto */}
                 <section className="grid gap-6 md:grid-cols-3">
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
                         <CardHeader className="pb-3 border-b border-slate-50">
-                            <CardTitle className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <GraduationCap className="h-5 w-5 text-indigo-600" />
                                 Demanda Académica
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="pt-4 space-y-4 text-xs font-medium text-slate-600">
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <CardContent className="pt-4 space-y-4 text-xs font-medium text-slate-600 dark:text-slate-400">
+                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Universidad principal</span>
-                                <span className="font-black text-slate-800">{uniLider}</span>
+                                <span className="font-black text-slate-800 dark:text-slate-200">{uniLider}</span>
                             </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Carrera principal</span>
                                 <span className="font-black text-slate-800 truncate max-w-[150px]">{carreraLider}</span>
                             </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Total postulantes</span>
                                 <span className="font-black text-indigo-600">{metricas?.totalPostulantes ?? 0}</span>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
                         <CardHeader className="pb-3 border-b border-slate-50">
-                            <CardTitle className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <BookCopy className="h-5 w-5 text-indigo-600" />
                                 Cobertura Evaluativa
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="pt-4 space-y-4 text-xs font-medium text-slate-600">
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <CardContent className="pt-4 space-y-4 text-xs font-medium text-slate-600 dark:text-slate-400">
+                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Áreas evaluadas</span>
-                                <span className="font-black text-slate-800">{metricas?.totalAreas ?? 0}</span>
+                                <span className="font-black text-slate-800 dark:text-slate-200">{metricas?.totalAreas ?? 0}</span>
                             </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Preguntas totales</span>
-                                <span className="font-black text-slate-800">{metricas?.totalPreguntas ?? 0}</span>
+                                <span className="font-black text-slate-800 dark:text-slate-200">{metricas?.totalPreguntas ?? 0}</span>
                             </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Plantillas activas</span>
                                 <span className="font-black text-indigo-600">{metricas?.totalPlantillas ?? 0}</span>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
                         <CardHeader className="pb-3 border-b border-slate-50">
-                            <CardTitle className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <Activity className="h-5 w-5 text-indigo-600" />
                                 Preparación para Learning Analytics
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="pt-4 space-y-4 text-xs font-medium text-slate-600">
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <CardContent className="pt-4 space-y-4 text-xs font-medium text-slate-600 dark:text-slate-400">
+                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Registros consolidados</span>
                                 <span className="font-black text-emerald-600">Listo</span>
                             </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Perfiles exigencia</span>
-                                <span className="font-black text-slate-800">4 niveles</span>
+                                <span className="font-black text-slate-800 dark:text-slate-200">4 niveles</span>
                             </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Base analítica</span>
                                 <span className="font-black text-indigo-650">Completada</span>
                             </div>
@@ -308,314 +481,373 @@ export default function Index({
                     </Card>
                 </section>
 
+
                 {/* 4. Gráficos Visuales */}
                 <section className="grid gap-6 md:grid-cols-2">
                     
-                    {/* A. Concentric SVG Ring Chart - Postulantes por universidad */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
+                    {/* A. Postulantes por universidad (PieChart tipo Donut) */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
                         <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <Building2 className="h-4.5 w-4.5 text-indigo-600" />
+                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                <Building2 className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Postulantes por universidad
                             </CardTitle>
-                            <CardDescription className="text-xs text-slate-500">
+                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
                                 Segmentación y porcentaje de postulantes agrupados por universidad meta.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="flex flex-col sm:flex-row items-center justify-around gap-6 pt-2">
-                            {/* SVG Donut Visual */}
-                            <div className="relative flex items-center justify-center h-32 w-32 shrink-0">
-                                <svg className="h-32 w-32 transform -rotate-90">
-                                    <circle cx="64" cy="64" r="50" stroke="#f1f5f9" strokeWidth="6" fill="transparent" />
-                                    {postulantesPorUniversidad.map((uni, idx) => {
-                                        const percent = metricas.totalPostulantes > 0 ? uni.total / metricas.totalPostulantes : 0;
-                                        const radius = 50 - (idx * 10);
-                                        const circumference = 2 * Math.PI * radius;
-                                        const strokeDashoffset = circumference - (percent * circumference);
-                                        const strokeColor = idx === 0 ? '#6366f1' : idx === 1 ? '#06b6d4' : idx === 2 ? '#a855f7' : '#94a3b8';
-                                        
-                                        return (
-                                            <circle 
-                                                key={uni.sigla_uni}
-                                                cx="64" 
-                                                cy="64" 
-                                                r={radius} 
-                                                stroke={strokeColor} 
-                                                strokeWidth="6" 
-                                                strokeDasharray={circumference}
-                                                strokeDashoffset={strokeDashoffset}
-                                                fill="transparent"
-                                                className="transition-all duration-500"
-                                            />
-                                        );
-                                    })}
-                                </svg>
-                                <div className="absolute text-center">
-                                    <span className="block text-xl font-black text-slate-900">{metricas.totalPostulantes}</span>
-                                    <span className="block text-[8px] font-bold text-slate-400 uppercase tracking-wider">Postulantes</span>
-                                </div>
-                            </div>
-
-                            {/* Leyenda */}
-                            <div className="flex-1 space-y-2.5 w-full">
-                                {postulantesPorUniversidad.map((uni, idx) => {
-                                    const percent = metricas.totalPostulantes > 0 ? Math.round((uni.total / metricas.totalPostulantes) * 100) : 0;
-                                    const badgeColor = idx === 0 ? 'bg-indigo-500' : idx === 1 ? 'bg-cyan-500' : idx === 2 ? 'bg-purple-500' : 'bg-slate-400';
-                                    
-                                    return (
-                                        <div key={uni.sigla_uni} className="flex items-center justify-between text-xs">
-                                            <div className="flex items-center gap-2">
-                                                <span className={`h-2.5 w-2.5 rounded-full ${badgeColor}`} />
-                                                <span className="font-semibold text-slate-700">{uni.sigla_uni}</span>
-                                            </div>
-                                            <span className="text-slate-500 font-bold">
-                                                {uni.total} ({percent}%)
-                                            </span>
+                        <CardContent className="pt-2">
+                            {dataUni.length === 0 ? (
+                                <EmptyState message="No hay datos de universidades meta registradas." />
+                            ) : (
+                                <div className="flex flex-col sm:flex-row items-center justify-around gap-6">
+                                    {/* Recharts Donut Visual */}
+                                    <div className="relative flex items-center justify-center h-72 w-full max-w-[280px] shrink-0">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={dataUni}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    innerRadius={65}
+                                                    outerRadius={95}
+                                                    paddingAngle={3}
+                                                    dataKey="value"
+                                                >
+                                                    {dataUni.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip content={<CustomTooltip />} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                        <div className="absolute text-center pointer-events-none">
+                                            <span className="block text-2xl font-black text-slate-900 dark:text-slate-100">{metricas?.totalPostulantes ?? 0}</span>
+                                            <span className="block text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Postulantes</span>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                    </div>
+
+                                    {/* Leyenda */}
+                                    <div className="flex-1 space-y-2.5 w-full">
+                                        {dataUni.map((uni, idx) => {
+                                            const percentVal = Math.round(uni.percent * 100);
+                                            const color = CHART_COLORS[idx % CHART_COLORS.length];
+                                            
+                                            return (
+                                                <div key={uni.name} className="flex items-center justify-between text-xs">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                                                        <span className="font-semibold text-slate-700 dark:text-slate-300">{uni.name}</span>
+                                                    </div>
+                                                    <span className="text-slate-500 dark:text-slate-400 font-bold">
+                                                        {uni.value} ({percentVal}%)
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
-                    {/* B. Barras Horizontales - Postulantes por carrera */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
+                    {/* B. Postulantes por carrera (BarChart horizontal) */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
                         <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <SlidersHorizontal className="h-4.5 w-4.5 text-indigo-600" />
+                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                <SlidersHorizontal className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Postulantes por carrera
                             </CardTitle>
-                            <CardDescription className="text-xs text-slate-500">
-                                Demanda registrada y distribución de carreras seleccionadas.
+                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                                Demanda registrada y distribución de las top 8 carreras seleccionadas.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-3 pt-2">
-                            {postulantesPorCarrera.map((car, index) => {
-                                const isTop = index === 0;
-                                const maxVal = postulantesPorCarrera?.[0]?.total ?? 1;
-                                const widthPercent = Math.round((car.total / maxVal) * 100);
-                                const barColor = isTop ? 'bg-indigo-650' : 'bg-indigo-400/80';
-                                
-                                return (
-                                    <div key={car.nombre_car} className="flex items-center gap-3">
-                                        <span className={`flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-lg text-[10px] font-black ${
-                                            isTop ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-500'
-                                        }`}>
-                                            {index + 1}
-                                        </span>
-                                        <div className="flex-1 space-y-1">
-                                            <div className="flex justify-between items-center text-xs">
-                                                <span className="font-semibold text-slate-700 truncate max-w-[200px]">{car.nombre_car}</span>
-                                                <span className="font-bold text-slate-800">{car.total} postulantes</span>
-                                            </div>
-                                            <div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100">
-                                                <div 
-                                                    className={`h-full ${barColor} rounded-full transition-all duration-500`}
-                                                    style={{ width: `${widthPercent}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        <CardContent className="pt-2">
+                            {topCarreras.length === 0 ? (
+                                <EmptyState message="No hay datos de carreras registradas." />
+                            ) : (
+                                <div className="h-72 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart
+                                            layout="vertical"
+                                            data={topCarreras}
+                                            margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
+                                            <XAxis type="number" stroke={axisColor} fontSize={10} tickLine={false} />
+                                            <YAxis type="category" dataKey="name" stroke={axisColor} fontSize={10} width={130} tickLine={false} />
+                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? '#1e293b' : '#f8fafc', opacity: 0.4 }} />
+                                            <Bar dataKey="total" radius={[0, 6, 6, 0]} barSize={14}>
+                                                {topCarreras.map((entry, index) => (
+                                                    <Cell 
+                                                        key={`cell-${index}`} 
+                                                        fill={index === 0 ? '#4f46e5' : '#818cf8'} 
+                                                    />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
-                    {/* C. Barras Horizontales - Postulantes por colegio */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
+                    {/* C. Postulantes por colegio (BarChart horizontal) */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
                         <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <GraduationCap className="h-4.5 w-4.5 text-indigo-600" />
+                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                <GraduationCap className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Postulantes por colegio
                             </CardTitle>
-                            <CardDescription className="text-xs text-slate-500">
-                                Unidades educativas paceñas con mayor volumen de egresados postulando.
+                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                                Top 8 unidades educativas de procedencia con mayor representación.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-3 pt-2">
-                            {postulantesPorColegio.map((col, index) => {
-                                const maxVal = postulantesPorColegio?.[0]?.total ?? 1;
-                                const widthPercent = Math.round((col.total / maxVal) * 100);
-                                
-                                return (
-                                    <div key={col.nombre_col} className="flex items-center gap-3">
-                                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-[9px] font-bold text-slate-500">
-                                            {index + 1}
-                                        </span>
-                                        <div className="flex-1 space-y-1">
-                                            <div className="flex justify-between items-center text-xs">
-                                                <span className="font-semibold text-slate-700 truncate max-w-[220px]">{col.nombre_col}</span>
-                                                <span className="font-bold text-slate-850">{col.total} postulantes</span>
-                                            </div>
-                                            <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-150">
-                                                <div 
-                                                    className="h-full bg-blue-500/80 rounded-full transition-all duration-500"
-                                                    style={{ width: `${widthPercent}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        <CardContent className="pt-2">
+                            {topColegios.length === 0 ? (
+                                <EmptyState message="No hay datos de colegios registrados." />
+                            ) : (
+                                <div className="h-72 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart
+                                            layout="vertical"
+                                            data={topColegios}
+                                            margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
+                                            <XAxis type="number" stroke={axisColor} fontSize={10} tickLine={false} />
+                                            <YAxis type="category" dataKey="name" stroke={axisColor} fontSize={10} width={130} tickLine={false} />
+                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? '#1e293b' : '#f8fafc', opacity: 0.4 }} />
+                                            <Bar dataKey="total" radius={[0, 6, 6, 0]} barSize={14}>
+                                                {topColegios.map((entry, index) => (
+                                                    <Cell 
+                                                        key={`cell-${index}`} 
+                                                        fill={index === 0 ? '#0891b2' : '#22d3ee'} 
+                                                    />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
-                    {/* D. Cobertura de Preguntas por Área */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
+                    {/* D. Banco de preguntas por área (BarChart) */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
                         <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <Layers className="h-4.5 w-4.5 text-indigo-600" />
-                                Cobertura del banco por área lógico-matemática
+                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                <Layers className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
+                                Banco de preguntas por área
                             </CardTitle>
-                            <CardDescription className="text-xs text-slate-500">
-                                Reactivos estructurados y distribuidos por área analítica.
+                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                                Cobertura del banco de reactivos por área lógico-matemática.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-3.5 pt-2">
-                            {preguntasPorArea.map((area) => {
-                                const maxVal = preguntasPorArea?.[0]?.total ?? 1;
-                                const widthPercent = Math.round((area.total / maxVal) * 100);
-                                
-                                return (
-                                    <div key={area.nombre_area} className="space-y-1">
-                                        <div className="flex justify-between items-center text-xs">
-                                            <span className="font-semibold text-slate-700">{area.nombre_area}</span>
-                                            <span className="font-bold text-slate-900">{area.total} reactivos</span>
-                                        </div>
-                                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-100">
-                                            <div 
-                                                className="h-full bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full transition-all duration-500"
-                                                style={{ width: `${widthPercent}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        <CardContent className="pt-2">
+                            {dataAreas.length === 0 ? (
+                                <EmptyState message="No hay preguntas ni áreas de conocimiento registradas." />
+                            ) : (
+                                <div className="h-72 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart
+                                            data={dataAreas}
+                                            margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                                            <XAxis dataKey="name" stroke={axisColor} fontSize={9} tickLine={false} />
+                                            <YAxis stroke={axisColor} fontSize={10} tickLine={false} />
+                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? '#1e293b' : '#f8fafc', opacity: 0.4 }} />
+                                            <Bar dataKey="total" radius={[6, 6, 0, 0]} barSize={24}>
+                                                {dataAreas.map((entry, index) => (
+                                                    <Cell 
+                                                        key={`cell-${index}`} 
+                                                        fill={CHART_COLORS[(index + 2) % CHART_COLORS.length]} 
+                                                    />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
-                    {/* E. Dificultad de Preguntas (Stacked Progress Bar) */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
+                    {/* E. Dificultad del banco de reactivos (PieChart) */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
                         <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <TrendingUp className="h-4.5 w-4.5 text-indigo-600" />
+                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                <TrendingUp className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Dificultad del banco de reactivos
                             </CardTitle>
-                            <CardDescription className="text-xs text-slate-500">
+                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
                                 Equilibrio de complejidad en las preguntas registradas.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-6 pt-2">
-                            {/* Stacked segmented bar */}
-                            <div className="space-y-2">
-                                <div className="flex justify-between items-center text-[10px] uppercase font-bold text-slate-400">
-                                    <span>Segmentación de dificultad</span>
-                                    <span>100% reactivos</span>
-                                </div>
-                                <div className="h-4 w-full bg-slate-100 rounded-xl overflow-hidden flex">
-                                    {preguntasPorDificultad.map((dif, idx) => {
-                                        const percent = metricas.totalPreguntas > 0 ? (dif.total / metricas.totalPreguntas) * 100 : 0;
-                                        const colors = idx === 0 ? 'bg-amber-500' : idx === 1 ? 'bg-rose-500' : 'bg-emerald-500';
-                                        return (
-                                            <div 
-                                                key={dif.dificultad_preg}
-                                                className={`h-full ${colors}`}
-                                                style={{ width: `${percent}%` }}
-                                                title={`${dif.dificultad_preg}: ${Math.round(percent)}%`}
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            {/* Legend details */}
-                            <div className="grid grid-cols-3 gap-3">
-                                {preguntasPorDificultad.map((dif, idx) => {
-                                    const percent = metricas.totalPreguntas > 0 ? Math.round((dif.total / metricas.totalPreguntas) * 100) : 0;
-                                    const dotColor = idx === 0 ? 'bg-amber-500' : idx === 1 ? 'bg-rose-500' : 'bg-emerald-500';
-                                    const label = dif.dificultad_preg === 'basica' ? 'Básica' : dif.dificultad_preg === 'media' ? 'Media' : 'Avanzada';
-                                    
-                                    return (
-                                        <div key={dif.dificultad_preg} className="border border-slate-100 rounded-2xl p-3 bg-slate-50/50 flex flex-col justify-between">
-                                            <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold uppercase">
-                                                <span className={`h-2 w-2 rounded-full ${dotColor}`} />
-                                                <span>{label}</span>
-                                            </div>
-                                            <p className="mt-2 text-base font-black text-slate-900">{dif.total}</p>
-                                            <span className="text-[10px] text-indigo-600 font-bold">{percent}% del banco</span>
+                        <CardContent className="pt-2">
+                            {dataDificultad.length === 0 ? (
+                                <EmptyState message="No hay preguntas para categorizar su dificultad." />
+                            ) : (
+                                <div className="flex flex-col sm:flex-row items-center justify-around gap-6">
+                                    {/* Recharts Donut Visual */}
+                                    <div className="relative flex items-center justify-center h-72 w-full max-w-[280px] shrink-0">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={dataDificultad}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    innerRadius={65}
+                                                    outerRadius={95}
+                                                    paddingAngle={3}
+                                                    dataKey="value"
+                                                >
+                                                    {dataDificultad.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip content={<CustomTooltip />} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                        <div className="absolute text-center pointer-events-none">
+                                            <span className="block text-2xl font-black text-slate-900 dark:text-slate-100">{metricas?.totalPreguntas ?? 0}</span>
+                                            <span className="block text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Reactivos</span>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                    </div>
+
+                                    {/* Leyenda */}
+                                    <div className="flex-1 space-y-3 w-full">
+                                        {dataDificultad.map((dif) => {
+                                            const percentVal = Math.round(dif.percent * 100);
+                                            return (
+                                                <div key={dif.name} className="flex flex-col border border-slate-100 dark:border-slate-800 rounded-2xl p-3 bg-slate-50/50 dark:bg-slate-800/40">
+                                                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">
+                                                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: dif.color }} />
+                                                        <span>{dif.name}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-baseline mt-1.5">
+                                                        <span className="text-base font-black text-slate-900 dark:text-slate-100">{dif.value}</span>
+                                                        <span className="text-[10px] text-indigo-650 dark:text-indigo-400 font-extrabold">{percentVal}% del banco</span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
-                    {/* F. Exigencia Matemática */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
+                    {/* F. Nivel de exigencia matemática (BarChart) */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
                         <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <Award className="h-4.5 w-4.5 text-indigo-600" />
+                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                <Award className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Distribución por nivel de exigencia matemática
                             </CardTitle>
-                            <CardDescription className="text-xs text-slate-500">
+                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
                                 Clasificación de postulantes según la exigencia lógica de su carrera objetivo.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4 pt-2">
-                            {postulantesPorExigenciaMatematica.map((ex) => {
-                                const percent = metricas.totalPostulantes > 0 ? Math.round((ex.total / metricas.totalPostulantes) * 100) : 0;
-                                const label = ex.nivel === 'alta' ? 'Alta' : ex.nivel === 'media-alta' ? 'Media-Alta' : ex.nivel === 'media' ? 'Media' : 'Baja-Media';
-                                const barColor = ex.nivel === 'alta' ? 'from-rose-500 to-rose-400' : ex.nivel === 'media-alta' ? 'from-amber-500 to-amber-400' : ex.nivel === 'media' ? 'from-blue-500 to-blue-400' : 'from-emerald-500 to-emerald-400';
-                                
-                                return (
-                                    <div key={ex.nivel} className="space-y-1">
-                                        <div className="flex justify-between items-center text-xs">
-                                            <span className="font-semibold text-slate-700">{label}</span>
-                                            <span className="font-bold text-slate-900">{ex.total} postulantes ({percent}%)</span>
-                                        </div>
-                                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-100">
-                                            <div 
-                                                className={`h-full bg-gradient-to-r ${barColor} rounded-full transition-all duration-500`}
-                                                style={{ width: `${percent}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        <CardContent className="pt-2">
+                            {dataExigencia.every(d => d.total === 0) ? (
+                                <EmptyState message="No hay datos de exigencia matemática registrados." />
+                            ) : (
+                                <div className="h-72 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart
+                                            data={dataExigencia}
+                                            margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                                            <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickLine={false} />
+                                            <YAxis stroke={axisColor} fontSize={11} tickLine={false} />
+                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? '#1e293b' : '#f8fafc', opacity: 0.4 }} />
+                                            <Bar dataKey="total" radius={[6, 6, 0, 0]} barSize={35}>
+                                                {dataExigencia.map((entry, index) => (
+                                                    <Cell 
+                                                        key={`cell-${index}`} 
+                                                        fill={entry.color} 
+                                                    />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
+
+                    {/* G. Síntesis Conceptual del Volumen Académico */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 md:col-span-2 dark:bg-slate-900 dark:ring-slate-800">
+                        <CardHeader>
+                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                <Sparkles className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
+                                Síntesis del volumen académico consolidado
+                            </CardTitle>
+                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                                Muestra una lectura institucional simplificada del crecimiento y escala de los componentes cargados en el sistema.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-2">
+                            <div className="h-64 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart
+                                        data={dataSintesis}
+                                        margin={{ top: 10, right: 20, left: -10, bottom: 5 }}
+                                    >
+                                        <defs>
+                                            <linearGradient id="colorConsolidado" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                                        <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickLine={false} />
+                                        <YAxis stroke={axisColor} fontSize={11} tickLine={false} />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Area type="monotone" dataKey="cantidad" stroke="#6366f1" strokeWidth={2.5} fillOpacity={1} fill="url(#colorConsolidado)" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </CardContent>
+                    </Card>
+
                 </section>
+
 
                 {/* 5. Sección Plantillas Académicas */}
                 <section className="space-y-4">
-                    <div className="border-b border-slate-200 pb-2">
-                        <h2 className="text-lg font-black text-slate-900">Plantillas académicas estructuradas</h2>
-                        <p className="text-xs text-slate-500">Instrumentos curriculares y de nivelación configurados en la plataforma.</p>
+                    <div className="border-b border-slate-200 dark:border-slate-800 pb-2">
+                        <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Plantillas académicas estructuradas</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Instrumentos curriculares y de nivelación configurados en la plataforma.</p>
                     </div>
 
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {plantillasDetalle.map((plantilla) => (
-                            <Card key={plantilla.id_plan} className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-indigo-300 transition duration-300 flex flex-col justify-between">
-                                <CardHeader className="pb-3 border-b border-slate-50">
+                            <Card key={plantilla.id_plan} className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-indigo-300 transition duration-300 flex flex-col justify-between
+                                dark:bg-slate-900 dark:ring-slate-800 dark:hover:ring-indigo-700">
+                                <CardHeader className="pb-3 border-b border-slate-50 dark:border-slate-800">
                                     <div className="flex items-start justify-between gap-3">
-                                        <h3 className="text-sm font-bold text-slate-900 leading-snug">{plantilla.nombre_plan}</h3>
-                                        <span className="capitalize text-[9px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full shrink-0">
+                                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">{plantilla.nombre_plan}</h3>
+                                        <span className="capitalize text-[9px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full shrink-0
+                                            dark:bg-slate-800 dark:text-slate-300">
                                             {plantilla.dificultad_plan}
                                         </span>
                                     </div>
                                 </CardHeader>
                                 <CardContent className="pt-4 space-y-4">
-                                    <div className="flex justify-between text-xs text-slate-500">
+                                    <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
                                         <span>Cantidad de reactivos:</span>
-                                        <span className="font-bold text-slate-800">{plantilla.cantidad_preguntas}</span>
+                                        <span className="font-bold text-slate-800 dark:text-slate-200">{plantilla.cantidad_preguntas}</span>
                                     </div>
                                     
                                     <div className="space-y-1.5">
-                                        <div className="flex justify-between text-xs font-semibold text-indigo-700">
+                                        <div className="flex justify-between text-xs font-semibold text-indigo-700 dark:text-indigo-400">
                                             <span>Puntaje de examen:</span>
                                             <span>{plantilla.puntaje_total} / 100 Pts</span>
                                         </div>
-                                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-100">
+                                        <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-100 dark:border-slate-700">
                                             <div 
                                                 className="h-full bg-indigo-600 rounded-full transition-all"
                                                 style={{ width: `${plantilla.puntaje_total}%` }}
@@ -623,8 +855,8 @@ export default function Index({
                                         </div>
                                     </div>
                                 </CardContent>
-                                <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between rounded-b-3xl">
-                                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Todas sobre 100 Pts</span>
+                                <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between rounded-b-3xl dark:bg-slate-800/50 dark:border-slate-700">
+                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Todas sobre 100 Pts</span>
                                     <StatusBadge status={plantilla.estado_plan === 'activo' ? 'Activa' : plantilla.estado_plan} />
                                 </div>
                             </Card>
@@ -634,13 +866,13 @@ export default function Index({
 
                 {/* 6. Nueva sección Reporte por Postulante */}
                 <section className="space-y-6">
-                    <div className="border-b border-slate-200 pb-2">
-                        <h2 className="text-lg font-black text-slate-900">Reporte por postulante</h2>
-                        <p className="text-xs text-slate-500">Vista individual para identificar perfil académico, universidad objetivo y nivel de exigencia matemática.</p>
+                    <div className="border-b border-slate-200 dark:border-slate-800 pb-2">
+                        <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Reporte por postulante</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Vista individual para identificar perfil académico, universidad objetivo y nivel de exigencia matemática.</p>
                     </div>
 
                     {/* Barra de Búsqueda y Filtros */}
-                    <div className="grid gap-4 md:grid-cols-5 bg-white p-5 rounded-3xl ring-1 ring-slate-200/80 shadow-sm">
+                    <div className="grid gap-4 md:grid-cols-5 bg-white p-5 rounded-3xl ring-1 ring-slate-200/80 shadow-sm dark:bg-slate-900 dark:ring-slate-800">
                         {/* Buscador */}
                         <div className="relative md:col-span-2">
                             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -651,7 +883,8 @@ export default function Index({
                                 placeholder="Buscar postulante, colegio, universidad o carrera..."
                                 value={searchQuery}
                                 onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); setExpandedPostulanteId(null); }}
-                                className="pl-10 h-10 w-full rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                className="pl-10 h-10 w-full rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500
+                                    dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder-slate-500"
                             />
                         </div>
 
@@ -659,7 +892,7 @@ export default function Index({
                         <select
                             value={filterUni}
                             onChange={handleFilterChange(setFilterUni)}
-                            className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                            className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                         >
                             <option value="">Universidad (Todas)</option>
                             {universidadesUnicas.map(u => (
@@ -671,7 +904,7 @@ export default function Index({
                         <select
                             value={filterCarrera}
                             onChange={handleFilterChange(setFilterCarrera)}
-                            className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                            className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                         >
                             <option value="">Carrera (Todas)</option>
                             {carrerasUnicas.map(c => (
@@ -683,7 +916,7 @@ export default function Index({
                         <select
                             value={filterExigencia}
                             onChange={handleFilterChange(setFilterExigencia)}
-                            className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                            className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                         >
                             <option value="">Exigencia (Todas)</option>
                             {exigenciasUnicas.map(ex => {
@@ -694,16 +927,16 @@ export default function Index({
                     </div>
 
                     {/* Tabla de Postulantes */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 overflow-hidden">
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 overflow-hidden dark:bg-slate-900 dark:ring-slate-800">
                         {/* Barra de estado de filtros */}
-                        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/60">
-                            <p className="text-[11px] font-semibold text-slate-500">
+                        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-800/40">
+                            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                                 {isFiltered
-                                    ? <span className="text-indigo-700">Mostrando resultados filtrados — {filteredPostulantes.length} de {postulantesList.length} postulantes</span>
+                                    ? <span className="text-indigo-700 dark:text-indigo-400">Mostrando resultados filtrados — {filteredPostulantes.length} de {postulantesList.length} postulantes</span>
                                     : <span>Total: <strong>{postulantesList.length}</strong> postulantes registrados</span>
                                 }
                             </p>
-                            <p className="text-[11px] font-semibold text-slate-400">
+                            <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
                                 Página {currentPage} de {totalPages}
                             </p>
                         </div>
@@ -717,12 +950,12 @@ export default function Index({
                             ) : (
                                 <Table>
                                     <TableHeader>
-                                        <TableRow className="bg-slate-50/80">
-                                            <TableHead className="pl-5">Postulante</TableHead>
-                                            <TableHead>Colegio</TableHead>
-                                            <TableHead>Universidad / Carrera</TableHead>
-                                            <TableHead>Exigencia</TableHead>
-                                            <TableHead>Perfil Académico Preliminar</TableHead>
+                                        <TableRow className="bg-slate-50/80 dark:bg-slate-800/60">
+                                            <TableHead className="pl-5 dark:text-slate-400">Postulante</TableHead>
+                                            <TableHead className="dark:text-slate-400">Colegio</TableHead>
+                                            <TableHead className="dark:text-slate-400">Universidad / Carrera</TableHead>
+                                            <TableHead className="dark:text-slate-400">Exigencia</TableHead>
+                                            <TableHead className="dark:text-slate-400">Perfil Académico Preliminar</TableHead>
                                             <TableHead className="text-center">Lectura</TableHead>
                                             <TableHead className="pr-5 text-right">Estado</TableHead>
                                         </TableRow>
@@ -757,19 +990,19 @@ export default function Index({
 
                                             return (
                                                 <React.Fragment key={post.id_post}>
-                                                    <TableRow className="hover:bg-slate-50/50 transition">
-                                                        <TableCell className="pl-5 font-bold text-slate-900">
+                                                    <TableRow className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
+                                                        <TableCell className="pl-5 font-bold text-slate-900 dark:text-slate-100">
                                                             <div>
                                                                 <p className="text-sm">{post.nombre_completo}</p>
-                                                                <p className="text-[10px] text-slate-400 font-semibold">{post.edad} años</p>
+                                                                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">{post.edad} años</p>
                                                             </div>
                                                         </TableCell>
-                                                        <TableCell className="text-slate-600 text-xs font-semibold max-w-[150px] truncate">
+                                                        <TableCell className="text-slate-600 dark:text-slate-400 text-xs font-semibold max-w-[150px] truncate">
                                                             {post.colegio}
                                                         </TableCell>
                                                         <TableCell className="text-xs">
-                                                            <div className="font-semibold text-slate-800">{post.carrera}</div>
-                                                            <div className="text-[10px] text-slate-400 font-semibold uppercase">{post.universidad}</div>
+                                                            <div className="font-semibold text-slate-800 dark:text-slate-200">{post.carrera}</div>
+                                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">{post.universidad}</div>
                                                         </TableCell>
                                                         <TableCell>
                                                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 ${exigenciaBadge}`}>
@@ -784,7 +1017,8 @@ export default function Index({
                                                         <TableCell className="text-center">
                                                             <button
                                                                 onClick={() => toggleExpandPostulante(post.id_post)}
-                                                                className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-650 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-xl transition"
+                                                                className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-xl transition
+                                                                    dark:text-indigo-400 dark:bg-indigo-950 dark:hover:bg-indigo-900"
                                                             >
                                                                 <span>Ver lectura académica</span>
                                                                 {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -797,21 +1031,21 @@ export default function Index({
                                                     
                                                     {/* Fila expandible con lectura académica */}
                                                     {isExpanded && (
-                                                        <TableRow className="bg-slate-50/55 hover:bg-slate-50/55">
+                                                        <TableRow className="bg-slate-50/55 hover:bg-slate-50/55 dark:bg-slate-800/30 dark:hover:bg-slate-800/30">
                                                             <TableCell colSpan={7} className="px-6 py-4">
-                                                                <div className="rounded-2xl border border-indigo-100/50 bg-white p-4 space-y-3">
-                                                                    <div className="flex items-center gap-2 text-xs font-bold text-indigo-850">
+                                                                <div className="rounded-2xl border border-indigo-100/50 bg-white p-4 space-y-3 dark:border-slate-700 dark:bg-slate-800">
+                                                                    <div className="flex items-center gap-2 text-xs font-bold text-indigo-700 dark:text-indigo-300">
                                                                         <Lightbulb className="h-4 w-4 text-amber-500 shrink-0" />
                                                                         <span>Lectura Institucional y Recomendaciones</span>
                                                                     </div>
                                                                     <div className="grid gap-4 sm:grid-cols-3 text-xs leading-relaxed">
                                                                         <div>
-                                                                            <span className="text-[10px] uppercase font-bold text-slate-400">Seguimiento sugerido</span>
-                                                                            <p className="mt-1 font-semibold text-slate-800">{post.perfil}</p>
+                                                                            <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Seguimiento sugerido</span>
+                                                                            <p className="mt-1 font-semibold text-slate-800 dark:text-slate-200">{post.perfil}</p>
                                                                         </div>
                                                                         <div className="sm:col-span-2">
-                                                                            <span className="text-[10px] uppercase font-bold text-slate-400">Recomendación de nivelación</span>
-                                                                            <p className="mt-1 text-slate-650">
+                                                                            <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Recomendación de nivelación</span>
+                                                                            <p className="mt-1 text-slate-600 dark:text-slate-400">
                                                                                 {getRecomendacionNivelacion(post.exigencia)} Basado en las ponderaciones curriculares exigidas por la carrera de {post.carrera} en la {post.universidad}.
                                                                             </p>
                                                                         </div>
@@ -829,21 +1063,23 @@ export default function Index({
                         </CardContent>
                         {/* Controles de paginación */}
                         {totalPages > 1 && (
-                            <div className="flex items-center justify-center gap-2 px-5 py-4 border-t border-slate-100">
+                            <div className="flex items-center justify-center gap-2 px-5 py-4 border-t border-slate-100 dark:border-slate-800">
                                 <button
                                     onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); setExpandedPostulanteId(null); }}
                                     disabled={currentPage === 1}
-                                    className="px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                    className="px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition
+                                        dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
                                 >
                                     ← Anterior
                                 </button>
-                                <span className="text-xs font-bold text-slate-500 px-2">
+                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 px-2">
                                     {currentPage} / {totalPages}
                                 </span>
                                 <button
                                     onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); setExpandedPostulanteId(null); }}
                                     disabled={currentPage === totalPages}
-                                    className="px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                    className="px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition
+                                        dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
                                 >
                                     Siguiente →
                                 </button>
@@ -854,72 +1090,72 @@ export default function Index({
 
                 {/* 7. Sección Lectura Académica Preliminar */}
                 <section className="space-y-4">
-                    <div className="border-b border-slate-200 pb-2">
-                        <h2 className="text-lg font-black text-slate-900">Lectura académica preliminar</h2>
-                        <p className="text-xs text-slate-500">Conclusiones analíticas y pautas derivadas de la masa crítica del instituto.</p>
+                    <div className="border-b border-slate-200 dark:border-slate-800 pb-2">
+                        <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Lectura académica preliminar</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Conclusiones analíticas y pautas derivadas de la masa crítica del instituto.</p>
                     </div>
 
                     <div className="grid gap-4 lg:grid-cols-4">
                         {/* Conclusión 1 */}
-                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                             <div className="space-y-2">
-                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-650">
+                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
                                     <Building2 className="h-4 w-4" />
                                 </span>
-                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">Concentración por universidad</h3>
-                                <p className="text-xs leading-relaxed text-slate-500">
+                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Concentración por universidad</h3>
+                                <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                                     La mayor concentración de postulantes se encuentra enfocada en la {uniLider}.
                                 </p>
                             </div>
-                            <p className="mt-4 pt-3 border-t border-slate-100 text-[10px] font-bold text-indigo-700 leading-normal">
+                            <p className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-indigo-700 dark:text-indigo-400 leading-normal">
                                 Recomendación: Priorizar la calendarización de plantillas evaluativas asociadas a la {uniLider} para validar el nivel inicial.
                             </p>
                         </div>
 
                         {/* Conclusión 2 */}
-                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                             <div className="space-y-2">
-                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-655">
+                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
                                     <SlidersHorizontal className="h-4 w-4" />
                                 </span>
-                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">Carrera con mayor demanda</h3>
-                                <p className="text-xs leading-relaxed text-slate-500">
+                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Carrera con mayor demanda</h3>
+                                <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                                     La carrera de {carreraLider} presenta el mayor volumen de postulantes inscritos.
                                 </p>
                             </div>
-                            <p className="mt-4 pt-3 border-t border-slate-100 text-[10px] font-bold text-indigo-700 leading-normal">
+                            <p className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-indigo-700 dark:text-indigo-400 leading-normal">
                                 Recomendación: Reforzar los módulos de álgebra y razonamiento lógico-matemático en los talleres de nivelación de esta rama.
                             </p>
                         </div>
 
                         {/* Conclusión 3 */}
-                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                             <div className="space-y-2">
-                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-655">
+                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
                                     <Layers className="h-4 w-4" />
                                 </span>
-                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">Cobertura del banco</h3>
-                                <p className="text-xs leading-relaxed text-slate-500">
+                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Cobertura del banco</h3>
+                                <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                                     El área de {areaLider} contiene la mayor cantidad de reactivos cargados.
                                 </p>
                             </div>
-                            <p className="mt-4 pt-3 border-t border-slate-100 text-[10px] font-bold text-indigo-700 leading-normal">
+                            <p className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-indigo-700 dark:text-indigo-400 leading-normal">
                                 Recomendación: Ampliar la base de reactivos complejos en las áreas complementarias para equilibrar la cobertura de plantillas.
                             </p>
                         </div>
 
                         {/* Conclusión 4 */}
-                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                             <div className="space-y-2">
-                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-655">
+                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
                                     <TrendingUp className="h-4 w-4" />
                                 </span>
-                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">Dificultad predominante</h3>
-                                <p className="text-xs leading-relaxed text-slate-500">
+                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Dificultad predominante</h3>
+                                <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                                     El banco de preguntas mantiene una concentración mayoritaria de complejidad {difPredominante}.
                                 </p>
                             </div>
-                            <p className="mt-4 pt-3 border-t border-slate-100 text-[10px] font-bold text-indigo-700 leading-normal">
+                            <p className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-indigo-700 dark:text-indigo-400 leading-normal">
                                 Recomendación: Incorporar de manera progresiva reactivos de nivel avanzado para simular la exigencia real de ingenierías.
                             </p>
                         </div>
@@ -928,42 +1164,42 @@ export default function Index({
 
                 {/* 8. Sección Base para Learning Analytics */}
                 <section>
-                    <div className="rounded-3xl border border-indigo-100 bg-indigo-50/60 p-6 sm:p-8 space-y-6 shadow-sm">
+                    <div className="rounded-3xl border border-indigo-100 bg-indigo-50/60 p-6 sm:p-8 space-y-6 shadow-sm dark:border-indigo-900/50 dark:bg-indigo-950/40">
                         <div className="flex gap-4 items-start">
-                            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
+                            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400">
                                 <Sparkles className="h-6 w-6" />
                             </span>
                             <div className="space-y-1">
-                                <h3 className="text-base font-bold text-indigo-950">Preparación para Learning Analytics</h3>
-                                <p className="text-sm text-indigo-700 leading-relaxed max-w-4xl">
+                                <h3 className="text-base font-bold text-indigo-950 dark:text-indigo-200">Preparación para Learning Analytics</h3>
+                                <p className="text-sm text-indigo-700 dark:text-indigo-400 leading-relaxed max-w-4xl">
                                     Los indicadores consolidados permiten construir una base académica para futuras capas de Learning Analytics, orientadas a riesgo académico, recomendaciones de refuerzo y predicción de desempeño.
                                 </p>
                             </div>
                         </div>
 
                         {/* Línea de proceso visual */}
-                        <div className="border-t border-indigo-100 pt-6">
-                            <div className="grid grid-cols-2 gap-4 md:grid-cols-5 text-center text-xs font-bold text-indigo-850">
-                                <div className="p-3 bg-white rounded-xl border border-indigo-150 flex flex-col justify-center items-center shadow-sm">
-                                    <span className="text-[10px] text-indigo-400 font-semibold uppercase">Paso 1</span>
+                        <div className="border-t border-indigo-100 dark:border-indigo-900 pt-6">
+                            <div className="grid grid-cols-2 gap-4 md:grid-cols-5 text-center text-xs font-bold text-indigo-900 dark:text-indigo-200">
+                                <div className="p-3 bg-white rounded-xl border border-indigo-100 flex flex-col justify-center items-center shadow-sm dark:bg-slate-900 dark:border-indigo-900">
+                                    <span className="text-[10px] text-indigo-400 dark:text-indigo-500 font-semibold uppercase">Paso 1</span>
                                     <span className="mt-1">Datos</span>
                                 </div>
-                                <div className="hidden md:flex items-center justify-center text-indigo-400">→</div>
-                                <div className="p-3 bg-white rounded-xl border border-indigo-150 flex flex-col justify-center items-center shadow-sm">
-                                    <span className="text-[10px] text-indigo-400 font-semibold uppercase">Paso 2</span>
+                                <div className="hidden md:flex items-center justify-center text-indigo-400 dark:text-indigo-600">→</div>
+                                <div className="p-3 bg-white rounded-xl border border-indigo-100 flex flex-col justify-center items-center shadow-sm dark:bg-slate-900 dark:border-indigo-900">
+                                    <span className="text-[10px] text-indigo-400 dark:text-indigo-500 font-semibold uppercase">Paso 2</span>
                                     <span className="mt-1">Indicadores</span>
                                 </div>
-                                <div className="hidden md:flex items-center justify-center text-indigo-400">→</div>
-                                <div className="p-3 bg-white rounded-xl border border-indigo-150 flex flex-col justify-center items-center shadow-sm md:col-span-1 col-span-2">
-                                    <span className="text-[10px] text-indigo-400 font-semibold uppercase">Paso 3</span>
+                                <div className="hidden md:flex items-center justify-center text-indigo-400 dark:text-indigo-600">→</div>
+                                <div className="p-3 bg-white rounded-xl border border-indigo-100 flex flex-col justify-center items-center shadow-sm md:col-span-1 col-span-2 dark:bg-slate-900 dark:border-indigo-900">
+                                    <span className="text-[10px] text-indigo-400 dark:text-indigo-500 font-semibold uppercase">Paso 3</span>
                                     <span className="mt-1">Lectura Académica</span>
                                 </div>
-                                <div className="hidden md:flex items-center justify-center text-indigo-400">→</div>
-                                <div className="p-3 bg-white rounded-xl border border-indigo-150 flex flex-col justify-center items-center shadow-sm">
-                                    <span className="text-[10px] text-indigo-400 font-semibold uppercase">Paso 4</span>
+                                <div className="hidden md:flex items-center justify-center text-indigo-400 dark:text-indigo-600">→</div>
+                                <div className="p-3 bg-white rounded-xl border border-indigo-100 flex flex-col justify-center items-center shadow-sm dark:bg-slate-900 dark:border-indigo-900">
+                                    <span className="text-[10px] text-indigo-400 dark:text-indigo-500 font-semibold uppercase">Paso 4</span>
                                     <span className="mt-1">Recomendaciones</span>
                                 </div>
-                                <div className="hidden md:flex items-center justify-center text-indigo-400">→</div>
+                                <div className="hidden md:flex items-center justify-center text-indigo-400 dark:text-indigo-600">→</div>
                                 <div className="p-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl flex flex-col justify-center items-center shadow-md">
                                     <span className="text-[9px] text-indigo-200 font-bold uppercase tracking-wider">Futuro</span>
                                     <span className="mt-0.5">Modelo Predictivo</span>

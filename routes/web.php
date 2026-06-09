@@ -25,7 +25,7 @@ Route::get('/evaluaciones-postulante', function () {
 })->name('evaluaciones-postulante');
 
 Route::get('/dashboard', function () {
-    if (auth()->user()->hasRole('estudiante')) {
+    if (auth()->user()->hasRole('Estudiante')) {
         return redirect('/');
     }
     return Inertia::render('Admin/Dashboard');
@@ -199,7 +199,7 @@ Route::middleware('auth')->group(function () {
 
     // Ruta de evaluaciones del estudiante
     Route::get('/estudiante/evaluaciones', function () {
-        if (auth()->user()->hasRole(['super-admin', 'administrador', 'docente'])) {
+        if (auth()->user()->hasRole(['Super Administrador', 'Administrador', 'Docente'])) {
             return redirect()->route('dashboard');
         }
         return Inertia::render('Estudiante/Evaluaciones');

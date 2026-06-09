@@ -250,9 +250,13 @@ const LearningAnalyticsFallback = () => (
         </div>
     </div>
 );
-
 export default function Welcome({ auth }) {
-    const isEstudiante = auth.user && auth.roles && auth.roles.includes('estudiante');
+    const roles = auth?.roles || auth?.user?.roles || [];
+    const isStudent = roles.includes('Estudiante');
+    const isAdminLike = roles.some((role) =>
+        ['Super Administrador', 'Administrador', 'Docente'].includes(role)
+    );
+
     return (
         <>
             <Head title="INTELECTA - Plataforma Académica Preuniversitaria" />
@@ -299,7 +303,7 @@ export default function Welcome({ auth }) {
                                             <ArrowRight className="h-4 w-4" />
                                         </Link>
                                     </>
-                                ) : isEstudiante ? (
+                                ) : isStudent ? (
                                     <>
                                         <Link
                                             href="/estudiante/evaluaciones"
@@ -316,7 +320,7 @@ export default function Welcome({ auth }) {
                                             Cerrar sesión
                                         </Link>
                                     </>
-                                ) : (
+                                ) : isAdminLike ? (
                                     <>
                                         <Link
                                             href={route('dashboard')}
@@ -325,6 +329,17 @@ export default function Welcome({ auth }) {
                                             Ir al panel
                                             <ArrowRight className="h-4 w-4" />
                                         </Link>
+                                        <Link
+                                            href={route('logout')}
+                                            method="post"
+                                            as="button"
+                                            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 hover:bg-slate-50 px-5 py-2.5 text-sm font-semibold text-slate-800 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                                        >
+                                            Cerrar sesión
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <>
                                         <Link
                                             href={route('logout')}
                                             method="post"
@@ -380,7 +395,7 @@ export default function Welcome({ auth }) {
                                                 <ArrowRight className="h-5 w-5" />
                                             </Link>
                                         </>
-                                    ) : isEstudiante ? (
+                                    ) : isStudent ? (
                                         <>
                                             <Link
                                                 href="/estudiante/evaluaciones"
@@ -397,7 +412,7 @@ export default function Welcome({ auth }) {
                                                 Cerrar sesión
                                             </Link>
                                         </>
-                                    ) : (
+                                    ) : isAdminLike ? (
                                         <>
                                             <Link
                                                 href={route('dashboard')}
@@ -406,6 +421,17 @@ export default function Welcome({ auth }) {
                                                 Ir al panel
                                                 <ArrowRight className="h-5 w-5" />
                                             </Link>
+                                            <Link
+                                                href={route('logout')}
+                                                method="post"
+                                                as="button"
+                                                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-3.5 text-base font-semibold text-slate-800 shadow-sm transition-all hover:-translate-y-0.5"
+                                            >
+                                                Cerrar sesión
+                                            </Link>
+                                        </>
+                                    ) : (
+                                        <>
                                             <Link
                                                 href={route('logout')}
                                                 method="post"
@@ -912,17 +938,33 @@ export default function Welcome({ auth }) {
                             INTELECTA integra postulantes, bancos de preguntas, plantillas académicas y análisis institucional en una base preparada para el seguimiento y la mejora del desempeño lógico-matemático.
                         </p>
                         <div className="pt-4">
-                            {auth.user ? (
+                            {!auth.user ? (
                                 <Link
-                                    href={route('dashboard')}
+                                    href={route('login')}
                                     className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-indigo-600/30 transition-all hover:bg-indigo-700 hover:shadow-indigo-600/40 hover:-translate-y-0.5"
                                 >
                                     Ingresar al sistema
                                     <ArrowRight className="h-5 w-5" />
                                 </Link>
+                            ) : isStudent ? (
+                                <Link
+                                    href="/estudiante/evaluaciones"
+                                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-cyan-400 hover:bg-cyan-500 px-8 py-4 text-base font-bold text-indigo-950 shadow-xl shadow-cyan-400/10 transition-all hover:-translate-y-0.5"
+                                >
+                                    Ingresar a Evaluaciones
+                                    <ArrowRight className="h-5 w-5" />
+                                </Link>
+                            ) : isAdminLike ? (
+                                <Link
+                                    href={route('dashboard')}
+                                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-indigo-600/30 transition-all hover:bg-indigo-700 hover:shadow-indigo-600/40 hover:-translate-y-0.5"
+                                >
+                                    Ir al panel
+                                    <ArrowRight className="h-5 w-5" />
+                                </Link>
                             ) : (
                                 <Link
-                                    href={route('login')}
+                                    href="/"
                                     className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-indigo-600/30 transition-all hover:bg-indigo-700 hover:shadow-indigo-600/40 hover:-translate-y-0.5"
                                 >
                                     Ingresar al sistema

@@ -150,7 +150,7 @@ export default function AppSidebar({ open = false, onClose = () => {} }) {
                 <button
                     type="button"
                     aria-label="Cerrar navegación"
-                    className="fixed inset-0 z-40 bg-slate-950/45 backdrop-blur-sm lg:hidden"
+                    className="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm lg:hidden dark:bg-slate-950/70"
                     onClick={onClose}
                 />
             )}
