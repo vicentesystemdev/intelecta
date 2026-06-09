@@ -27,14 +27,19 @@ const navigationGroups = [
                 label: 'Dashboard',
                 icon: LayoutDashboard,
                 href: '/dashboard',
-                active: true,
+                routeName: 'dashboard',
             },
         ],
     },
     {
         label: 'Gestión Académica',
         items: [
-            { label: 'Postulantes', icon: GraduationCap, href: '#' },
+            {
+                label: 'Postulantes',
+                icon: GraduationCap,
+                href: '/postulantes',
+                routeName: 'postulantes.*',
+            },
             { label: 'Docentes', icon: UserRoundCheck, href: '#' },
             { label: 'Carreras', icon: BriefcaseBusiness, href: '#' },
             { label: 'Colegios', icon: Building2, href: '#' },
@@ -121,7 +126,12 @@ export default function AppSidebar({ open = false, onClose = () => {} }) {
                             </p>
                             <div className="space-y-1">
                                 {group.items.map(
-                                    ({ label, icon: Icon, href, active }) => (
+                                    ({ label, icon: Icon, href, routeName }) => {
+                                        const active = routeName
+                                            ? route().current(routeName)
+                                            : false;
+
+                                        return (
                                         <Link
                                             key={label}
                                             href={href}
@@ -141,7 +151,8 @@ export default function AppSidebar({ open = false, onClose = () => {} }) {
                                             />
                                             {label}
                                         </Link>
-                                    ),
+                                        );
+                                    },
                                 )}
                             </div>
                         </div>
