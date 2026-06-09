@@ -48,8 +48,18 @@ const navigationGroups = [
     {
         label: 'Evaluaciones',
         items: [
-            { label: 'Plantillas', icon: BookCopy, href: '#' },
-            { label: 'Banco de Preguntas', icon: FileQuestion, href: '#' },
+            {
+                label: 'Plantillas',
+                icon: BookCopy,
+                href: '/plantillas-evaluacion',
+                routeName: 'plantillas-evaluacion.*',
+            },
+            {
+                label: 'Banco de Preguntas',
+                icon: FileQuestion,
+                href: '/preguntas',
+                routeName: 'preguntas.*',
+            },
             { label: 'Evaluaciones', icon: ClipboardCheck, href: '#' },
             { label: 'Resultados', icon: FileChartColumn, href: '#' },
         ],

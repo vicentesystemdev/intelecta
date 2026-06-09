@@ -20,6 +20,10 @@ class DatabaseSeeder extends Seeder
             UniversidadesSeeder::class,
             CarrerasSeeder::class,
             PostulantesSeeder::class,
+            AreasConocimientoSeeder::class,
+            TemasSeeder::class,
+            PreguntasSeeder::class,
+            PlantillasEvaluacionSeeder::class,
         ]);
     }
 }

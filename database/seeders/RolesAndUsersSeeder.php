@@ -7,12 +7,13 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndUsersSeeder extends Seeder
 {
     public function run(): void
     {
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions = [
             'dashboard.ver',
@@ -40,6 +41,24 @@ class RolesAndUsersSeeder extends Seeder
             'evaluaciones.crear',
             'evaluaciones.editar',
             'evaluaciones.cerrar',
+
+            'areas.ver',
+            'areas.crear',
+            'areas.editar',
+
+            'temas.ver',
+            'temas.crear',
+            'temas.editar',
+
+            'preguntas.ver',
+            'preguntas.crear',
+            'preguntas.editar',
+            'preguntas.eliminar',
+
+            'plantillas.ver',
+            'plantillas.crear',
+            'plantillas.editar',
+            'plantillas.eliminar',
 
             'reportes.ver',
             'learning_analytics.ver',
@@ -91,6 +110,20 @@ class RolesAndUsersSeeder extends Seeder
             'evaluaciones.crear',
             'evaluaciones.editar',
             'evaluaciones.cerrar',
+            'areas.ver',
+            'areas.crear',
+            'areas.editar',
+            'temas.ver',
+            'temas.crear',
+            'temas.editar',
+            'preguntas.ver',
+            'preguntas.crear',
+            'preguntas.editar',
+            'preguntas.eliminar',
+            'plantillas.ver',
+            'plantillas.crear',
+            'plantillas.editar',
+            'plantillas.eliminar',
             'reportes.ver',
             'learning_analytics.ver',
         ]);
@@ -101,6 +134,18 @@ class RolesAndUsersSeeder extends Seeder
             'evaluaciones.crear',
             'evaluaciones.editar',
             'evaluaciones.cerrar',
+            'areas.ver',
+            'areas.crear',
+            'areas.editar',
+            'temas.ver',
+            'temas.crear',
+            'temas.editar',
+            'preguntas.ver',
+            'preguntas.crear',
+            'preguntas.editar',
+            'plantillas.ver',
+            'plantillas.crear',
+            'plantillas.editar',
             'reportes.ver',
             'learning_analytics.ver',
         ]);
@@ -122,13 +167,13 @@ class RolesAndUsersSeeder extends Seeder
         );
 
         $this->createUserWithRole(
-            name: 'Docente Demo',
+            name: 'Docente Académico',
             email: 'docente@intelecta.test',
             role: $docente
         );
 
         $this->createUserWithRole(
-            name: 'Estudiante Demo',
+            name: 'Estudiante Institucional',
             email: 'estudiante@intelecta.test',
             role: $estudiante
         );
