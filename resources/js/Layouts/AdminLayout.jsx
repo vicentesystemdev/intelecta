@@ -11,13 +11,13 @@ export default function AdminLayout({ title, subtitle, children }) {
         : 'Administrador institucional';
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-950">
+        <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-950">
             <AppSidebar
                 open={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
             />
 
-            <div className="min-h-screen lg:pl-72">
+            <div className="flex-1 flex flex-col h-screen overflow-hidden lg:pl-72">
                 <AppHeader
                     title={title}
                     subtitle={subtitle}
@@ -25,7 +25,9 @@ export default function AdminLayout({ title, subtitle, children }) {
                     role={role}
                     onMenuClick={() => setSidebarOpen(true)}
                 />
-                <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
+                <main className="flex-1 overflow-y-auto custom-scrollbar px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+                    {children}
+                </main>
             </div>
         </div>
     );

@@ -18,7 +18,7 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     AlertTriangle,
     BrainCircuit,
@@ -32,6 +32,10 @@ import {
     Target,
     TrendingUp,
     Users,
+    ChevronRight,
+    Settings,
+    ShieldCheck,
+    Layers,
 } from 'lucide-react';
 
 const metrics = [
@@ -201,6 +205,136 @@ export default function Dashboard() {
                     {metrics.map((metric) => (
                         <MetricCard key={metric.title} {...metric} />
                     ))}
+                </div>
+            </section>
+
+            <section className="mt-8">
+                <SectionHeading
+                    eyebrow="Navegación Modular"
+                    title="Módulos y Herramientas Administrativas"
+                    description="Consola de accesos directos para la gestión del instituto preuniversitario."
+                />
+                
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    {/* Tarjeta A: Gestión Académica */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-indigo-300 transition duration-300">
+                        <CardHeader className="pb-3 border-b border-slate-50">
+                            <div className="flex items-center gap-2">
+                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                                    <GraduationCap className="h-4.5 w-4.5" />
+                                </span>
+                                <CardTitle className="text-sm font-bold text-slate-800">
+                                    Gestión Académica
+                                </CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="pt-4 space-y-2">
+                            <Link href="/postulantes" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                                <span>Postulantes</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link href="/admin/gestion-academica/docentes" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                                <span>Docentes</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link href="/admin/gestion-academica/carreras" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                                <span>Carreras</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link href="/admin/gestion-academica/colegios" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                                <span>Colegios</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    {/* Tarjeta B: Evaluaciones */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-cyan-300 transition duration-300">
+                        <CardHeader className="pb-3 border-b border-slate-50">
+                            <div className="flex items-center gap-2">
+                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-50 text-cyan-600">
+                                    <ClipboardList className="h-4.5 w-4.5" />
+                                </span>
+                                <CardTitle className="text-sm font-bold text-slate-800">
+                                    Evaluaciones
+                                </CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="pt-4 space-y-2">
+                            <Link href="/plantillas-evaluacion" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-cyan-50 hover:text-cyan-700 transition">
+                                <span>Plantillas</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link href="/preguntas" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-cyan-50 hover:text-cyan-700 transition">
+                                <span>Banco de Preguntas</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link href="/admin/evaluaciones" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-cyan-50 hover:text-cyan-700 transition">
+                                <span>Evaluaciones</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link href="/admin/evaluaciones/resultados" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-cyan-50 hover:text-cyan-700 transition">
+                                <span>Resultados</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    {/* Tarjeta C: Análisis Académico */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-violet-300 transition duration-300">
+                        <CardHeader className="pb-3 border-b border-slate-50">
+                            <div className="flex items-center gap-2">
+                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
+                                    <TrendingUp className="h-4.5 w-4.5" />
+                                </span>
+                                <CardTitle className="text-sm font-bold text-slate-800">
+                                    Análisis Académico
+                                </CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="pt-4 space-y-2">
+                            <Link href="/reportes-academicos" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-violet-50 hover:text-violet-700 transition">
+                                <span>Reportes Académicos</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link href="/admin/analisis/learning-analytics" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-violet-50 hover:text-violet-750 transition">
+                                <span>Learning Analytics</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link href="/admin/analisis/riesgo-academico" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-violet-50 hover:text-violet-750 transition">
+                                <span>Riesgo Académico</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    {/* Tarjeta D: Sistema */}
+                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-slate-400 transition duration-300">
+                        <CardHeader className="pb-3 border-b border-slate-50">
+                            <div className="flex items-center gap-2">
+                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                                    <Settings className="h-4.5 w-4.5" />
+                                </span>
+                                <CardTitle className="text-sm font-bold text-slate-800">
+                                    Sistema
+                                </CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="pt-4 space-y-2">
+                            <Link href="/admin/sistema/usuarios" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-slate-950 transition">
+                                <span>Usuarios</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link href="/admin/sistema/roles-permisos" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-slate-950 transition">
+                                <span>Roles y Permisos</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link href="/admin/sistema/configuracion" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-slate-950 transition">
+                                <span>Configuración</span>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+                        </CardContent>
+                    </Card>
                 </div>
             </section>
 

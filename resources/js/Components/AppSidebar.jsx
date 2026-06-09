@@ -46,9 +46,24 @@ const navigationGroups = [
                 href: '/postulantes',
                 routeName: 'postulantes.*',
             },
-            { label: 'Docentes', icon: UserRoundCheck, href: '#' },
-            { label: 'Carreras', icon: BriefcaseBusiness, href: '#' },
-            { label: 'Colegios', icon: Building2, href: '#' },
+            {
+                label: 'Docentes',
+                icon: UserRoundCheck,
+                href: '/admin/gestion-academica/docentes',
+                routeName: 'admin.docentes',
+            },
+            {
+                label: 'Carreras',
+                icon: BriefcaseBusiness,
+                href: '/admin/gestion-academica/carreras',
+                routeName: 'admin.carreras',
+            },
+            {
+                label: 'Colegios',
+                icon: Building2,
+                href: '/admin/gestion-academica/colegios',
+                routeName: 'admin.colegios',
+            },
         ],
     },
     {
@@ -66,28 +81,64 @@ const navigationGroups = [
                 href: '/preguntas',
                 routeName: 'preguntas.*',
             },
-            { label: 'Evaluaciones', icon: ClipboardCheck, href: '#' },
-            { label: 'Resultados', icon: FileChartColumn, href: '#' },
+            {
+                label: 'Evaluaciones',
+                icon: ClipboardCheck,
+                href: '/admin/evaluaciones',
+                routeName: 'admin.evaluaciones.index',
+            },
+            {
+                label: 'Resultados',
+                icon: FileChartColumn,
+                href: '/admin/evaluaciones/resultados',
+                routeName: 'admin.evaluaciones.resultados',
+            },
         ],
     },
     {
         label: 'Análisis',
         items: [
-            { label: 'Reportes Académicos', icon: BarChart3, href: '#' },
+            {
+                label: 'Reportes Académicos',
+                icon: BarChart3,
+                href: '/reportes-academicos',
+                routeName: 'reportes-academicos.index',
+            },
             {
                 label: 'Learning Analytics',
                 icon: ChartNoAxesCombined,
-                href: '#',
+                href: '/admin/analisis/learning-analytics',
+                routeName: 'admin.analisis.learning-analytics',
             },
-            { label: 'Riesgo Académico', icon: ShieldAlert, href: '#' },
+            {
+                label: 'Riesgo Académico',
+                icon: ShieldAlert,
+                href: '/admin/analisis/riesgo-academico',
+                routeName: 'admin.analisis.riesgo-academico',
+            },
         ],
     },
     {
         label: 'Sistema',
         items: [
-            { label: 'Usuarios', icon: Users, href: '#' },
-            { label: 'Roles y Permisos', icon: ShieldCheck, href: '#' },
-            { label: 'Configuración', icon: Settings, href: '#' },
+            {
+                label: 'Usuarios',
+                icon: Users,
+                href: '/admin/sistema/usuarios',
+                routeName: 'admin.sistema.usuarios',
+            },
+            {
+                label: 'Roles y Permisos',
+                icon: ShieldCheck,
+                href: '/admin/sistema/roles-permisos',
+                routeName: 'admin.sistema.roles-permisos',
+            },
+            {
+                label: 'Configuración',
+                icon: Settings,
+                href: '/admin/sistema/configuracion',
+                routeName: 'admin.sistema.configuracion',
+            },
         ],
     },
 ];
@@ -134,7 +185,7 @@ export default function AppSidebar({ open = false, onClose = () => {} }) {
                     </button>
                 </div>
 
-                <nav className="flex-1 space-y-5 overflow-y-auto px-4 py-5">
+                <nav className="flex-1 space-y-5 overflow-y-auto px-4 py-5 sidebar-scrollbar">
                     {navigationGroups.map((group) => (
                         <div key={group.label}>
                             <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-300">

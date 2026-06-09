@@ -252,6 +252,7 @@ const LearningAnalyticsFallback = () => (
 );
 
 export default function Welcome({ auth }) {
+    const isEstudiante = auth.user && auth.roles && auth.roles.includes('estudiante');
     return (
         <>
             <Head title="INTELECTA - Plataforma Académica Preuniversitaria" />
@@ -281,23 +282,58 @@ export default function Welcome({ auth }) {
                             </nav>
 
                             {/* Botón de Acción */}
-                            <div>
-                                {auth.user ? (
-                                    <Link
-                                        href={route('dashboard')}
-                                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-700 hover:shadow-indigo-600/30 hover:-translate-y-0.5 active:translate-y-0"
-                                    >
-                                        Ir al panel
-                                        <ArrowRight className="h-4 w-4" />
-                                    </Link>
+                            <div className="flex items-center gap-2">
+                                {!auth.user ? (
+                                    <>
+                                        <Link
+                                            href="/evaluaciones-postulante"
+                                            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 hover:bg-slate-50 px-5 py-2.5 text-sm font-semibold text-slate-800 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                                        >
+                                            Ver evaluaciones académicas
+                                        </Link>
+                                        <Link
+                                            href={route('login')}
+                                            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-950/20 transition-all hover:bg-slate-900 hover:shadow-slate-950/30 hover:-translate-y-0.5 active:translate-y-0"
+                                        >
+                                            Iniciar sesión
+                                            <ArrowRight className="h-4 w-4" />
+                                        </Link>
+                                    </>
+                                ) : isEstudiante ? (
+                                    <>
+                                        <Link
+                                            href="/estudiante/evaluaciones"
+                                            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-cyan-400 hover:bg-cyan-500 px-5 py-2.5 text-sm font-bold text-indigo-950 shadow-lg shadow-cyan-400/10 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                                        >
+                                            Ingresar a Evaluaciones
+                                        </Link>
+                                        <Link
+                                            href={route('logout')}
+                                            method="post"
+                                            as="button"
+                                            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 hover:bg-slate-50 px-5 py-2.5 text-sm font-semibold text-slate-800 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                                        >
+                                            Cerrar sesión
+                                        </Link>
+                                    </>
                                 ) : (
-                                    <Link
-                                        href={route('login')}
-                                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-950/20 transition-all hover:bg-slate-900 hover:shadow-slate-950/30 hover:-translate-y-0.5 active:translate-y-0"
-                                    >
-                                        Iniciar sesión
-                                        <ArrowRight className="h-4 w-4" />
-                                    </Link>
+                                    <>
+                                        <Link
+                                            href={route('dashboard')}
+                                            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-700 hover:shadow-indigo-600/30 hover:-translate-y-0.5 active:translate-y-0"
+                                        >
+                                            Ir al panel
+                                            <ArrowRight className="h-4 w-4" />
+                                        </Link>
+                                        <Link
+                                            href={route('logout')}
+                                            method="post"
+                                            as="button"
+                                            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 hover:bg-slate-50 px-5 py-2.5 text-sm font-semibold text-slate-800 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                                        >
+                                            Cerrar sesión
+                                        </Link>
+                                    </>
                                 )}
                             </div>
                         </div>
@@ -328,29 +364,58 @@ export default function Welcome({ auth }) {
                                     Plataforma web para registrar postulantes, construir evaluaciones académicas, organizar bancos de preguntas y preparar información para futuras predicciones de desempeño.
                                 </p>
                                 <div className="mt-10 flex flex-wrap gap-4 justify-center lg:justify-start">
-                                    {auth.user ? (
-                                        <Link
-                                            href={route('dashboard')}
-                                            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3.5 text-base font-semibold text-white shadow-xl shadow-indigo-600/20 transition-all hover:bg-indigo-700 hover:shadow-indigo-600/30 hover:-translate-y-0.5"
-                                        >
-                                            Ir al panel
-                                            <ArrowRight className="h-5 w-5" />
-                                        </Link>
+                                    {!auth.user ? (
+                                        <>
+                                            <Link
+                                                href="/evaluaciones-postulante"
+                                                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-cyan-400 hover:bg-cyan-500 px-6 py-3.5 text-base font-bold text-indigo-950 shadow-xl shadow-cyan-400/10 transition-all hover:-translate-y-0.5"
+                                            >
+                                                Ver evaluaciones académicas
+                                            </Link>
+                                            <Link
+                                                href={route('login')}
+                                                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 hover:bg-slate-800 px-6 py-3.5 text-base font-semibold text-white shadow-xl shadow-slate-900/20 transition-all hover:-translate-y-0.5"
+                                            >
+                                                Iniciar sesión
+                                                <ArrowRight className="h-5 w-5" />
+                                            </Link>
+                                        </>
+                                    ) : isEstudiante ? (
+                                        <>
+                                            <Link
+                                                href="/estudiante/evaluaciones"
+                                                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-cyan-400 hover:bg-cyan-500 px-6 py-3.5 text-base font-bold text-indigo-950 shadow-xl shadow-cyan-400/10 transition-all hover:-translate-y-0.5"
+                                            >
+                                                Ingresar a Evaluaciones
+                                            </Link>
+                                            <Link
+                                                href={route('logout')}
+                                                method="post"
+                                                as="button"
+                                                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-3.5 text-base font-semibold text-slate-800 shadow-sm transition-all hover:-translate-y-0.5"
+                                            >
+                                                Cerrar sesión
+                                            </Link>
+                                        </>
                                     ) : (
-                                        <Link
-                                            href={route('login')}
-                                            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3.5 text-base font-semibold text-white shadow-xl shadow-indigo-600/20 transition-all hover:bg-indigo-700 hover:shadow-indigo-600/30 hover:-translate-y-0.5"
-                                        >
-                                            Iniciar sesión
-                                            <ArrowRight className="h-5 w-5" />
-                                        </Link>
+                                        <>
+                                            <Link
+                                                href={route('dashboard')}
+                                                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3.5 text-base font-semibold text-white shadow-xl shadow-indigo-600/20 transition-all hover:bg-indigo-700 hover:shadow-indigo-600/30 hover:-translate-y-0.5"
+                                            >
+                                                Ir al panel
+                                                <ArrowRight className="h-5 w-5" />
+                                            </Link>
+                                            <Link
+                                                href={route('logout')}
+                                                method="post"
+                                                as="button"
+                                                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-3.5 text-base font-semibold text-slate-800 shadow-sm transition-all hover:-translate-y-0.5"
+                                            >
+                                                Cerrar sesión
+                                            </Link>
+                                        </>
                                     )}
-                                    <a
-                                        href="#enfoque"
-                                        className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-3.5 text-base font-semibold text-slate-800 shadow-sm transition-all hover:border-slate-350 hover:bg-slate-50 hover:-translate-y-0.5"
-                                    >
-                                        Ver enfoque académico
-                                    </a>
                                 </div>
                             </div>
 

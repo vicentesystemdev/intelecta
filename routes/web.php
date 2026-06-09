@@ -5,6 +5,7 @@ use App\Http\Controllers\PlantillaEvaluacionController;
 use App\Http\Controllers\PostulanteController;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReporteAcademicoController;
 use App\Http\Controllers\TemaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +20,14 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/evaluaciones-postulante', function () {
+    return Inertia::render('Public/EvaluacionesPostulante');
+})->name('evaluaciones-postulante');
+
 Route::get('/dashboard', function () {
+    if (auth()->user()->hasRole('estudiante')) {
+        return redirect('/');
+    }
     return Inertia::render('Admin/Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -83,6 +91,119 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:postulantes.eliminar')
             ->name('cambiar-estado');
     });
+
+    Route::get('/reportes-academicos', [ReporteAcademicoController::class, 'index'])
+        ->middleware('permission:reportes.ver')
+        ->name('reportes-academicos.index');
+
+    // Rutas planificadas del panel administrativo
+    Route::prefix('admin')->group(function () {
+        Route::prefix('gestion-academica')->group(function () {
+            Route::get('/docentes', function () {
+                return Inertia::render('Modulos/ModuloPlanificado', [
+                    'titulo' => 'Docentes',
+                    'descripcion' => 'Gestión de tutores, carga académica e intervención en evaluaciones lógico-matemáticas.',
+                    'moduloRelacionado' => 'Postulantes y Evaluaciones',
+                    'proximaEvolucion' => 'Monitoreo de la asignación de tutores y flujos de revisión para los bancos de preguntas preuniversitarios.'
+                ]);
+            })->name('admin.docentes');
+
+            Route::get('/carreras', function () {
+                return Inertia::render('Modulos/ModuloPlanificado', [
+                    'titulo' => 'Carreras',
+                    'descripcion' => 'Consulta institucional de carreras postuladas, universidades asociadas y nivel de exigencia matemática.',
+                    'moduloRelacionado' => 'Reportes Académicos',
+                    'proximaEvolucion' => 'Control de ponderación de puntajes mínimos exigidos y perfil de postulación académica.'
+                ]);
+            })->name('admin.carreras');
+
+            Route::get('/colegios', function () {
+                return Inertia::render('Modulos/ModuloPlanificado', [
+                    'titulo' => 'Colegios',
+                    'descripcion' => 'Seguimiento de colegios de procedencia y origen académico de postulantes.',
+                    'moduloRelacionado' => 'Postulantes',
+                    'proximaEvolucion' => 'Estadísticas comparativas agregadas por colegios fiscales, privados y de convenio para análisis del instituto.'
+                ]);
+            })->name('admin.colegios');
+        });
+
+        Route::prefix('evaluaciones')->group(function () {
+            Route::get('/', function () {
+                return Inertia::render('Modulos/ModuloPlanificado', [
+                    'titulo' => 'Evaluaciones',
+                    'descripcion' => 'Programación académica de evaluaciones a partir de plantillas y bancos de preguntas.',
+                    'moduloRelacionado' => 'Plantillas de Evaluación',
+                    'proximaEvolucion' => 'Calendarización interactiva, asignación de fechas de examen, y control de estados de pruebas.'
+                ]);
+            })->name('admin.evaluaciones.index');
+
+            Route::get('/resultados', function () {
+                return Inertia::render('Modulos/ModuloPlanificado', [
+                    'titulo' => 'Resultados',
+                    'descripcion' => 'Concentrado académico preparado para registrar resultados y desempeño por área evaluada.',
+                    'moduloRelacionado' => 'Reportes Académicos',
+                    'proximaEvolucion' => 'Centralización de notas obtenidas en pruebas guiadas, cálculo de desvíos estándar e historiales.'
+                ]);
+            })->name('admin.evaluaciones.resultados');
+        });
+
+        Route::prefix('analisis')->group(function () {
+            Route::get('/learning-analytics', function () {
+                return Inertia::render('Modulos/ModuloPlanificado', [
+                    'titulo' => 'Learning Analytics',
+                    'descripcion' => 'Base de análisis preparada para consolidar indicadores académicos y futura predicción de desempeño.',
+                    'moduloRelacionado' => 'Reportes Académicos',
+                    'proximaEvolucion' => 'Algoritmos estadísticos avanzados aplicados a la evolución lógica de los postulantes.'
+                ]);
+            })->name('admin.analisis.learning-analytics');
+
+            Route::get('/riesgo-academico', function () {
+                return Inertia::render('Modulos/ModuloPlanificado', [
+                    'titulo' => 'Riesgo Académico',
+                    'descripcion' => 'Seguimiento preliminar de brechas lógico-matemáticas y priorización de refuerzo académico.',
+                    'moduloRelacionado' => 'Postulantes en Alerta',
+                    'proximaEvolucion' => 'Semáforo automático de detección de brechas académicas y sugerencia de tutorías dinámicas.'
+                ]);
+            })->name('admin.analisis.riesgo-academico');
+        });
+
+        Route::prefix('sistema')->group(function () {
+            Route::get('/usuarios', function () {
+                return Inertia::render('Modulos/ModuloPlanificado', [
+                    'titulo' => 'Usuarios',
+                    'descripcion' => 'Gestión planificada de accesos institucionales para administradores, tutores y postulantes.',
+                    'moduloRelacionado' => 'Configuración General',
+                    'proximaEvolucion' => 'Control de cuentas activas del personal de admisión y perfiles de postulantes autorizados.'
+                ]);
+            })->name('admin.sistema.usuarios');
+
+            Route::get('/roles-permisos', function () {
+                return Inertia::render('Modulos/ModuloPlanificado', [
+                    'titulo' => 'Roles y Permisos',
+                    'descripcion' => 'Administración de perfiles de acceso y permisos por rol institucional.',
+                    'moduloRelacionado' => 'Usuarios y Seguridad',
+                    'proximaEvolucion' => 'Matriz interactiva para asociar capacidades de Spatie Permission de forma visual en tiempo real.'
+                ]);
+            })->name('admin.sistema.roles-permisos');
+
+            Route::get('/configuracion', function () {
+                return Inertia::render('Modulos/ModuloPlanificado', [
+                    'titulo' => 'Configuración',
+                    'descripcion' => 'Parámetros generales del sistema y preferencias académicas de operación.',
+                    'moduloRelacionado' => 'Sistema General',
+                    'proximaEvolucion' => 'Ajustes del temporizador global, ponderaciones de corrección y límites de intentos en exámenes.'
+                ]);
+            })->name('admin.sistema.configuracion');
+        });
+    });
+
+    // Ruta de evaluaciones del estudiante
+    Route::get('/estudiante/evaluaciones', function () {
+        if (auth()->user()->hasRole(['super-admin', 'administrador', 'docente'])) {
+            return redirect()->route('dashboard');
+        }
+        return Inertia::render('Estudiante/Evaluaciones');
+    })->middleware('verified')->name('estudiante.evaluaciones');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
