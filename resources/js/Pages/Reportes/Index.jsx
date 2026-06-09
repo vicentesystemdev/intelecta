@@ -1,1217 +1,1082 @@
-import React, { useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout';
-import MetricCard from '@/Components/MetricCard';
 import StatusBadge from '@/Components/StatusBadge';
-import useTheme from '@/Hooks/useTheme';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
-import { 
-    GraduationCap, 
-    Building2, 
-    SlidersHorizontal, 
-    BookCopy, 
-    FileQuestion, 
-    TrendingUp, 
-    Award, 
-    Lightbulb, 
-    Sparkles, 
-    CheckCircle2, 
-    AlertTriangle, 
-    Search,
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/Components/ui/table';
+import useTheme from '@/Hooks/useTheme';
+import AdminLayout from '@/Layouts/AdminLayout';
+import { Head, Link } from '@inertiajs/react';
+import {
+    Activity,
+    BarChart3,
+    BookCopy,
+    BrainCircuit,
+    Building2,
     ChevronDown,
     ChevronUp,
-    ChevronLeft,
-    ChevronRight,
-    BookmarkCheck,
-    Layers,
-    Activity,
-    Compass,
-    Calendar,
-    Users
+    FileQuestion,
+    GraduationCap,
+    Layers3,
+    LibraryBig,
+    Search,
+    Sparkles,
+    Tags,
 } from 'lucide-react';
+import { Fragment, useMemo, useState } from 'react';
 import {
-    ResponsiveContainer,
-    PieChart,
-    Pie,
-    Cell,
-    Tooltip,
-    Legend,
-    BarChart,
     Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    Legend,
+    Pie,
+    PieChart,
+    ResponsiveContainer,
+    Tooltip,
     XAxis,
     YAxis,
-    CartesianGrid,
-    AreaChart,
-    Area
 } from 'recharts';
 
+const chartColors = [
+    '#4f46e5',
+    '#0ea5e9',
+    '#06b6d4',
+    '#7c3aed',
+    '#f59e0b',
+    '#10b981',
+    '#f43f5e',
+];
 
-export default function Index({
-    metricas,
-    postulantesPorUniversidad = [],
-    postulantesPorCarrera = [],
-    postulantesPorColegio = [],
-    preguntasPorArea = [],
-    preguntasPorDificultad = [],
-    plantillasDetalle = [],
-    postulantesPorExigenciaMatematica = [],
-    postulantesList = []
-}) {
-    // Estados para el Buscador y Filtros locales de Postulantes
-    const PAGE_SIZE = 15;
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filterUni, setFilterUni] = useState('');
-    const [filterCarrera, setFilterCarrera] = useState('');
-    const [filterExigencia, setFilterExigencia] = useState('');
-    const [filterEstado, setFilterEstado] = useState('');
-    const [expandedPostulanteId, setExpandedPostulanteId] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
+const difficultyColors = {
+    basica: '#10b981',
+    media: '#f59e0b',
+    avanzada: '#f43f5e',
+    sin_clasificacion: '#94a3b8',
+};
 
-    // Detección dinámica de modo oscuro
-    const { isDark } = useTheme();
+const shortMatterLabel = (name) => {
+    if (name?.includes('Razonamiento Académico')) return 'PAA';
+    return name || 'Sin materia';
+};
 
-    // Colores y temas de los gráficos
-    const gridColor = isDark ? '#334155' : '#e2e8f0'; // slate-700 / slate-200
-    const axisColor = isDark ? '#94a3b8' : '#64748b'; // slate-400 / slate-500
-    const CHART_COLORS = ['#6366f1', '#06b6d4', '#a855f7', '#3b82f6', '#f59e0b', '#10b981', '#f43f5e', '#64748b'];
+function ChartCard({ icon: Icon, title, description, children }) {
+    return (
+        <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-slate-900 dark:text-slate-100">
+                    <Icon className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
+                    {title}
+                </CardTitle>
+                <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">
+                    {description}
+                </p>
+            </CardHeader>
+            <CardContent>{children}</CardContent>
+        </Card>
+    );
+}
 
-    // Tooltip personalizado
-    const CustomTooltip = ({ active, payload }) => {
-        if (active && payload && payload.length) {
-            const item = payload[0];
-            const value = Number(item.value) || 0;
-            const name = item.name || item.payload?.name || '';
-            const percentage = item.payload?.percent !== undefined 
-                ? Math.round(item.payload.percent * 100) 
-                : (item.payload?.porcentaje ?? undefined);
-
-            return (
-                <div className={`rounded-xl border p-3 shadow-lg text-xs font-semibold ${
-                    isDark 
-                        ? 'bg-slate-950 border-slate-800 text-slate-100' 
-                        : 'bg-white border-slate-200 text-slate-900'
-                }`}>
-                    <p className="font-black mb-1">{item.payload?.fullName || name}</p>
-                    <p className="flex justify-between items-center gap-4 text-indigo-600 dark:text-indigo-400">
-                        <span>Cantidad:</span>
-                        <span className="font-bold text-slate-800 dark:text-slate-200">{value}</span>
-                    </p>
-                    {percentage !== undefined && (
-                        <p className="flex justify-between items-center gap-4 text-[10px] text-slate-400 dark:text-slate-500 font-bold mt-0.5">
-                            <span>Porcentaje:</span>
-                            <span>{percentage}%</span>
-                        </p>
-                    )}
-                </div>
-            );
-        }
-        return null;
-    };
-
-    // Estado vacío para los gráficos
-    const EmptyState = ({ message = "No hay datos disponibles para mostrar" }) => (
-        <div className="flex flex-col items-center justify-center h-72 w-full text-slate-400 dark:text-slate-500 bg-slate-50/30 dark:bg-slate-800/10 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 p-6">
-            <Activity className="h-8 w-8 mb-2 animate-pulse text-slate-300 dark:text-slate-700" />
-            <p className="text-xs font-semibold text-center">{message}</p>
+function EmptyState({ message }) {
+    return (
+        <div className="flex h-72 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/40 p-6 text-center text-xs font-semibold text-slate-400 dark:border-slate-800 dark:bg-slate-800/10 dark:text-slate-500">
+            {message}
         </div>
     );
+}
 
+export default function Index({
+    metricas = {},
+    postulantesPorUniversidad = [],
+    postulantesPorCarrera = [],
+    preguntasPorArea = [],
+    coberturaMaterias = [],
+    dificultadPorMateria = [],
+    plantillasPorTipo = [],
+    plantillasDetalle = [],
+    postulantesList = [],
+    preguntasSinMateria = 0,
+}) {
+    const { isDark } = useTheme();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [expandedPostulanteId, setExpandedPostulanteId] = useState(null);
 
-    // Obtener valores únicos para poblar los selects de filtros
-    const universidadesUnicas = Array.from(new Set(postulantesList.map(p => p.universidad).filter(Boolean)));
-    const carrerasUnicas = Array.from(new Set(postulantesList.map(p => p.carrera).filter(Boolean)));
-    const exigenciasUnicas = Array.from(new Set(postulantesList.map(p => p.exigencia).filter(Boolean)));
-    const estadosUnicos = Array.from(new Set(postulantesList.map(p => p.estado).filter(Boolean)));
-
-    // Filtrar postulantes
-    const filteredPostulantes = postulantesList.filter(postulante => {
-        const matchesSearch = 
-            postulante.nombre_completo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            postulante.colegio.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            postulante.carrera.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            postulante.universidad.toLowerCase().includes(searchQuery.toLowerCase());
-
-        const matchesUni = filterUni ? postulante.universidad === filterUni : true;
-        const matchesCarrera = filterCarrera ? postulante.carrera === filterCarrera : true;
-        const matchesExigencia = filterExigencia ? postulante.exigencia === filterExigencia : true;
-        const matchesEstado = filterEstado ? postulante.estado === filterEstado : true;
-
-        return matchesSearch && matchesUni && matchesCarrera && matchesExigencia && matchesEstado;
-    });
-
-    // Paginación de postulantes
-    const totalPages = Math.max(1, Math.ceil(filteredPostulantes.length / PAGE_SIZE));
-    const pagedPostulantes = filteredPostulantes.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-    const isFiltered = searchQuery || filterUni || filterCarrera || filterExigencia || filterEstado;
-
-    const handleFilterChange = (setter) => (e) => {
-        setter(e.target.value);
-        setCurrentPage(1);
-        setExpandedPostulanteId(null);
+    const gridColor = isDark ? '#334155' : '#e2e8f0';
+    const axisColor = isDark ? '#94a3b8' : '#64748b';
+    const tooltipStyle = {
+        backgroundColor: isDark ? '#020617' : '#ffffff',
+        borderColor: isDark ? '#1e293b' : '#e2e8f0',
+        borderRadius: 12,
+        color: isDark ? '#f8fafc' : '#0f172a',
+        fontSize: 12,
     };
 
-    const toggleExpandPostulante = (id) => {
-        setExpandedPostulanteId(prev => (prev === id ? null : id));
-    };
-
-    // 1. Métricas superiores
-    const metricsList = [
+    const metricCards = [
         {
-            title: 'Postulantes registrados',
-            value: (metricas?.totalPostulantes ?? 0).toString(),
-            detail: 'Seguimiento activo del proceso',
-            trend: 'neutral',
+            title: 'Postulantes',
+            value: metricas.totalPostulantes ?? 0,
+            detail: 'Perfiles registrados',
             icon: GraduationCap,
-            accent: 'indigo',
+            color: 'text-indigo-600',
         },
         {
-            title: 'Universidades objetivo',
-            value: (metricas?.totalUniversidades ?? 0).toString(),
-            detail: 'Destinos académicos de interés',
-            trend: 'neutral',
-            icon: Building2,
-            accent: 'blue',
+            title: 'Materias',
+            value: metricas.totalMaterias ?? 0,
+            detail: 'Base curricular',
+            icon: LibraryBig,
+            color: 'text-blue-600',
         },
         {
-            title: 'Carreras postuladas',
-            value: (metricas?.totalCarreras ?? 0).toString(),
-            detail: 'Ofertas académicas asociadas',
-            trend: 'neutral',
-            icon: SlidersHorizontal,
-            accent: 'violet',
-        },
-        {
-            title: 'Colegios de procedencia',
-            value: (metricas?.totalColegios ?? 0).toString(),
-            detail: 'Unidades educativas representadas',
-            trend: 'neutral',
-            icon: Building2,
-            accent: 'rose',
-        },
-        {
-            title: 'Banco de preguntas',
-            value: (metricas?.totalPreguntas ?? 0).toString(),
-            detail: 'Reactivos metodológicos en base',
-            trend: 'neutral',
+            title: 'Preguntas',
+            value: metricas.totalPreguntas ?? 0,
+            detail: 'Banco académico',
             icon: FileQuestion,
-            accent: 'cyan',
+            color: 'text-cyan-600',
         },
         {
-            title: 'Áreas evaluadas',
-            value: (metricas?.totalAreas ?? 0).toString(),
-            detail: 'Competencias lógicas clave',
-            trend: 'neutral',
-            icon: Layers,
-            accent: 'sky',
-        },
-        {
-            title: 'Temas registrados',
-            value: (metricas?.totalTemas ?? 0).toString(),
-            detail: 'Subcategorías lógico-matemáticas',
-            trend: 'neutral',
-            icon: BookmarkCheck,
-            accent: 'emerald',
-        },
-        {
-            title: 'Plantillas académicas',
-            value: (metricas?.totalPlantillas ?? 0).toString(),
-            detail: 'Exámenes configurados',
-            trend: 'neutral',
+            title: 'Plantillas activas',
+            value: metricas.totalPlantillasActivas ?? 0,
+            detail: 'Instrumentos disponibles',
             icon: BookCopy,
-            accent: 'amber',
+            color: 'text-violet-600',
+        },
+        {
+            title: 'Áreas',
+            value: metricas.totalAreas ?? 0,
+            detail: 'Campos curriculares',
+            icon: Layers3,
+            color: 'text-sky-600',
+        },
+        {
+            title: 'Temas',
+            value: metricas.totalTemas ?? 0,
+            detail: 'Contenidos evaluables',
+            icon: Tags,
+            color: 'text-emerald-600',
+        },
+        {
+            title: 'Universidades',
+            value: metricas.totalUniversidades ?? 0,
+            detail: 'Destinos académicos',
+            icon: Building2,
+            color: 'text-amber-600',
+        },
+        {
+            title: 'Carreras',
+            value: metricas.totalCarreras ?? 0,
+            detail: 'Opciones postuladas',
+            icon: BarChart3,
+            color: 'text-rose-600',
         },
     ];
 
-    // Cálculos dinámicos para conclusiones
-    const uniLider = postulantesPorUniversidad?.[0]?.sigla_uni ?? 'UMSA';
-    const carreraLider = postulantesPorCarrera?.[0]?.nombre_car ?? 'Ingeniería de Sistemas';
-    const areaLider = preguntasPorArea?.[0]?.nombre_area ?? 'Razonamiento Lógico-Matemático';
-    const difPredominante = preguntasPorDificultad?.[0]?.dificultad_preg ?? 'media';
-
-    // Obtener recomendación de nivelación según exigencia
-    const getRecomendacionNivelacion = (exigencia) => {
-        if (exigencia === 'alta') {
-            return 'Priorizar refuerzo en álgebra, trigonometría y resolución de problemas.';
-        } else if (exigencia === 'media-alta') {
-            return 'Reforzar razonamiento lógico y planteo de ecuaciones.';
-        } else if (exigencia === 'media') {
-            return 'Mantener seguimiento regular con evaluación diagnóstica.';
-        } else {
-            return 'Aplicar nivelación focalizada según resultados iniciales.';
-        }
-    };
-
-    // Mapeos de datos para Recharts
-    const dataUni = (postulantesPorUniversidad ?? []).map((uni, idx) => ({
-        name: uni.sigla_uni,
-        fullName: uni.sigla_uni,
-        value: Number(uni.total) || 0,
-        percent: (metricas?.totalPostulantes ?? 0) > 0 ? (uni.total / metricas.totalPostulantes) : 0
+    const dataUniversidades = postulantesPorUniversidad.map((item) => ({
+        name: item.sigla_uni || item.nombre_uni,
+        value: Number(item.total) || 0,
     }));
 
-    const topCarreras = (postulantesPorCarrera ?? []).slice(0, 8).map((car, idx) => ({
-        name: car.nombre_car.length > 20 ? car.nombre_car.substring(0, 20) + '...' : car.nombre_car,
-        fullName: car.nombre_car,
-        total: Number(car.total) || 0,
-        isTop: idx === 0
+    const dataCarreras = postulantesPorCarrera.slice(0, 8).map((item) => ({
+        name:
+            item.nombre_car.length > 22
+                ? `${item.nombre_car.slice(0, 22)}...`
+                : item.nombre_car,
+        fullName: item.nombre_car,
+        total: Number(item.total) || 0,
     }));
 
-    const topColegios = (postulantesPorColegio ?? []).slice(0, 8).map((col, idx) => ({
-        name: col.nombre_col.length > 20 ? col.nombre_col.substring(0, 20) + '...' : col.nombre_col,
-        fullName: col.nombre_col,
-        total: Number(col.total) || 0
+    const dataPreguntasMateria = coberturaMaterias.map((materia) => ({
+        name: materia.codigo_mat,
+        fullName: materia.nombre_mat,
+        preguntas: Number(materia.preguntas) || 0,
     }));
 
-    const dataAreas = (preguntasPorArea ?? []).map(area => ({
-        name: area.nombre_area.length > 15 ? area.nombre_area.substring(0, 15) + '...' : area.nombre_area,
-        fullName: area.nombre_area,
-        total: Number(area.total) || 0
+    const dataCobertura = coberturaMaterias.map((materia) => ({
+        name: materia.codigo_mat,
+        fullName: materia.nombre_mat,
+        areas: Number(materia.areas) || 0,
+        temas: Number(materia.temas) || 0,
+        preguntas: Number(materia.preguntas) || 0,
+        plantillas: Number(materia.plantillas) || 0,
     }));
 
-    const DIFICULTAD_MAP = {
-        'basica': 'Básica',
-        'media': 'Media',
-        'avanzada': 'Avanzada'
-    };
-    const DIFICULTAD_COLORS = {
-        'basica': '#10b981', // emerald
-        'media': '#f59e0b', // amber
-        'avanzada': '#f43f5e' // rose
-    };
-    const dataDificultad = (preguntasPorDificultad ?? []).map(dif => {
-        const name = DIFICULTAD_MAP[dif.dificultad_preg.toLowerCase()] || dif.dificultad_preg;
-        return {
-            name,
-            fullName: `Reactivos de dificultad ${name}`,
-            value: Number(dif.total) || 0,
-            color: DIFICULTAD_COLORS[dif.dificultad_preg.toLowerCase()] || '#64748b',
-            percent: (metricas?.totalPreguntas ?? 0) > 0 ? (dif.total / metricas.totalPreguntas) : 0
-        };
-    });
+    const dataDificultad = dificultadPorMateria.map((materia) => ({
+        name: materia.codigo_mat,
+        fullName: materia.nombre_mat,
+        basica: Number(materia.basica) || 0,
+        media: Number(materia.media) || 0,
+        avanzada: Number(materia.avanzada) || 0,
+        sin_clasificacion: Number(materia.sin_clasificacion) || 0,
+    }));
 
-    const EXIGENCIA_LABELS = {
-        'alta': 'Alta',
-        'media-alta': 'Media-Alta',
-        'media': 'Media',
-        'baja-media': 'Baja-Media'
-    };
-    const EXIGENCIA_COLORS = {
-        'Alta': '#f43f5e',
-        'Media-Alta': '#f59e0b',
-        'Media': '#3b82f6',
-        'Baja-Media': '#10b981'
-    };
-    
-    // Normalizar y agrupar exigencias
-    const exigenciaMap = {};
-    (postulantesPorExigenciaMatematica ?? []).forEach(ex => {
-        if (!ex.nivel) return;
-        const key = ex.nivel.toLowerCase().replace('_', '-');
-        const label = EXIGENCIA_LABELS[key] || ex.nivel;
-        exigenciaMap[label] = (exigenciaMap[label] || 0) + (Number(ex.total) || 0);
-    });
-    
-    const orderedExigenciaKeys = ['Alta', 'Media-Alta', 'Media', 'Baja-Media'];
-    const dataExigencia = orderedExigenciaKeys.map(key => {
-        const val = exigenciaMap[key] || 0;
-        return {
-            name: key,
-            fullName: `Exigencia matemática ${key}`,
-            total: val,
-            porcentaje: (metricas?.totalPostulantes ?? 0) > 0 ? Math.round((val / metricas.totalPostulantes) * 100) : 0,
-            color: EXIGENCIA_COLORS[key] || '#94a3b8'
-        };
-    });
+    const dataPlantillas = plantillasPorTipo.map((item) => ({
+        name: item.tipo,
+        value: Number(item.total) || 0,
+    }));
 
-    // Síntesis institucional conceptual
-    const dataSintesis = [
-        { name: 'Áreas', cantidad: Number(metricas?.totalAreas) || 0, fullName: 'Áreas de Conocimiento' },
-        { name: 'Plantillas', cantidad: Number(metricas?.totalPlantillas) || 0, fullName: 'Plantillas Académicas' },
-        { name: 'Colegios', cantidad: Number(metricas?.totalColegios) || 0, fullName: 'Colegios Registrados' },
-        { name: 'Carreras', cantidad: Number(metricas?.totalCarreras) || 0, fullName: 'Carreras de Interés' },
-        { name: 'Postulantes', cantidad: Number(metricas?.totalPostulantes) || 0, fullName: 'Postulantes Activos' },
-        { name: 'Reactivos', cantidad: Number(metricas?.totalPreguntas) || 0, fullName: 'Reactivos en el Banco' }
-    ];
+    const filteredPostulantes = useMemo(() => {
+        const query = searchQuery.trim().toLowerCase();
+        if (!query) return postulantesList;
+
+        return postulantesList.filter((postulante) =>
+            [
+                postulante.nombre_completo,
+                postulante.colegio,
+                postulante.universidad,
+                postulante.carrera,
+            ]
+                .filter(Boolean)
+                .some((value) => value.toLowerCase().includes(query)),
+        );
+    }, [postulantesList, searchQuery]);
+
+    const materiaLider = [...coberturaMaterias].sort(
+        (a, b) => Number(b.preguntas) - Number(a.preguntas),
+    )[0];
+    const areaLider = preguntasPorArea[0];
 
     return (
-
         <AdminLayout
             title="Reportes Académicos"
-            subtitle="Indicadores institucionales para el seguimiento del desempeño lógico-matemático preuniversitario."
+            subtitle="Cobertura institucional en ciencias exactas y razonamiento académico."
             wide
         >
             <Head title="Reportes Académicos - INTELECTA" />
 
             <div className="space-y-8">
-                
-                {/* 1. Tarjeta de lectura rápida */}
-                <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6
-                    dark:border-slate-800 dark:bg-slate-900">
-                    <div className="space-y-2">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-700/10
-                            dark:bg-indigo-950 dark:text-indigo-300 dark:ring-indigo-800">
-                            <Sparkles className="h-3 w-3 animate-pulse" />
-                            Lectura Rápida
-                        </span>
-                        <p className="text-sm text-slate-600 max-w-4xl leading-relaxed dark:text-slate-400">
-                            Este panel consolida información de postulantes, universidades, carreras, colegios, banco de preguntas y plantillas académicas para apoyar la toma de decisiones del instituto. Permite un análisis modular de competencias y procedencias estudiantiles.
+                <section className="flex flex-col justify-between gap-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:flex-row md:items-center">
+                    <div>
+                        <Badge className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 dark:bg-indigo-950 dark:text-indigo-300">
+                            <Sparkles className="mr-1 h-3.5 w-3.5" />
+                            Lectura institucional
+                        </Badge>
+                        <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-600 dark:text-slate-400">
+                            La cobertura académica se distribuye entre Matemática,
+                            Física, Química y Razonamiento Académico. Las métricas
+                            proceden de materias, áreas, temas, preguntas y
+                            plantillas registradas.
                         </p>
                     </div>
-                    <Link href="/dashboard" className="shrink-0 w-full md:w-auto">
-                        <button className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold h-10 px-4 transition
-                            dark:bg-slate-700 dark:hover:bg-slate-600">
-                            Volver al Dashboard
-                        </button>
+                    <Link
+                        href="/dashboard"
+                        className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 px-4 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600"
+                    >
+                        Volver al Dashboard
                     </Link>
-                </div>
-
-                {/* 2. KPIs superiores */}
-                <section>
-                    <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-                        {metricsList.map((metric) => {
-                            const Icon = metric.icon;
-                            let cardColor = 'text-indigo-600 bg-indigo-50/50 hover:ring-indigo-300';
-                            if (metric.accent === 'blue') cardColor = 'text-blue-600 bg-blue-50/50 hover:ring-blue-300';
-                            if (metric.accent === 'violet') cardColor = 'text-violet-600 bg-violet-50/50 hover:ring-violet-300';
-                            if (metric.accent === 'rose') cardColor = 'text-rose-600 bg-rose-50/50 hover:ring-rose-300';
-                            if (metric.accent === 'cyan') cardColor = 'text-cyan-600 bg-cyan-50/50 hover:ring-cyan-300';
-                            if (metric.accent === 'sky') cardColor = 'text-sky-600 bg-sky-50/50 hover:ring-sky-300';
-                            if (metric.accent === 'emerald') cardColor = 'text-emerald-600 bg-emerald-50/50 hover:ring-emerald-300';
-                            if (metric.accent === 'amber') cardColor = 'text-amber-600 bg-amber-50/50 hover:ring-amber-300';
-
-                            return (
-                                <Card key={metric.title} className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm transition duration-300 ${cardColor}`}>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
-                                            {metric.title}
-                                        </span>
-                                        <span className="p-1 rounded-lg bg-white shadow-sm dark:bg-slate-800">
-                                            <Icon className="h-4 w-4" />
-                                        </span>
-                                    </div>
-                                    <div className="mt-2.5">
-                                        <p className="text-2xl font-black text-slate-900 dark:text-slate-100 leading-none">{metric.value}</p>
-                                        <p className="text-[9px] text-slate-400 mt-1 font-semibold leading-none">{metric.detail}</p>
-                                    </div>
-                                </Card>
-                            );
-                        })}
-                    </div>
                 </section>
 
-                {/* 3. Panel Estado general del instituto */}
-                <section className="grid gap-6 md:grid-cols-3">
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
-                        <div className="flex flex-col border-b border-slate-100 dark:border-slate-800/80 pb-3">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                <GraduationCap className="h-5 w-5 text-indigo-600" />
-                                Demanda Académica
-                            </h3>
-                        </div>
-                        <div className="mt-4 space-y-4 text-xs font-medium text-slate-650 dark:text-slate-400">
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                <span>Universidad principal</span>
-                                <span className="font-black text-slate-800 dark:text-slate-200">{uniLider}</span>
+                <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                    {metricCards.map(({ title, value, detail, icon: Icon, color }) => (
+                        <Card
+                            key={title}
+                            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+                        >
+                            <div className="flex items-center justify-between">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    {title}
+                                </p>
+                                <Icon className={`h-4 w-4 ${color}`} />
                             </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                <span>Carrera principal</span>
-                                <span className="max-w-[150px] truncate font-black text-slate-800 dark:text-slate-200">{carreraLider}</span>
-                            </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                <span>Total postulantes</span>
-                                <span className="font-black text-indigo-600">{metricas?.totalPostulantes ?? 0}</span>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
-                        <div className="flex flex-col border-b border-slate-100 dark:border-slate-800/80 pb-3">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                <BookCopy className="h-5 w-5 text-indigo-600" />
-                                Cobertura Evaluativa
-                            </h3>
-                        </div>
-                        <div className="mt-4 space-y-4 text-xs font-medium text-slate-650 dark:text-slate-400">
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                <span>Áreas evaluadas</span>
-                                <span className="font-black text-slate-800 dark:text-slate-200">{metricas?.totalAreas ?? 0}</span>
-                            </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                <span>Preguntas totales</span>
-                                <span className="font-black text-slate-800 dark:text-slate-200">{metricas?.totalPreguntas ?? 0}</span>
-                            </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                <span>Plantillas activas</span>
-                                <span className="font-black text-indigo-600">{metricas?.totalPlantillas ?? 0}</span>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
-                        <div className="flex flex-col border-b border-slate-100 dark:border-slate-800/80 pb-3">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                <Activity className="h-5 w-5 text-indigo-600" />
-                                Preparación para Learning Analytics
-                            </h3>
-                        </div>
-                        <div className="mt-4 space-y-4 text-xs font-medium text-slate-650 dark:text-slate-400">
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                <span>Registros consolidados</span>
-                                <span className="font-black text-emerald-600">Listo</span>
-                            </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                <span>Perfiles exigencia</span>
-                                <span className="font-black text-slate-800 dark:text-slate-200">4 niveles</span>
-                            </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                <span>Base analítica</span>
-                                <span className="font-black text-indigo-650">Completada</span>
-                            </div>
-                        </div>
-                    </Card>
+                            <p className="mt-3 text-2xl font-black text-slate-900 dark:text-slate-100">
+                                {value}
+                            </p>
+                            <p className="mt-1 text-[10px] font-semibold text-slate-400">
+                                {detail}
+                            </p>
+                        </Card>
+                    ))}
                 </section>
 
-
-                {/* 4. Gráficos Visuales */}
                 <section className="grid gap-6 md:grid-cols-2">
-                    
-                    {/* A. Postulantes por universidad (PieChart tipo Donut) */}
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
-                        <div className="flex flex-col">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                <Building2 className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
-                                Postulantes por universidad
-                            </h3>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                Segmentación y porcentaje de postulantes agrupados por universidad meta.
-                            </p>
-                        </div>
-                        <div className="mt-4">
-                            {dataUni.length === 0 ? (
-                                <EmptyState message="No hay datos de universidades meta registradas." />
-                            ) : (
-                                <div className="flex flex-col sm:flex-row items-center justify-around gap-6">
-                                    {/* Recharts Donut Visual */}
-                                    <div className="relative flex items-center justify-center h-72 w-full max-w-[280px] shrink-0">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <PieChart>
-                                                <Pie
-                                                    data={dataUni}
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    innerRadius={65}
-                                                    outerRadius={95}
-                                                    paddingAngle={3}
-                                                    dataKey="value"
-                                                >
-                                                    {dataUni.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                                                    ))}
-                                                </Pie>
-                                                <Tooltip content={<CustomTooltip />} />
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                        <div className="absolute text-center pointer-events-none">
-                                            <span className="block text-2xl font-black text-slate-900 dark:text-slate-100">{metricas?.totalPostulantes ?? 0}</span>
-                                            <span className="block text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Postulantes</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Leyenda */}
-                                    <div className="flex-1 space-y-2.5 w-full">
-                                        {dataUni.map((uni, idx) => {
-                                            const percentVal = Math.round(uni.percent * 100);
-                                            const color = CHART_COLORS[idx % CHART_COLORS.length];
-                                            
-                                            return (
-                                                <div key={uni.name} className="flex items-center justify-between text-xs">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
-                                                        <span className="font-semibold text-slate-700 dark:text-slate-300">{uni.name}</span>
-                                                    </div>
-                                                    <span className="text-slate-500 dark:text-slate-400 font-bold">
-                                                        {uni.value} ({percentVal}%)
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                    {/* B. Postulantes por carrera (BarChart horizontal) */}
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
-                        <div className="flex flex-col">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                <SlidersHorizontal className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
-                                Postulantes por carrera
-                            </h3>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                Demanda registrada y distribución de las top 8 carreras seleccionadas.
-                            </p>
-                        </div>
-                        <div className="mt-4">
-                            {topCarreras.length === 0 ? (
-                                <EmptyState message="No hay datos de carreras registradas." />
-                            ) : (
-                                <div className="h-72 w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart
-                                            layout="vertical"
-                                            data={topCarreras}
-                                            margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
-                                        >
-                                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
-                                            <XAxis type="number" stroke={axisColor} fontSize={10} tickLine={false} />
-                                            <YAxis type="category" dataKey="name" stroke={axisColor} fontSize={10} width={130} tickLine={false} />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? '#1e293b' : '#f8fafc', opacity: 0.4 }} />
-                                            <Bar dataKey="total" radius={[0, 6, 6, 0]} barSize={14}>
-                                                {topCarreras.map((entry, index) => (
-                                                    <Cell 
-                                                        key={`cell-${index}`} 
-                                                        fill={index === 0 ? '#4f46e5' : '#818cf8'} 
-                                                    />
-                                                ))}
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                    {/* C. Postulantes por colegio (BarChart horizontal) */}
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
-                        <div className="flex flex-col">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                <GraduationCap className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
-                                Postulantes por colegio
-                            </h3>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                Top 8 unidades educativas de procedencia con mayor representación.
-                            </p>
-                        </div>
-                        <div className="mt-4">
-                            {topColegios.length === 0 ? (
-                                <EmptyState message="No hay datos de colegios registrados." />
-                            ) : (
-                                <div className="h-72 w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart
-                                            layout="vertical"
-                                            data={topColegios}
-                                            margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
-                                        >
-                                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
-                                            <XAxis type="number" stroke={axisColor} fontSize={10} tickLine={false} />
-                                            <YAxis type="category" dataKey="name" stroke={axisColor} fontSize={10} width={130} tickLine={false} />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? '#1e293b' : '#f8fafc', opacity: 0.4 }} />
-                                            <Bar dataKey="total" radius={[0, 6, 6, 0]} barSize={14}>
-                                                {topColegios.map((entry, index) => (
-                                                    <Cell 
-                                                        key={`cell-${index}`} 
-                                                        fill={index === 0 ? '#0891b2' : '#22d3ee'} 
-                                                    />
-                                                ))}
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                    {/* D. Banco de preguntas por área (BarChart) */}
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
-                        <div className="flex flex-col">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                <Layers className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
-                                Banco de preguntas por área
-                            </h3>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                Cobertura del banco de reactivos por área lógico-matemática.
-                            </p>
-                        </div>
-                        <div className="mt-4">
-                            {dataAreas.length === 0 ? (
-                                <EmptyState message="No hay preguntas ni áreas de conocimiento registradas." />
-                            ) : (
-                                <div className="h-72 w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart
-                                            data={dataAreas}
-                                            margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
-                                        >
-                                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-                                            <XAxis dataKey="name" stroke={axisColor} fontSize={9} tickLine={false} />
-                                            <YAxis stroke={axisColor} fontSize={10} tickLine={false} />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? '#1e293b' : '#f8fafc', opacity: 0.4 }} />
-                                            <Bar dataKey="total" radius={[6, 6, 0, 0]} barSize={24}>
-                                                {dataAreas.map((entry, index) => (
-                                                    <Cell 
-                                                        key={`cell-${index}`} 
-                                                        fill={CHART_COLORS[(index + 2) % CHART_COLORS.length]} 
-                                                    />
-                                                ))}
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                    {/* E. Dificultad del banco de reactivos (PieChart) */}
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
-                        <div className="flex flex-col">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                <TrendingUp className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
-                                Dificultad del banco de reactivos
-                            </h3>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                Equilibrio de complejidad en las preguntas registradas.
-                            </p>
-                        </div>
-                        <div className="mt-4">
-                            {dataDificultad.length === 0 ? (
-                                <EmptyState message="No hay preguntas para categorizar su dificultad." />
-                            ) : (
-                                <div className="flex flex-col sm:flex-row items-center justify-around gap-6">
-                                    {/* Recharts Donut Visual */}
-                                    <div className="relative flex items-center justify-center h-72 w-full max-w-[280px] shrink-0">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <PieChart>
-                                                <Pie
-                                                    data={dataDificultad}
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    innerRadius={65}
-                                                    outerRadius={95}
-                                                    paddingAngle={3}
-                                                    dataKey="value"
-                                                >
-                                                    {dataDificultad.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                                    ))}
-                                                </Pie>
-                                                <Tooltip content={<CustomTooltip />} />
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                        <div className="absolute text-center pointer-events-none">
-                                            <span className="block text-2xl font-black text-slate-900 dark:text-slate-100">{metricas?.totalPreguntas ?? 0}</span>
-                                            <span className="block text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Reactivos</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Leyenda */}
-                                    <div className="flex-1 space-y-3 w-full">
-                                        {dataDificultad.map((dif) => {
-                                            const percentVal = Math.round(dif.percent * 100);
-                                            return (
-                                                <div key={dif.name} className="flex flex-col border border-slate-100 dark:border-slate-800 rounded-2xl p-3 bg-slate-50/50 dark:bg-slate-800/40">
-                                                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">
-                                                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: dif.color }} />
-                                                        <span>{dif.name}</span>
-                                                    </div>
-                                                    <div className="flex justify-between items-baseline mt-1.5">
-                                                        <span className="text-base font-black text-slate-900 dark:text-slate-100">{dif.value}</span>
-                                                        <span className="text-[10px] text-indigo-650 dark:text-indigo-400 font-extrabold">{percentVal}% del banco</span>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                    {/* F. Nivel de exigencia matemática (BarChart) */}
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
-                        <div className="flex flex-col">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                <Award className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
-                                Distribución por nivel de exigencia matemática
-                            </h3>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                Clasificación de postulantes según la exigencia lógica de su carrera objetivo.
-                            </p>
-                        </div>
-                        <div className="mt-4">
-                            {dataExigencia.every(d => d.total === 0) ? (
-                                <EmptyState message="No hay datos de exigencia matemática registrados." />
-                            ) : (
-                                <div className="h-72 w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart
-                                            data={dataExigencia}
-                                            margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
-                                        >
-                                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-                                            <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickLine={false} />
-                                            <YAxis stroke={axisColor} fontSize={11} tickLine={false} />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? '#1e293b' : '#f8fafc', opacity: 0.4 }} />
-                                            <Bar dataKey="total" radius={[6, 6, 0, 0]} barSize={35}>
-                                                {dataExigencia.map((entry, index) => (
-                                                    <Cell 
-                                                        key={`cell-${index}`} 
-                                                        fill={entry.color} 
-                                                    />
-                                                ))}
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                    {/* G. Síntesis Conceptual del Volumen Académico */}
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm md:col-span-2">
-                        <div className="flex flex-col">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                <Sparkles className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
-                                Síntesis del volumen académico consolidado
-                            </h3>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                Muestra una lectura institucional simplificada del crecimiento y escala de los componentes cargados en el sistema.
-                            </p>
-                        </div>
-                        <div className="mt-4">
-                            <div className="h-64 w-full">
+                    <ChartCard
+                        icon={Building2}
+                        title="Postulantes por universidad"
+                        description="Distribución de destinos académicos registrados."
+                    >
+                        {dataUniversidades.length === 0 ? (
+                            <EmptyState message="No hay universidades asociadas a postulantes." />
+                        ) : (
+                            <div className="h-72">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart
-                                        data={dataSintesis}
-                                        margin={{ top: 10, right: 20, left: -10, bottom: 5 }}
-                                    >
-                                        <defs>
-                                            <linearGradient id="colorConsolidado" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0}/>
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-                                        <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickLine={false} />
-                                        <YAxis stroke={axisColor} fontSize={11} tickLine={false} />
-                                        <Tooltip content={<CustomTooltip />} />
-                                        <Area type="monotone" dataKey="cantidad" stroke="#6366f1" strokeWidth={2.5} fillOpacity={1} fill="url(#colorConsolidado)" />
-                                    </AreaChart>
+                                    <PieChart>
+                                        <Pie
+                                            data={dataUniversidades}
+                                            dataKey="value"
+                                            nameKey="name"
+                                            innerRadius={62}
+                                            outerRadius={94}
+                                            paddingAngle={3}
+                                        >
+                                            {dataUniversidades.map((item, index) => (
+                                                <Cell
+                                                    key={item.name}
+                                                    fill={
+                                                        chartColors[
+                                                            index % chartColors.length
+                                                        ]
+                                                    }
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        <Legend
+                                            wrapperStyle={{
+                                                fontSize: 11,
+                                                color: axisColor,
+                                            }}
+                                        />
+                                    </PieChart>
                                 </ResponsiveContainer>
                             </div>
-                        </div>
-                    </Card>
+                        )}
+                    </ChartCard>
 
-                </section>
-
-
-                {/* 5. Sección Plantillas Académicas */}
-                <section className="space-y-4">
-                    <div className="border-b border-slate-200 dark:border-slate-800 pb-2">
-                        <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Plantillas académicas estructuradas</h2>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Instrumentos curriculares y de nivelación configurados en la plataforma.</p>
-                    </div>
-
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {plantillasDetalle.map((plantilla) => {
-                            const totalPuntaje = Number(plantilla.puntaje_total || 0);
-                            return (
-                                <Card key={plantilla.id_plan} className="h-full min-h-[230px] flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition duration-300">
-                                    <div className="h-1.5 bg-gradient-to-r from-indigo-600 to-cyan-400 shrink-0" />
-                                    
-                                    {/* Header: title (left) + difficulty badge (right) */}
-                                    <div className="flex items-start justify-between gap-4 p-5 pb-4">
-                                        <h3 
-                                            className="flex-1 text-base font-semibold leading-snug text-slate-900 dark:text-slate-100 min-h-[44px] pr-2 break-words" 
-                                            title={plantilla.nombre_plan}
-                                            style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
-                                        >
-                                            {plantilla.nombre_plan}
-                                        </h3>
-                                        <span className="capitalize text-[10px] font-bold border border-indigo-100 bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full shrink-0 mt-0.5">
-                                            {plantilla.dificultad_plan?.replace('-', ' ') || 'No definida'}
-                                        </span>
-                                    </div>
-
-                                    {/* Body: metrics & progress bar */}
-                                    <div className="px-5 py-4 space-y-4 flex-1 flex flex-col justify-between">
-                                        <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-                                            <span>Cantidad de reactivos:</span>
-                                            <span className="font-bold text-slate-800 dark:text-slate-200">{plantilla.cantidad_preguntas}</span>
-                                        </div>
-                                        
-                                        {/* Progress bar */}
-                                        <div className="space-y-1.5">
-                                            <div className="flex justify-between text-xs font-semibold text-indigo-700 dark:text-indigo-400">
-                                                <span>Puntaje de examen:</span>
-                                                <span>{totalPuntaje.toFixed(0)} / 100 Pts</span>
-                                            </div>
-                                            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-100 dark:border-slate-700">
-                                                <div 
-                                                    className="h-full bg-indigo-600 rounded-full transition-all"
-                                                    style={{ width: `${Math.min(totalPuntaje, 100)}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {/* Footer: status */}
-                                    <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800 px-5 py-4 bg-slate-50/20 dark:bg-slate-900/60">
-                                        <span className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[10px] truncate shrink-0">
-                                            <span className="hidden sm:inline">TODAS SOBRE </span>100 PTS
-                                        </span>
-                                        <StatusBadge status={plantilla.estado_plan === 'activo' ? 'Activa' : plantilla.estado_plan} />
-                                    </div>
-                                </Card>
-                            );
-                        })}
-                    </div>
-                </section>
-
-                {/* 6. Nueva sección Reporte por Postulante */}
-                <section className="space-y-6">
-                    <div className="border-b border-slate-200 dark:border-slate-800 pb-2">
-                        <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Reporte por postulante</h2>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Vista individual para identificar perfil académico, universidad objetivo y nivel de exigencia matemática.</p>
-                    </div>
-
-                    {/* Barra de Búsqueda y Filtros */}
-                    <div className="grid gap-4 md:grid-cols-5 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        {/* Buscador */}
-                        <div className="relative md:col-span-2">
-                            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="h-4.5 w-4.5 text-slate-400" />
-                            </span>
-                            <input
-                                type="text"
-                                placeholder="Buscar postulante, colegio, universidad o carrera..."
-                                value={searchQuery}
-                                onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); setExpandedPostulanteId(null); }}
-                                className="pl-10 h-10 w-full rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500
-                                    dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder-slate-500"
-                            />
-                        </div>
-
-                        {/* Filtro Universidad */}
-                        <select
-                            value={filterUni}
-                            onChange={handleFilterChange(setFilterUni)}
-                            className="h-10 w-full rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Universidad (Todas)</option>
-                            {universidadesUnicas.map(u => (
-                                <option key={u} value={u}>{u}</option>
-                            ))}
-                        </select>
-
-                        {/* Filtro Carrera */}
-                        <select
-                            value={filterCarrera}
-                            onChange={handleFilterChange(setFilterCarrera)}
-                            className="h-10 w-full rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Carrera (Todas)</option>
-                            {carrerasUnicas.map(c => (
-                                <option key={c} value={c}>{c}</option>
-                            ))}
-                        </select>
-
-                        {/* Filtro Exigencia */}
-                        <select
-                            value={filterExigencia}
-                            onChange={handleFilterChange(setFilterExigencia)}
-                            className="h-10 w-full rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">Exigencia (Todas)</option>
-                            {exigenciasUnicas.map(ex => {
-                                const label = ex === 'alta' ? 'Alta' : ex === 'media-alta' ? 'Media-Alta' : ex === 'media' ? 'Media' : 'Baja-Media';
-                                return <option key={ex} value={ex}>{label}</option>;
-                            })}
-                        </select>
-                    </div>
-
-                    {/* Tabla de Postulantes */}
-                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
-                        {/* Barra de estado de filtros */}
-                        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-800/40">
-                            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                                {isFiltered
-                                    ? <span className="text-indigo-700 dark:text-indigo-400">Mostrando resultados filtrados — {filteredPostulantes.length} de {postulantesList.length} postulantes</span>
-                                    : <span>Total: <strong>{postulantesList.length}</strong> postulantes registrados</span>
-                                }
-                            </p>
-                            <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
-                                Página {currentPage} de {totalPages}
-                            </p>
-                        </div>
-                        <CardContent className="p-0 overflow-x-auto">
-                            {filteredPostulantes.length === 0 ? (
-                                <div className="text-center py-10 space-y-2">
-                                    <AlertTriangle className="h-8 w-8 text-slate-400 mx-auto" />
-                                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">No se encontraron registros</h3>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">Ningún postulante coincide con la búsqueda o filtros seleccionados.</p>
-                                </div>
-                            ) : (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="bg-slate-50/80 dark:bg-slate-800/60">
-                                            <TableHead className="pl-5 dark:text-slate-400">Postulante</TableHead>
-                                            <TableHead className="dark:text-slate-400">Colegio</TableHead>
-                                            <TableHead className="dark:text-slate-400">Universidad / Carrera</TableHead>
-                                            <TableHead className="dark:text-slate-400">Exigencia</TableHead>
-                                            <TableHead className="dark:text-slate-400">Perfil Académico Preliminar</TableHead>
-                                            <TableHead className="text-center">Lectura</TableHead>
-                                            <TableHead className="pr-5 text-right">Estado</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {pagedPostulantes.map((post) => {
-                                            const isExpanded = expandedPostulanteId === post.id_post;
-                                            
-                                            // Badges de exigencia
-                                            let exigenciaBadge = 'bg-emerald-50 text-emerald-700 ring-emerald-700/10';
-                                            let exigencyLabel = 'Baja-Media';
-                                            if (post.exigencia === 'alta') {
-                                                exigenciaBadge = 'bg-rose-50 text-rose-700 ring-rose-700/10';
-                                                exigencyLabel = 'Alta';
-                                            } else if (post.exigencia === 'media-alta') {
-                                                exigenciaBadge = 'bg-amber-50 text-amber-700 ring-amber-700/10';
-                                                exigencyLabel = 'Media-Alta';
-                                            } else if (post.exigencia === 'media') {
-                                                exigenciaBadge = 'bg-blue-50 text-blue-700 ring-blue-700/10';
-                                                exigencyLabel = 'Media';
-                                            }
-
-                                            // Badges de perfil
-                                            let perfilBadge = 'bg-slate-100 text-slate-700';
-                                            if (post.perfil === 'Requiere seguimiento intensivo') {
-                                                perfilBadge = 'bg-rose-100/60 text-rose-800';
-                                            } else if (post.perfil === 'Seguimiento regular recomendado') {
-                                                perfilBadge = 'bg-blue-100/60 text-blue-800';
-                                            } else {
-                                                perfilBadge = 'bg-emerald-100/60 text-emerald-800';
-                                            }
-
-                                            return (
-                                                <React.Fragment key={post.id_post}>
-                                                    <TableRow className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
-                                                        <TableCell className="pl-5 font-bold text-slate-900 dark:text-slate-100 max-w-[180px] whitespace-normal break-words leading-snug">
-                                                            <div>
-                                                                <p className="text-sm">{post.nombre_completo}</p>
-                                                                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">{post.edad} años</p>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-slate-600 dark:text-slate-400 text-xs font-semibold max-w-[150px] whitespace-normal break-words leading-snug">
-                                                            {post.colegio}
-                                                        </TableCell>
-                                                        <TableCell className="text-xs max-w-[180px] whitespace-normal break-words leading-snug">
-                                                            <div className="font-semibold text-slate-800 dark:text-slate-200">{post.carrera}</div>
-                                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">{post.universidad}</div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 ${exigenciaBadge}`}>
-                                                                {exigencyLabel}
-                                                            </span>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <span className={`inline-flex items-center rounded-xl px-2.5 py-1 text-[10px] font-bold ${perfilBadge}`}>
-                                                                {post.perfil}
-                                                            </span>
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            <button
-                                                                onClick={() => toggleExpandPostulante(post.id_post)}
-                                                                className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-xl transition
-                                                                    dark:text-indigo-400 dark:bg-indigo-950 dark:hover:bg-indigo-900"
-                                                            >
-                                                                <span>Ver lectura académica</span>
-                                                                {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                                                            </button>
-                                                        </TableCell>
-                                                        <TableCell className="pr-5 text-right">
-                                                            <StatusBadge status={post.estado === 'activo' ? 'Activo' : post.estado} />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                    
-                                                    {/* Fila expandible con lectura académica */}
-                                                    {isExpanded && (
-                                                        <TableRow className="bg-slate-50/55 hover:bg-slate-50/55 dark:bg-slate-800/30 dark:hover:bg-slate-800/30">
-                                                            <TableCell colSpan={7} className="px-6 py-4">
-                                                                <div className="rounded-2xl border border-indigo-100/50 bg-white p-4 space-y-3 dark:border-slate-700 dark:bg-slate-800">
-                                                                    <div className="flex items-center gap-2 text-xs font-bold text-indigo-700 dark:text-indigo-300">
-                                                                        <Lightbulb className="h-4 w-4 text-amber-500 shrink-0" />
-                                                                        <span>Lectura Institucional y Recomendaciones</span>
-                                                                    </div>
-                                                                    <div className="grid gap-4 sm:grid-cols-3 text-xs leading-relaxed">
-                                                                        <div>
-                                                                            <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Seguimiento sugerido</span>
-                                                                            <p className="mt-1 font-semibold text-slate-800 dark:text-slate-200">{post.perfil}</p>
-                                                                        </div>
-                                                                        <div className="sm:col-span-2">
-                                                                            <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Recomendación de nivelación</span>
-                                                                            <p className="mt-1 text-slate-600 dark:text-slate-400">
-                                                                                {getRecomendacionNivelacion(post.exigencia)} Basado en las ponderaciones curriculares exigidas por la carrera de {post.carrera} en la {post.universidad}.
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    )}
-                                                </React.Fragment>
-                                            );
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            )}
-                        </CardContent>
-                        {/* Controles de paginación */}
-                        {totalPages > 1 && (
-                            <div className="flex items-center justify-center gap-2 px-5 py-4 border-t border-slate-100 dark:border-slate-800">
-                                <button
-                                    onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); setExpandedPostulanteId(null); }}
-                                    disabled={currentPage === 1}
-                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-250 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                                    aria-label="Página anterior"
-                                >
-                                    <ChevronLeft className="h-4.5 w-4.5" />
-                                </button>
-                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 px-3 bg-slate-50 dark:bg-slate-950 py-1.5 rounded-lg border border-slate-100 dark:border-slate-800">
-                                    {currentPage} / {totalPages}
-                                </span>
-                                <button
-                                    onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); setExpandedPostulanteId(null); }}
-                                    disabled={currentPage === totalPages}
-                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-250 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                                    aria-label="Página siguiente"
-                                >
-                                    <ChevronRight className="h-4.5 w-4.5" />
-                                </button>
+                    <ChartCard
+                        icon={GraduationCap}
+                        title="Postulantes por carrera"
+                        description="Carreras con mayor cantidad de postulantes registrados."
+                    >
+                        {dataCarreras.length === 0 ? (
+                            <EmptyState message="No hay carreras asociadas a postulantes." />
+                        ) : (
+                            <div className="h-72">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart
+                                        layout="vertical"
+                                        data={dataCarreras}
+                                        margin={{ left: 10, right: 20 }}
+                                    >
+                                        <CartesianGrid
+                                            stroke={gridColor}
+                                            strokeDasharray="3 3"
+                                            horizontal={false}
+                                        />
+                                        <XAxis
+                                            type="number"
+                                            stroke={axisColor}
+                                            fontSize={10}
+                                            tickLine={false}
+                                        />
+                                        <YAxis
+                                            type="category"
+                                            dataKey="name"
+                                            width={135}
+                                            stroke={axisColor}
+                                            fontSize={10}
+                                            tickLine={false}
+                                        />
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        <Bar
+                                            dataKey="total"
+                                            name="Postulantes"
+                                            fill="#4f46e5"
+                                            radius={[0, 6, 6, 0]}
+                                            barSize={15}
+                                        />
+                                    </BarChart>
+                                </ResponsiveContainer>
                             </div>
                         )}
+                    </ChartCard>
+
+                    <ChartCard
+                        icon={FileQuestion}
+                        title="Preguntas por materia"
+                        description="Distribución real del banco entre materias académicas."
+                    >
+                        {dataPreguntasMateria.length === 0 ? (
+                            <EmptyState message="No hay materias para analizar." />
+                        ) : (
+                            <div className="h-72">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={dataPreguntasMateria}>
+                                        <CartesianGrid
+                                            stroke={gridColor}
+                                            strokeDasharray="3 3"
+                                            vertical={false}
+                                        />
+                                        <XAxis
+                                            dataKey="name"
+                                            stroke={axisColor}
+                                            fontSize={11}
+                                            tickLine={false}
+                                        />
+                                        <YAxis
+                                            stroke={axisColor}
+                                            fontSize={10}
+                                            tickLine={false}
+                                        />
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        <Bar
+                                            dataKey="preguntas"
+                                            name="Preguntas"
+                                            radius={[6, 6, 0, 0]}
+                                            barSize={34}
+                                        >
+                                            {dataPreguntasMateria.map((item, index) => (
+                                                <Cell
+                                                    key={item.name}
+                                                    fill={
+                                                        chartColors[
+                                                            index % chartColors.length
+                                                        ]
+                                                    }
+                                                />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </ChartCard>
+
+                    <ChartCard
+                        icon={Layers3}
+                        title="Cobertura curricular por materia"
+                        description="Áreas, temas, preguntas y plantillas donde participa cada materia."
+                    >
+                        {dataCobertura.length === 0 ? (
+                            <EmptyState message="No hay estructura curricular disponible." />
+                        ) : (
+                            <div className="h-72">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart
+                                        layout="vertical"
+                                        data={dataCobertura}
+                                        margin={{ left: 5, right: 20 }}
+                                    >
+                                        <CartesianGrid
+                                            stroke={gridColor}
+                                            strokeDasharray="3 3"
+                                            horizontal={false}
+                                        />
+                                        <XAxis
+                                            type="number"
+                                            stroke={axisColor}
+                                            fontSize={10}
+                                            tickLine={false}
+                                        />
+                                        <YAxis
+                                            type="category"
+                                            dataKey="name"
+                                            width={45}
+                                            stroke={axisColor}
+                                            fontSize={11}
+                                            tickLine={false}
+                                        />
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        <Legend wrapperStyle={{ fontSize: 11 }} />
+                                        <Bar
+                                            dataKey="areas"
+                                            name="Áreas"
+                                            fill="#4f46e5"
+                                            radius={[0, 4, 4, 0]}
+                                        />
+                                        <Bar
+                                            dataKey="temas"
+                                            name="Temas"
+                                            fill="#0ea5e9"
+                                            radius={[0, 4, 4, 0]}
+                                        />
+                                        <Bar
+                                            dataKey="preguntas"
+                                            name="Preguntas"
+                                            fill="#06b6d4"
+                                            radius={[0, 4, 4, 0]}
+                                        />
+                                        <Bar
+                                            dataKey="plantillas"
+                                            name="Plantillas"
+                                            fill="#7c3aed"
+                                            radius={[0, 4, 4, 0]}
+                                        />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </ChartCard>
+
+                    <ChartCard
+                        icon={Activity}
+                        title="Dificultad por materia"
+                        description="Composición básica, media y avanzada de cada materia."
+                    >
+                        {dataDificultad.length === 0 ? (
+                            <EmptyState message="No hay dificultad curricular clasificada." />
+                        ) : (
+                            <div className="h-72">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={dataDificultad}>
+                                        <CartesianGrid
+                                            stroke={gridColor}
+                                            strokeDasharray="3 3"
+                                            vertical={false}
+                                        />
+                                        <XAxis
+                                            dataKey="name"
+                                            stroke={axisColor}
+                                            fontSize={11}
+                                            tickLine={false}
+                                        />
+                                        <YAxis
+                                            stroke={axisColor}
+                                            fontSize={10}
+                                            tickLine={false}
+                                        />
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        <Legend wrapperStyle={{ fontSize: 11 }} />
+                                        <Bar
+                                            dataKey="basica"
+                                            name="Básica"
+                                            stackId="dificultad"
+                                            fill={difficultyColors.basica}
+                                        />
+                                        <Bar
+                                            dataKey="media"
+                                            name="Media"
+                                            stackId="dificultad"
+                                            fill={difficultyColors.media}
+                                        />
+                                        <Bar
+                                            dataKey="avanzada"
+                                            name="Avanzada"
+                                            stackId="dificultad"
+                                            fill={difficultyColors.avanzada}
+                                        />
+                                        <Bar
+                                            dataKey="sin_clasificacion"
+                                            name="Sin clasificación"
+                                            stackId="dificultad"
+                                            fill={difficultyColors.sin_clasificacion}
+                                        />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </ChartCard>
+
+                    <ChartCard
+                        icon={BookCopy}
+                        title="Plantillas por tipo académico"
+                        description="Instrumentos clasificados según nombre y composición por materia."
+                    >
+                        {dataPlantillas.length === 0 ? (
+                            <EmptyState message="No hay plantillas académicas registradas." />
+                        ) : (
+                            <div className="h-72">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={dataPlantillas}
+                                            dataKey="value"
+                                            nameKey="name"
+                                            innerRadius={58}
+                                            outerRadius={90}
+                                            paddingAngle={3}
+                                        >
+                                            {dataPlantillas.map((item, index) => (
+                                                <Cell
+                                                    key={item.name}
+                                                    fill={
+                                                        chartColors[
+                                                            index % chartColors.length
+                                                        ]
+                                                    }
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        <Legend
+                                            wrapperStyle={{
+                                                fontSize: 10,
+                                                color: axisColor,
+                                            }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </ChartCard>
+                </section>
+
+                <section>
+                    <div className="mb-4">
+                        <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">
+                            Composición de plantillas
+                        </h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Materias y ponderación general de cada instrumento académico.
+                        </p>
+                    </div>
+                    <Card className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+                        <CardContent className="p-0">
+                            <div className="hidden md:block">
+                            <Table className="w-full table-fixed">
+                                <TableHeader>
+                                    <TableRow className="bg-slate-50 dark:bg-slate-800/50">
+                                        <TableHead className="w-[34%] px-4 py-3">
+                                            Plantilla
+                                        </TableHead>
+                                        <TableHead className="w-[28%] px-4 py-3">
+                                            Materias
+                                        </TableHead>
+                                        <TableHead className="w-[10%] px-4 py-3 text-center">
+                                            Preguntas
+                                        </TableHead>
+                                        <TableHead className="w-[10%] px-4 py-3 text-center">
+                                            Puntaje
+                                        </TableHead>
+                                        <TableHead className="w-[10%] px-4 py-3">
+                                            Dificultad
+                                        </TableHead>
+                                        <TableHead className="w-[8%] px-4 py-3 text-right">
+                                            Estado
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {plantillasDetalle.map((plantilla) => (
+                                        <TableRow key={plantilla.id_plan}>
+                                            <TableCell className="whitespace-normal break-words px-4 py-4 align-top text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100">
+                                                {plantilla.nombre_plan}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-4 align-top">
+                                                <div className="flex max-w-full flex-wrap gap-1.5">
+                                                    {plantilla.materias.map(
+                                                        (materia) => (
+                                                            <Badge
+                                                                key={materia.materia}
+                                                                variant="outline"
+                                                                className="inline-flex max-w-full shrink-0 rounded-md px-2 py-1 text-[11px] leading-none"
+                                                            >
+                                                                {shortMatterLabel(materia.materia)}:{' '}
+                                                                {materia.cantidad}
+                                                            </Badge>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="whitespace-nowrap px-4 py-4 text-center align-top">
+                                                {plantilla.cantidad_preguntas}
+                                            </TableCell>
+                                            <TableCell className="whitespace-nowrap px-4 py-4 text-center align-top">
+                                                {Number(
+                                                    plantilla.puntaje_total,
+                                                ).toFixed(2)}
+                                            </TableCell>
+                                            <TableCell className="whitespace-normal break-words px-4 py-4 align-top text-xs capitalize leading-snug">
+                                                {plantilla.dificultad_plan?.replace(
+                                                    '-',
+                                                    ' ',
+                                                ) || 'Sin clasificación'}
+                                            </TableCell>
+                                            <TableCell className="whitespace-nowrap px-4 py-4 text-right align-top">
+                                                <StatusBadge
+                                                    status={
+                                                        plantilla.estado_plan ===
+                                                        'activa'
+                                                            ? 'Activa'
+                                                            : 'Inactiva'
+                                                    }
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            </div>
+
+                            <div className="space-y-3 md:hidden">
+                                {plantillasDetalle.map((plantilla) => (
+                                    <div
+                                        key={plantilla.id_plan}
+                                        className="rounded-xl border border-slate-200 p-4 dark:border-slate-800"
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="min-w-0">
+                                                <p className="whitespace-normal break-words text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100">
+                                                    {plantilla.nombre_plan}
+                                                </p>
+                                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                                    {plantilla.cantidad_preguntas} preguntas ·{' '}
+                                                    {Number(plantilla.puntaje_total).toFixed(2)} pts
+                                                </p>
+                                            </div>
+                                            <StatusBadge
+                                                status={
+                                                    plantilla.estado_plan === 'activa'
+                                                        ? 'Activa'
+                                                        : 'Inactiva'
+                                                }
+                                            />
+                                        </div>
+                                        <div className="mt-3 flex max-w-full flex-wrap gap-1.5">
+                                            {plantilla.materias.map((materia) => (
+                                                <Badge
+                                                    key={materia.materia}
+                                                    variant="outline"
+                                                    className="inline-flex shrink-0 rounded-md px-2 py-1 text-[11px]"
+                                                >
+                                                    {shortMatterLabel(materia.materia)}:{' '}
+                                                    {materia.cantidad}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                        <p className="mt-3 text-xs capitalize text-slate-500 dark:text-slate-400">
+                                            Dificultad:{' '}
+                                            {plantilla.dificultad_plan?.replace('-', ' ') ||
+                                                'Sin clasificación'}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
                     </Card>
                 </section>
 
-                {/* 7. Sección Lectura Académica Preliminar */}
-                <section className="space-y-4">
-                    <div className="border-b border-slate-200 dark:border-slate-800 pb-2">
-                        <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Lectura académica preliminar</h2>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Conclusiones analíticas y pautas derivadas de la masa crítica del instituto.</p>
-                    </div>
-
-                    <div className="grid gap-4 lg:grid-cols-4">
-                        {/* Conclusión 1 */}
-                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <div className="space-y-2">
-                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
-                                    <Building2 className="h-4 w-4" />
-                                </span>
-                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Concentración por universidad</h3>
-                                <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                    La mayor concentración de postulantes se encuentra enfocada en la {uniLider}.
-                                </p>
-                            </div>
-                            <p className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-indigo-700 dark:text-indigo-400 leading-normal">
-                                Recomendación: Priorizar la calendarización de plantillas evaluativas asociadas a la {uniLider} para validar el nivel inicial.
+                <section>
+                    <div className="mb-4 flex flex-col justify-between gap-3 md:flex-row md:items-end">
+                        <div>
+                            <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">
+                                Perfil académico preliminar por postulante
+                            </h2>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                Contexto institucional según carrera y exigencia
+                                registrada, sin resultados evaluativos atribuidos.
                             </p>
                         </div>
-
-                        {/* Conclusión 2 */}
-                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <div className="space-y-2">
-                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
-                                    <SlidersHorizontal className="h-4 w-4" />
-                                </span>
-                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Carrera con mayor demanda</h3>
-                                <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                    La carrera de {carreraLider} presenta el mayor volumen de postulantes inscritos.
-                                </p>
-                            </div>
-                            <p className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-indigo-700 dark:text-indigo-400 leading-normal">
-                                Recomendación: Reforzar los módulos de álgebra y razonamiento lógico-matemático en los talleres de nivelación de esta rama.
-                            </p>
-                        </div>
-
-                        {/* Conclusión 3 */}
-                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <div className="space-y-2">
-                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
-                                    <Layers className="h-4 w-4" />
-                                </span>
-                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Cobertura del banco</h3>
-                                <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                    El área de {areaLider} contiene la mayor cantidad de reactivos cargados.
-                                </p>
-                            </div>
-                            <p className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-indigo-700 dark:text-indigo-400 leading-normal">
-                                Recomendación: Ampliar la base de reactivos complejos en las áreas complementarias para equilibrar la cobertura de plantillas.
-                            </p>
-                        </div>
-
-                        {/* Conclusión 4 */}
-                        <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <div className="space-y-2">
-                                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
-                                    <TrendingUp className="h-4 w-4" />
-                                </span>
-                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Dificultad predominante</h3>
-                                <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                    El banco de preguntas mantiene una concentración mayoritaria de complejidad {difPredominante}.
-                                </p>
-                            </div>
-                            <p className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-indigo-700 dark:text-indigo-400 leading-normal">
-                                Recomendación: Incorporar de manera progresiva reactivos de nivel avanzado para simular la exigencia real de ingenierías.
-                            </p>
+                        <div className="relative w-full md:w-96">
+                            <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                            <input
+                                value={searchQuery}
+                                onChange={(event) =>
+                                    setSearchQuery(event.target.value)
+                                }
+                                className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                aria-label="Buscar postulante"
+                                placeholder="Buscar postulante, colegio, universidad o carrera"
+                            />
                         </div>
                     </div>
+                    <Card className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+                        <CardContent className="p-0">
+                            <div className="hidden lg:block">
+                            <Table className="w-full table-fixed">
+                                <TableHeader>
+                                    <TableRow className="bg-slate-50 dark:bg-slate-800/50">
+                                        <TableHead className="w-[22%] px-4 py-3">
+                                            Postulante
+                                        </TableHead>
+                                        <TableHead className="w-[18%] px-4 py-3">
+                                            Colegio
+                                        </TableHead>
+                                        <TableHead className="w-[22%] px-4 py-3">
+                                            Universidad / Carrera
+                                        </TableHead>
+                                        <TableHead className="w-[10%] px-4 py-3">
+                                            Exigencia
+                                        </TableHead>
+                                        <TableHead className="w-[18%] px-4 py-3">
+                                            Seguimiento
+                                        </TableHead>
+                                        <TableHead className="w-[10%] px-4 py-3 text-right">
+                                            Lectura
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {filteredPostulantes.map((postulante) => {
+                                        const expanded =
+                                            expandedPostulanteId ===
+                                            postulante.id_post;
+
+                                        return (
+                                            <Fragment key={postulante.id_post}>
+                                                <TableRow>
+                                                    <TableCell className="whitespace-normal break-words px-4 py-4 align-top leading-snug">
+                                                        <p className="text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100">
+                                                            {
+                                                                postulante.nombre_completo
+                                                            }
+                                                        </p>
+                                                        <p className="mt-1 text-xs text-slate-400">
+                                                            {postulante.edad}{' '}
+                                                            {postulante.edad !==
+                                                            'No registrado'
+                                                                ? 'años'
+                                                                : ''}
+                                                        </p>
+                                                    </TableCell>
+                                                    <TableCell className="whitespace-normal break-words px-4 py-4 align-top text-xs leading-snug text-slate-600 dark:text-slate-400">
+                                                        {postulante.colegio}
+                                                    </TableCell>
+                                                    <TableCell className="whitespace-normal break-words px-4 py-4 align-top text-xs leading-snug">
+                                                        <p className="font-semibold leading-snug text-slate-800 dark:text-slate-200">
+                                                            {postulante.carrera}
+                                                        </p>
+                                                        <p className="mt-1 whitespace-normal break-words text-[10px] uppercase leading-snug text-slate-400">
+                                                            {
+                                                                postulante.universidad
+                                                            }
+                                                        </p>
+                                                    </TableCell>
+                                                    <TableCell className="px-4 py-4 align-top">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="inline-flex shrink-0 whitespace-nowrap text-[10px]"
+                                                        >
+                                                            {
+                                                                postulante.exigencia
+                                                            }
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="whitespace-normal break-words px-4 py-4 align-top text-xs font-semibold leading-snug text-slate-700 dark:text-slate-300">
+                                                        <span className="line-clamp-2">
+                                                            {postulante.perfil}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell className="whitespace-nowrap px-4 py-4 text-right align-top">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setExpandedPostulanteId(
+                                                                    expanded
+                                                                        ? null
+                                                                        : postulante.id_post,
+                                                                )
+                                                            }
+                                                            className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-[10px] font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
+                                                        >
+                                                            Ver contexto
+                                                            {expanded ? (
+                                                                <ChevronUp className="h-3 w-3" />
+                                                            ) : (
+                                                                <ChevronDown className="h-3 w-3" />
+                                                            )}
+                                                        </button>
+                                                    </TableCell>
+                                                </TableRow>
+                                                {expanded && (
+                                                    <TableRow
+                                                        className="bg-slate-50/60 dark:bg-slate-800/30"
+                                                    >
+                                                        <TableCell
+                                                            colSpan={6}
+                                                            className="px-4 py-4"
+                                                        >
+                                                            <div className="rounded-xl border border-indigo-100 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                                                                <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300">
+                                                                    Lectura
+                                                                    institucional
+                                                                </p>
+                                                                <p className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400">
+                                                                    {
+                                                                        postulante.lectura_materias
+                                                                    }{' '}
+                                                                    Se recomienda
+                                                                    aplicar una
+                                                                    evaluación
+                                                                    diagnóstica
+                                                                    acorde con la
+                                                                    exigencia de{' '}
+                                                                    {
+                                                                        postulante.carrera
+                                                                    }
+                                                                    .
+                                                                </p>
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </Fragment>
+                                        );
+                                    })}
+                                    {filteredPostulantes.length === 0 && (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={6}
+                                                className="py-10 text-center text-sm text-slate-400"
+                                            >
+                                                No se encontraron postulantes con
+                                                el criterio indicado.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                            </div>
+
+                            <div className="space-y-3 lg:hidden">
+                                {filteredPostulantes.map((postulante) => {
+                                    const expanded =
+                                        expandedPostulanteId === postulante.id_post;
+
+                                    return (
+                                        <div
+                                            key={postulante.id_post}
+                                            className="rounded-xl border border-slate-200 p-4 dark:border-slate-800"
+                                        >
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div className="min-w-0">
+                                                    <p className="whitespace-normal break-words text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100">
+                                                        {postulante.nombre_completo}
+                                                    </p>
+                                                    <p className="mt-1 text-xs text-slate-400">
+                                                        {postulante.edad}{' '}
+                                                        {postulante.edad !== 'No registrado'
+                                                            ? 'años'
+                                                            : ''}
+                                                    </p>
+                                                </div>
+                                                <Badge
+                                                    variant="outline"
+                                                    className="inline-flex shrink-0 whitespace-nowrap text-[10px]"
+                                                >
+                                                    {postulante.exigencia}
+                                                </Badge>
+                                            </div>
+                                            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                                                <div>
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                                        Colegio
+                                                    </p>
+                                                    <p className="mt-1 whitespace-normal break-words text-xs leading-snug text-slate-600 dark:text-slate-400">
+                                                        {postulante.colegio}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                                        Carrera / Universidad
+                                                    </p>
+                                                    <p className="mt-1 whitespace-normal break-words text-xs font-semibold leading-snug text-slate-800 dark:text-slate-200">
+                                                        {postulante.carrera}
+                                                    </p>
+                                                    <p className="mt-1 whitespace-normal break-words text-[10px] uppercase leading-snug text-slate-400">
+                                                        {postulante.universidad}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="mt-4 flex items-end justify-between gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
+                                                <div className="min-w-0">
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                                        Seguimiento
+                                                    </p>
+                                                    <p className="mt-1 whitespace-normal break-words text-xs font-semibold leading-snug text-slate-700 dark:text-slate-300">
+                                                        {postulante.perfil}
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setExpandedPostulanteId(
+                                                            expanded
+                                                                ? null
+                                                                : postulante.id_post,
+                                                        )
+                                                    }
+                                                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-[10px] font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
+                                                >
+                                                    Ver contexto
+                                                    {expanded ? (
+                                                        <ChevronUp className="h-3 w-3" />
+                                                    ) : (
+                                                        <ChevronDown className="h-3 w-3" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                            {expanded && (
+                                                <div className="mt-3 rounded-xl border border-indigo-100 bg-indigo-50/40 p-3 dark:border-indigo-900 dark:bg-indigo-950/20">
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                                                        Lectura institucional
+                                                    </p>
+                                                    <p className="mt-1 whitespace-normal break-words text-xs leading-5 text-slate-600 dark:text-slate-400">
+                                                        {postulante.lectura_materias}{' '}
+                                                        Se recomienda aplicar una
+                                                        evaluación diagnóstica acorde
+                                                        con la exigencia de{' '}
+                                                        {postulante.carrera}.
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                                {filteredPostulantes.length === 0 && (
+                                    <p className="py-8 text-center text-sm text-slate-400">
+                                        No se encontraron postulantes con el criterio
+                                        indicado.
+                                    </p>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
                 </section>
 
-                {/* 8. Sección Base para Learning Analytics */}
-                <section>
-                    <div className="rounded-3xl border border-indigo-100 bg-indigo-50/60 p-6 sm:p-8 space-y-6 shadow-sm dark:border-indigo-900/50 dark:bg-indigo-950/40">
-                        <div className="flex gap-4 items-start">
-                            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400">
-                                <Sparkles className="h-6 w-6" />
-                            </span>
-                            <div className="space-y-1">
-                                <h3 className="text-base font-bold text-indigo-950 dark:text-indigo-200">Preparación para Learning Analytics</h3>
-                                <p className="text-sm text-indigo-700 dark:text-indigo-400 leading-relaxed max-w-4xl">
-                                    Los indicadores consolidados permiten construir una base académica para futuras capas de Learning Analytics, orientadas a riesgo académico, recomendaciones de refuerzo y predicción de desempeño.
-                                </p>
-                            </div>
-                        </div>
+                <section className="grid gap-4 lg:grid-cols-4">
+                    {[
+                        {
+                            title: 'Cobertura académica',
+                            text: `La estructura registra ${metricas.totalMaterias ?? 0} materias, ${metricas.totalAreas ?? 0} áreas y ${metricas.totalTemas ?? 0} temas evaluables.`,
+                        },
+                        {
+                            title: 'Banco institucional',
+                            text: materiaLider
+                                ? `${materiaLider.nombre_mat} concentra ${materiaLider.preguntas} preguntas; la lectura debe complementarse con las demás materias.`
+                                : 'El banco está preparado para organizar preguntas por materia.',
+                        },
+                        {
+                            title: 'Cobertura por área',
+                            text: areaLider
+                                ? `${areaLider.nombre_area} es el área con mayor cantidad de preguntas registradas.`
+                                : 'Las áreas podrán compararse cuando existan preguntas asociadas.',
+                        },
+                        {
+                            title: 'Base para Learning Analytics',
+                            text: 'Las plantillas mixtas permiten observar equilibrio curricular cuando se registren evaluaciones aplicadas y resultados históricos.',
+                        },
+                    ].map((item) => (
+                        <Card
+                            key={item.title}
+                            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+                        >
+                            <BrainCircuit className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                            <h3 className="mt-3 text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                                {item.title}
+                            </h3>
+                            <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                                {item.text}
+                            </p>
+                        </Card>
+                    ))}
+                </section>
 
-                        {/* Línea de proceso visual */}
-                        <div className="border-t border-indigo-100 dark:border-indigo-900 pt-6">
-                            <div className="grid grid-cols-2 gap-4 md:grid-cols-5 text-center text-xs font-bold text-indigo-900 dark:text-indigo-200">
-                                <div className="p-3 bg-white rounded-xl border border-indigo-100 flex flex-col justify-center items-center shadow-sm dark:bg-slate-900 dark:border-indigo-900">
-                                    <span className="text-[10px] text-indigo-400 dark:text-indigo-500 font-semibold uppercase">Paso 1</span>
-                                    <span className="mt-1">Datos</span>
-                                </div>
-                                <div className="hidden md:flex items-center justify-center text-indigo-400 dark:text-indigo-600">→</div>
-                                <div className="p-3 bg-white rounded-xl border border-indigo-100 flex flex-col justify-center items-center shadow-sm dark:bg-slate-900 dark:border-indigo-900">
-                                    <span className="text-[10px] text-indigo-400 dark:text-indigo-500 font-semibold uppercase">Paso 2</span>
-                                    <span className="mt-1">Indicadores</span>
-                                </div>
-                                <div className="hidden md:flex items-center justify-center text-indigo-400 dark:text-indigo-600">→</div>
-                                <div className="p-3 bg-white rounded-xl border border-indigo-100 flex flex-col justify-center items-center shadow-sm md:col-span-1 col-span-2 dark:bg-slate-900 dark:border-indigo-900">
-                                    <span className="text-[10px] text-indigo-400 dark:text-indigo-500 font-semibold uppercase">Paso 3</span>
-                                    <span className="mt-1">Lectura Académica</span>
-                                </div>
-                                <div className="hidden md:flex items-center justify-center text-indigo-400 dark:text-indigo-600">→</div>
-                                <div className="p-3 bg-white rounded-xl border border-indigo-100 flex flex-col justify-center items-center shadow-sm dark:bg-slate-900 dark:border-indigo-900">
-                                    <span className="text-[10px] text-indigo-400 dark:text-indigo-500 font-semibold uppercase">Paso 4</span>
-                                    <span className="mt-1">Recomendaciones</span>
-                                </div>
-                                <div className="hidden md:flex items-center justify-center text-indigo-400 dark:text-indigo-600">→</div>
-                                <div className="p-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl flex flex-col justify-center items-center shadow-md">
-                                    <span className="text-[9px] text-indigo-200 font-bold uppercase tracking-wider">Futuro</span>
-                                    <span className="mt-0.5">Modelo Predictivo</span>
-                                </div>
-                            </div>
+                <section className="rounded-3xl border border-indigo-100 bg-indigo-50/60 p-6 dark:border-indigo-900/50 dark:bg-indigo-950/30">
+                    <div className="flex gap-4">
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                            <BrainCircuit className="h-5 w-5" />
+                        </span>
+                        <div>
+                            <h3 className="font-bold text-indigo-950 dark:text-indigo-100">
+                                Interpretación responsable
+                            </h3>
+                            <p className="mt-1 text-sm leading-6 text-indigo-800 dark:text-indigo-300">
+                                Los datos actuales representan cobertura académica
+                                y lectura institucional. No constituyen resultados
+                                de admisión ni permiten estimar el ingreso. El análisis
+                                por desempeño requiere evaluaciones aplicadas y
+                                resultados históricos consistentes.
+                            </p>
+                            {preguntasSinMateria > 0 && (
+                                <p className="mt-2 text-xs font-semibold text-amber-700 dark:text-amber-300">
+                                    {preguntasSinMateria} preguntas permanecen sin
+                                    materia asociada y se presentan como pendientes
+                                    de clasificación curricular.
+                                </p>
+                            )}
                         </div>
                     </div>
                 </section>

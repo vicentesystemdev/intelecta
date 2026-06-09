@@ -9,7 +9,9 @@ use App\Domains\Institucional\Models\Carrera;
 use App\Domains\Evaluaciones\Models\Pregunta;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
 use App\Domains\Evaluaciones\Models\AreaConocimiento;
+use App\Domains\Evaluaciones\Models\Materia;
 use App\Domains\Evaluaciones\Models\Tema;
+use App\Domains\Reportes\Services\CoberturaCurricularService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -17,7 +19,7 @@ use Inertia\Response;
 
 class ReporteAcademicoController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, CoberturaCurricularService $cobertura): Response
     {
         // 1. KPIs principales
         $totalPostulantes = Postulante::count();
@@ -26,6 +28,8 @@ class ReporteAcademicoController extends Controller
         $totalCarreras = Carrera::count();
         $totalPreguntas = Pregunta::count();
         $totalPlantillas = PlantillaEvaluacion::count();
+        $totalPlantillasActivas = PlantillaEvaluacion::where('estado_plan', 'activa')->count();
+        $totalMaterias = Materia::count();
         $totalAreas = AreaConocimiento::count();
         $totalTemas = Tema::count();
 
@@ -76,8 +80,17 @@ class ReporteAcademicoController extends Controller
 
         // 8. Plantillas evaluativas detalladas
         $plantillasDetalle = PlantillaEvaluacion::withCount('preguntas')
+            ->with('preguntas.tema.area.materia:id_mat,codigo_mat,nombre_mat')
             ->get()
             ->map(function ($plantilla) {
+                $materias = $plantilla->preguntas
+                    ->groupBy(fn ($pregunta) => $pregunta->tema?->area?->materia?->nombre_mat ?? 'Sin materia')
+                    ->map(fn ($preguntas, $materia) => [
+                        'materia' => $materia,
+                        'cantidad' => $preguntas->count(),
+                    ])
+                    ->values();
+
                 return [
                     'id_plan' => $plantilla->id_plan,
                     'nombre_plan' => $plantilla->nombre_plan,
@@ -85,6 +98,7 @@ class ReporteAcademicoController extends Controller
                     'cantidad_preguntas' => $plantilla->preguntas_count,
                     'puntaje_total' => (float) $plantilla->preguntas()->sum('plantilla_preguntas.puntaje_pp'),
                     'estado_plan' => $plantilla->estado_plan,
+                    'materias' => $materias,
                 ];
             });
 
@@ -94,15 +108,15 @@ class ReporteAcademicoController extends Controller
             ->map(function ($postulante) {
                 $carrera = $postulante->carrera;
                 $universidad = $carrera ? $carrera->universidad : null;
-                $exigencia = $carrera ? $carrera->nivel_exigencia_matematica_car : 'baja-media';
+                $exigencia = $carrera?->nivel_exigencia_matematica_car ?: 'Sin clasificación';
+                $exigenciaNormalizada = mb_strtolower($exigencia);
 
-                // Determinar perfil académico preliminar
-                if ($exigencia === 'alta' || $exigencia === 'media-alta') {
-                    $perfil = 'Requiere seguimiento intensivo';
-                } elseif ($exigencia === 'media') {
-                    $perfil = 'Seguimiento regular recomendado';
+                if (in_array($exigenciaNormalizada, ['alta', 'media-alta'], true)) {
+                    $perfil = 'Evaluación diagnóstica prioritaria';
+                } elseif ($exigenciaNormalizada === 'media') {
+                    $perfil = 'Seguimiento académico sugerido';
                 } else {
-                    $perfil = 'Nivelación focalizada según área';
+                    $perfil = 'Perfil académico por verificar';
                 }
 
                 return [
@@ -115,6 +129,7 @@ class ReporteAcademicoController extends Controller
                     'exigencia' => $exigencia,
                     'estado' => $postulante->estado_post ?? 'Activo',
                     'perfil' => $perfil,
+                    'lectura_materias' => 'La estructura está preparada para generar análisis por materia cuando se registren evaluaciones aplicadas.',
                 ];
             });
 
@@ -126,6 +141,8 @@ class ReporteAcademicoController extends Controller
                 'totalCarreras' => $totalCarreras,
                 'totalPreguntas' => $totalPreguntas,
                 'totalPlantillas' => $totalPlantillas,
+                'totalPlantillasActivas' => $totalPlantillasActivas,
+                'totalMaterias' => $totalMaterias,
                 'totalAreas' => $totalAreas,
                 'totalTemas' => $totalTemas,
             ],
@@ -134,6 +151,10 @@ class ReporteAcademicoController extends Controller
             'postulantesPorColegio' => $postulantesPorColegio,
             'preguntasPorArea' => $preguntasPorArea,
             'preguntasPorDificultad' => $preguntasPorDificultad,
+            'coberturaMaterias' => $cobertura->resumenMaterias(),
+            'dificultadPorMateria' => $cobertura->dificultadPorMateria(),
+            'plantillasPorTipo' => $cobertura->plantillasPorTipo(),
+            'preguntasSinMateria' => $cobertura->preguntasSinMateria(),
             'postulantesPorExigenciaMatematica' => $postulantesPorExigenciaMatematica,
             'plantillasDetalle' => $plantillasDetalle,
             'postulantesList' => $postulantesList,

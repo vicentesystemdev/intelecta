@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\RolPermisoController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\AreaConocimientoController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PlantillaEvaluacionController;
 use App\Http\Controllers\PostulanteController;
 use App\Http\Controllers\PreguntaController;
@@ -26,12 +27,9 @@ Route::get('/evaluaciones-postulante', function () {
     return Inertia::render('Public/EvaluacionesPostulante');
 })->name('evaluaciones-postulante');
 
-Route::get('/dashboard', function () {
-    if (auth()->user()->hasRole('Estudiante')) {
-        return redirect('/');
-    }
-    return Inertia::render('Admin/Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::prefix('areas-conocimiento')->name('areas-conocimiento.')->group(function () {
