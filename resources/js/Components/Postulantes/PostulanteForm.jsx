@@ -8,7 +8,8 @@ import { Link, useForm } from '@inertiajs/react';
 import { Save } from 'lucide-react';
 import { useMemo } from 'react';
 
-const fieldClass = 'mt-1.5 h-10 border-slate-200 bg-white';
+const fieldClass =
+    'mt-1.5 h-10 border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100';
 
 export default function PostulanteForm({
     postulante = null,
@@ -17,6 +18,7 @@ export default function PostulanteForm({
     submitRoute,
     method = 'post',
     submitLabel,
+    onCancel = null,
 }) {
     const { data, setData, post, put, processing, errors } = useForm({
         nombres_post: postulante?.nombres_post || '',
@@ -37,12 +39,20 @@ export default function PostulanteForm({
     const submit = (event) => {
         event.preventDefault();
 
+        const options = {
+            onSuccess: () => {
+                if (onCancel) {
+                    onCancel();
+                }
+            },
+        };
+
         if (method === 'put') {
-            put(submitRoute);
+            put(submitRoute, options);
             return;
         }
 
-        post(submitRoute);
+        post(submitRoute, options);
     };
 
     const field = (name, value) => setData(name, value);
@@ -75,9 +85,9 @@ export default function PostulanteForm({
 
     return (
         <form onSubmit={submit} className="space-y-6">
-            <Card className="gap-0 border-0 bg-white py-0 shadow-sm ring-1 ring-slate-200/80">
-                <CardHeader className="border-b border-slate-100 p-5">
-                    <CardTitle className="text-lg text-slate-900">
+            <Card className="gap-0 border-0 bg-white py-0 shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-950/70 dark:ring-slate-800">
+                <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
+                    <CardTitle className="text-lg text-slate-900 dark:text-slate-100">
                         Información personal
                     </CardTitle>
                 </CardHeader>
@@ -169,9 +179,9 @@ export default function PostulanteForm({
                 </CardContent>
             </Card>
 
-            <Card className="gap-0 border-0 bg-white py-0 shadow-sm ring-1 ring-slate-200/80">
-                <CardHeader className="border-b border-slate-100 p-5">
-                    <CardTitle className="text-lg text-slate-900">
+            <Card className="gap-0 border-0 bg-white py-0 shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-950/70 dark:ring-slate-800">
+                <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
+                    <CardTitle className="text-lg text-slate-900 dark:text-slate-100">
                         Información académica
                     </CardTitle>
                 </CardHeader>
@@ -304,7 +314,7 @@ export default function PostulanteForm({
                         <Label htmlFor="observaciones_post">Observaciones</Label>
                         <Textarea
                             id="observaciones_post"
-                            className="mt-1.5 min-h-28 border-slate-200 bg-white"
+                            className="mt-1.5 min-h-28 border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                             value={data.observaciones_post}
                             onChange={(event) =>
                                 field('observaciones_post', event.target.value)
@@ -319,9 +329,21 @@ export default function PostulanteForm({
             </Card>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                <Button variant="outline" asChild className="h-10">
-                    <Link href={route('postulantes.index')}>Cancelar</Link>
-                </Button>
+                {onCancel ? (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="h-10"
+                        disabled={processing}
+                        onClick={onCancel}
+                    >
+                        Cancelar
+                    </Button>
+                ) : (
+                    <Button variant="outline" asChild className="h-10">
+                        <Link href={route('postulantes.index')}>Cancelar</Link>
+                    </Button>
+                )}
                 <Button
                     type="submit"
                     disabled={processing}

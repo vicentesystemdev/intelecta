@@ -54,7 +54,7 @@ class PostulanteController extends Controller
             PostulanteData::fromArray($request->validated())
         );
 
-        return to_route('postulantes.show', $postulante)
+        return to_route('postulantes.index')
             ->with('success', 'Postulante registrado correctamente.');
     }
 
@@ -92,7 +92,7 @@ class PostulanteController extends Controller
             PostulanteData::fromArray($request->validated())
         );
 
-        return to_route('postulantes.show', $postulante)
+        return to_route('postulantes.index')
             ->with('success', 'Información del postulante actualizada correctamente.');
     }
 

@@ -88,11 +88,18 @@ export default function StudentEvaluaciones() {
         return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
     };
 
+    const scrollToTop = () => {
+        window.requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    };
+
     const handleStart = () => {
         setStep(2);
         setAnswers({});
         setSecondsLeft(900);
         setIsActive(true);
+        scrollToTop();
     };
 
     const handleSelectOption = (questionId, optionKey) => {
@@ -105,12 +112,14 @@ export default function StudentEvaluaciones() {
     const handleSubmit = () => {
         setIsActive(false);
         setStep(3);
+        scrollToTop();
     };
 
     const handleReset = () => {
         setStep(1);
         setAnswers({});
         setSecondsLeft(900);
+        scrollToTop();
     };
 
     // Calcular estadísticas de resultados

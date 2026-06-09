@@ -30,6 +30,7 @@ export default function PreguntaForm({
     submitRoute,
     method = 'post',
     submitLabel,
+    onCancel = null,
 }) {
     const existing = pregunta?.alternativas?.map((item, index) => ({
         texto_alt: item.texto_alt,
@@ -75,7 +76,16 @@ export default function PreguntaForm({
 
     const submit = (event) => {
         event.preventDefault();
-        method === 'put' ? put(submitRoute) : post(submitRoute);
+        
+        const options = {
+            onSuccess: () => {
+                if (onCancel) {
+                    onCancel();
+                }
+            },
+        };
+
+        method === 'put' ? put(submitRoute, options) : post(submitRoute, options);
     };
 
     return (
@@ -238,9 +248,21 @@ export default function PreguntaForm({
             </Card>
 
             <div className="flex justify-end gap-3">
-                <Button variant="outline" asChild>
-                    <Link href={route('preguntas.index')}>Cancelar</Link>
-                </Button>
+                {onCancel ? (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="h-10"
+                        disabled={processing}
+                        onClick={onCancel}
+                    >
+                        Cancelar
+                    </Button>
+                ) : (
+                    <Button variant="outline" asChild>
+                        <Link href={route('preguntas.index')}>Cancelar</Link>
+                    </Button>
+                )}
                 <Button
                     type="submit"
                     disabled={processing}

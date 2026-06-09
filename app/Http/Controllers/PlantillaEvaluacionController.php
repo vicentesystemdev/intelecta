@@ -18,15 +18,24 @@ use Inertia\Response;
 
 class PlantillaEvaluacionController extends Controller
 {
-    public function index(Request $request, ListarPlantillasEvaluacionAction $action): Response
-    {
+    public function index(
+        Request $request,
+        ListarPlantillasEvaluacionAction $action,
+        PlantillaEvaluacionService $service
+    ): Response {
         $filters = $request->validate([
             'buscar' => ['nullable', 'string', 'max:160'],
             'estado_plan' => ['nullable', 'in:activa,inactiva'],
         ]);
 
+        $data = $action->execute($filters);
+        if (isset($data['plantillas'])) {
+            $data['plantillas']->getCollection()->load(['preguntas.tema.area', 'preguntas.alternativas']);
+        }
+
         return Inertia::render('Evaluaciones/Plantillas/Index', [
-            ...$action->execute($filters),
+            ...$data,
+            'preguntasDisponibles' => $service->questions(),
             'filtros' => $filters,
             'permisos' => $this->permissions($request),
         ]);
@@ -41,7 +50,7 @@ class PlantillaEvaluacionController extends Controller
     {
         $plantilla = $action->execute(PlantillaEvaluacionData::fromArray($request->validated()));
 
-        return to_route('plantillas-evaluacion.show', $plantilla)
+        return to_route('plantillas-evaluacion.index')
             ->with('success', 'Plantilla de evaluación creada correctamente.');
     }
 
@@ -71,7 +80,7 @@ class PlantillaEvaluacionController extends Controller
     ): RedirectResponse {
         $action->execute($plantilla, PlantillaEvaluacionData::fromArray($request->validated()));
 
-        return to_route('plantillas-evaluacion.show', $plantilla)
+        return to_route('plantillas-evaluacion.index')
             ->with('success', 'Plantilla de evaluación actualizada correctamente.');
     }
 

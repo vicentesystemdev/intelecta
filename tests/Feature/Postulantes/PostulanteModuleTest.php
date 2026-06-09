@@ -86,7 +86,7 @@ class PostulanteModuleTest extends TestCase
         $postulante = Postulante::where('ci_post', '8765432')->firstOrFail();
 
         $response
-            ->assertRedirect(route('postulantes.show', $postulante))
+            ->assertRedirect(route('postulantes.index'))
             ->assertSessionHas('success');
 
         $this->assertDatabaseHas('postulantes', [
@@ -127,7 +127,7 @@ class PostulanteModuleTest extends TestCase
                 ...$this->validData(),
                 'id_car' => $otraCarrera->id_car,
             ])
-            ->assertRedirect(route('postulantes.show', $postulante))
+            ->assertRedirect(route('postulantes.index'))
             ->assertSessionHas('success');
 
         $this->assertDatabaseHas('postulantes', [

@@ -1,3 +1,4 @@
+import ConfirmModal from '@/Components/ConfirmModal';
 import StatusBadge from '@/Components/StatusBadge';
 import { Button } from '@/Components/ui/button';
 import {
@@ -19,6 +20,7 @@ import {
     UserRound,
     UserX,
 } from 'lucide-react';
+import { useState } from 'react';
 
 function Detail({ label, value }) {
     return (
@@ -36,17 +38,20 @@ function Detail({ label, value }) {
 export default function Show({ postulante, permisos }) {
     const { flash } = usePage().props;
     const fullName = `${postulante.nombres_post} ${postulante.apellidos_post}`;
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [changingStatus, setChangingStatus] = useState(false);
 
     const changeStatus = () => {
-        const action =
-            postulante.estado_post === 'activo' ? 'inactivar' : 'activar';
-        if (window.confirm(`¿Confirma que desea ${action} a este postulante?`)) {
-            router.patch(
-                route('postulantes.cambiar-estado', postulante.id_post),
-                {},
-                { preserveScroll: true },
-            );
-        }
+        setChangingStatus(true);
+        router.patch(
+            route('postulantes.cambiar-estado', postulante.id_post),
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => setConfirmOpen(false),
+                onFinish: () => setChangingStatus(false),
+            },
+        );
     };
 
     return (
@@ -87,7 +92,7 @@ export default function Show({ postulante, permisos }) {
                                         ? 'border-rose-200 text-rose-700 hover:bg-rose-50'
                                         : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'
                                 }
-                                onClick={changeStatus}
+                                onClick={() => setConfirmOpen(true)}
                             >
                                 {postulante.estado_post === 'activo' ? (
                                     <UserX className="h-4 w-4" />
@@ -269,6 +274,31 @@ export default function Show({ postulante, permisos }) {
                     </CardContent>
                 </Card>
             </div>
+
+            <ConfirmModal
+                open={confirmOpen}
+                onOpenChange={setConfirmOpen}
+                title={
+                    postulante.estado_post === 'activo'
+                        ? 'Inactivar postulante'
+                        : 'Activar postulante'
+                }
+                message={`¿Confirma que desea ${
+                    postulante.estado_post === 'activo'
+                        ? 'inactivar'
+                        : 'activar'
+                } a ${fullName}?`}
+                confirmLabel={
+                    postulante.estado_post === 'activo'
+                        ? 'Inactivar'
+                        : 'Activar'
+                }
+                variant={
+                    postulante.estado_post === 'activo' ? 'danger' : 'normal'
+                }
+                processing={changingStatus}
+                onConfirm={changeStatus}
+            />
         </AdminLayout>
     );
 }

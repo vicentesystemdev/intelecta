@@ -29,8 +29,13 @@ class PreguntaController extends Controller
             'estado_preg' => ['nullable', 'in:activo,inactivo'],
         ]);
 
+        $data = $action->execute($filters);
+        if (isset($data['preguntas'])) {
+            $data['preguntas']->getCollection()->load(['alternativas']);
+        }
+
         return Inertia::render('Evaluaciones/Preguntas/Index', [
-            ...$action->execute($filters),
+            ...$data,
             'filtros' => $filters,
             'permisos' => $this->permissions($request),
         ]);
@@ -45,7 +50,7 @@ class PreguntaController extends Controller
     {
         $pregunta = $action->execute(PreguntaData::fromArray($request->validated()));
 
-        return to_route('preguntas.show', $pregunta)->with('success', 'Pregunta incorporada al banco académico.');
+        return to_route('preguntas.index')->with('success', 'Pregunta incorporada al banco académico.');
     }
 
     public function show(Request $request, Pregunta $pregunta, PreguntaService $service): Response
@@ -71,7 +76,7 @@ class PreguntaController extends Controller
     ): RedirectResponse {
         $action->execute($pregunta, PreguntaData::fromArray($request->validated()));
 
-        return to_route('preguntas.show', $pregunta)->with('success', 'Pregunta actualizada correctamente.');
+        return to_route('preguntas.index')->with('success', 'Pregunta actualizada correctamente.');
     }
 
     public function cambiarEstado(Pregunta $pregunta, CambiarEstadoPreguntaAction $action): RedirectResponse

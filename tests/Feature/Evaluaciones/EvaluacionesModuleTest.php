@@ -87,7 +87,7 @@ class EvaluacionesModuleTest extends TestCase
 
         $pregunta = Pregunta::where('enunciado_preg', $this->validQuestionData()['enunciado_preg'])->firstOrFail();
 
-        $response->assertRedirect(route('preguntas.show', $pregunta));
+        $response->assertRedirect(route('preguntas.index'));
         $this->assertCount(5, $pregunta->alternativas);
         $this->assertSame(1, $pregunta->alternativas->where('es_correcta_alt', true)->count());
     }
@@ -156,7 +156,7 @@ class EvaluacionesModuleTest extends TestCase
 
         $plantilla = PlantillaEvaluacion::where('nombre_plan', 'Evaluación institucional de ingreso')->firstOrFail();
 
-        $response->assertRedirect(route('plantillas-evaluacion.show', $plantilla));
+        $response->assertRedirect(route('plantillas-evaluacion.index'));
         $this->assertCount(2, $plantilla->preguntas);
     }
 

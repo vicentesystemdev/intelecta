@@ -34,6 +34,7 @@ export default function PlantillaEvaluacionForm({
     submitRoute,
     method = 'post',
     submitLabel,
+    onCancel = null,
 }) {
     const selected =
         plantilla?.preguntas?.map((pregunta, index) => ({
@@ -75,7 +76,16 @@ export default function PlantillaEvaluacionForm({
 
     const submit = (event) => {
         event.preventDefault();
-        method === 'put' ? put(submitRoute) : post(submitRoute);
+        
+        const options = {
+            onSuccess: () => {
+                if (onCancel) {
+                    onCancel();
+                }
+            },
+        };
+
+        method === 'put' ? put(submitRoute, options) : post(submitRoute, options);
     };
 
     return (
@@ -303,11 +313,23 @@ export default function PlantillaEvaluacionForm({
             </Card>
 
             <div className="flex justify-end gap-3">
-                <Button variant="outline" asChild>
-                    <Link href={route('plantillas-evaluacion.index')}>
+                {onCancel ? (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="h-10"
+                        disabled={processing}
+                        onClick={onCancel}
+                    >
                         Cancelar
-                    </Link>
-                </Button>
+                    </Button>
+                ) : (
+                    <Button variant="outline" asChild>
+                        <Link href={route('plantillas-evaluacion.index')}>
+                            Cancelar
+                        </Link>
+                    </Button>
+                )}
                 <Button
                     type="submit"
                     disabled={processing}
