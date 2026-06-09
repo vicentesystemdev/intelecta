@@ -1,4 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
+import ThemeToggle from '@/Components/ThemeToggle';
+import useTheme from '@/Hooks/useTheme';
 import React, { useState, useEffect } from 'react';
 import {
     GraduationCap,
@@ -251,6 +253,7 @@ const LearningAnalyticsFallback = () => (
     </div>
 );
 export default function Welcome({ auth }) {
+    useTheme();
     const roles = auth?.roles || auth?.user?.roles || [];
     const isStudent = roles.includes('Estudiante');
     const isAdminLike = roles.some((role) =>
@@ -261,9 +264,9 @@ export default function Welcome({ auth }) {
         <>
             <Head title="INTELECTA - Plataforma Académica Preuniversitaria" />
 
-            <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-500 selection:text-white">
+            <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-indigo-500 selection:text-white dark:bg-slate-950 dark:text-slate-100 dark:[&_section]:border-slate-800 dark:[&_section]:bg-slate-950 dark:[&_.rounded-3xl]:border-slate-800 dark:[&_.rounded-3xl]:bg-slate-900 dark:[&_.bg-white]:bg-slate-900 dark:[&_.bg-slate-50]:bg-slate-950 dark:[&_.bg-slate-100]:bg-slate-900 dark:[&_.text-slate-950]:text-slate-50 dark:[&_.text-slate-900]:text-slate-100 dark:[&_.text-slate-800]:text-slate-200 dark:[&_.text-slate-700]:text-slate-300 dark:[&_.text-slate-600]:text-slate-400 dark:[&_.text-slate-500]:text-slate-400 dark:[&_.border-slate-200]:border-slate-800 dark:[&_.border-slate-100]:border-slate-800">
                 {/* 1. Header superior */}
-                <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-xl transition-all">
+                <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-xl transition-all dark:border-slate-800 dark:bg-slate-950/95">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex h-20 items-center justify-between">
                             {/* Logo */}
@@ -271,13 +274,13 @@ export default function Welcome({ auth }) {
                                 <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-600/20">
                                     <GraduationCap className="h-6 w-6" />
                                 </span>
-                                <span className="text-2xl font-black tracking-[0.15em] bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-900 bg-clip-text text-transparent">
+                                <span className="bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-900 bg-clip-text text-2xl font-black tracking-[0.15em] text-transparent dark:from-white dark:via-indigo-200 dark:to-cyan-300">
                                     INTELECTA
                                 </span>
                             </div>
 
                             {/* Navegación */}
-                            <nav className="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-600">
+                            <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-300 lg:flex">
                                 <a href="#enfoque" className="transition hover:text-indigo-600">Enfoque académico</a>
                                 <a href="#modulos" className="transition hover:text-indigo-600">Módulos</a>
                                 <a href="#evaluaciones" className="transition hover:text-indigo-600">Plantillas</a>
@@ -287,11 +290,12 @@ export default function Welcome({ auth }) {
 
                             {/* Botón de Acción */}
                             <div className="flex items-center gap-2">
+                                <ThemeToggle />
                                 {!auth.user ? (
                                     <>
                                         <Link
                                             href="/evaluaciones-postulante"
-                                            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 hover:bg-slate-50 px-5 py-2.5 text-sm font-semibold text-slate-800 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                                            className="hidden items-center justify-center gap-2 rounded-2xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-800 transition-all hover:-translate-y-0.5 hover:bg-slate-50 active:translate-y-0 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 xl:inline-flex"
                                         >
                                             Ver evaluaciones académicas
                                         </Link>
@@ -356,7 +360,7 @@ export default function Welcome({ auth }) {
                 </header>
 
                 {/* 2. Hero principal */}
-                <section className="relative overflow-hidden py-16 sm:py-24 lg:py-28 bg-gradient-to-b from-white via-slate-50 to-slate-100">
+                <section className="relative overflow-hidden bg-gradient-to-b from-white via-slate-50 to-slate-100 py-16 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 sm:py-24 lg:py-28">
                     {/* Elementos abstractos de fondo */}
                     <div className="absolute top-1/4 left-10 w-72 h-72 rounded-full bg-indigo-100/50 blur-3xl pointer-events-none" />
                     <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-cyan-100/40 blur-3xl pointer-events-none" />

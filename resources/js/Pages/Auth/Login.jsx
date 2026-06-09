@@ -1,7 +1,9 @@
 import Checkbox from '@/Components/Checkbox';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
+import ThemeToggle from '@/Components/ThemeToggle';
 import TextInput from '@/Components/TextInput';
+import useTheme from '@/Hooks/useTheme';
 import { Head, Link, useForm } from '@inertiajs/react';
 import React, { useState } from 'react';
 import {
@@ -17,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export default function Login({ status, canResetPassword }) {
+    useTheme();
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -37,7 +40,7 @@ export default function Login({ status, canResetPassword }) {
         <>
             <Head title="Iniciar Sesión - INTELECTA" />
 
-            <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-500 selection:text-white">
+            <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-indigo-500 selection:text-white dark:bg-slate-950 dark:text-slate-100">
                 {/* Columna Izquierda: Panel Visual Institucional */}
                 <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-tr from-indigo-950 via-indigo-900 to-cyan-900 p-12 text-white flex-col justify-between relative overflow-hidden">
                     {/* Patrón de fondo abstracto */}
@@ -146,31 +149,32 @@ export default function Login({ status, canResetPassword }) {
                 </div>
 
                 {/* Columna Derecha: Formulario de Login */}
-                <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 sm:p-12 md:p-20 relative">
+                <div className="relative flex w-full flex-col items-center justify-center p-6 sm:p-12 md:p-20 lg:w-1/2">
+                    <ThemeToggle className="absolute right-5 top-5 sm:right-8 sm:top-8" />
                     <div className="w-full max-w-md">
                         {/* Cabecera Móvil (sólo visible si no está en desktop) */}
                         <div className="flex items-center gap-3 lg:hidden mb-8 justify-center">
                             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
                                 <GraduationCap className="h-6 w-6" />
                             </span>
-                            <span className="text-2xl font-black tracking-[0.15em] bg-gradient-to-r from-slate-900 to-indigo-900 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-slate-900 to-indigo-900 bg-clip-text text-2xl font-black tracking-[0.15em] text-transparent dark:from-slate-100 dark:to-indigo-300">
                                 INTELECTA
                             </span>
                         </div>
 
                         {/* Form Card */}
-                        <div className="bg-white rounded-3xl border border-slate-200/80 p-8 sm:p-10 shadow-xl shadow-slate-200/40">
+                        <div className="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-slate-950/40 sm:p-10">
                             <div>
-                                <h1 className="text-2xl font-bold tracking-tight text-slate-950">
+                                <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-slate-100">
                                     Iniciar sesión
                                 </h1>
-                                <p className="text-sm text-slate-500 mt-1.5">
+                                <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
                                     Accede al panel académico de INTELECTA.
                                 </p>
                             </div>
 
                             {status && (
-                                <div className="mt-4 rounded-xl bg-emerald-50 p-4 text-xs font-medium text-emerald-800 border border-emerald-100">
+                                <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-xs font-medium text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                                     {status}
                                 </div>
                             )}
@@ -178,7 +182,7 @@ export default function Login({ status, canResetPassword }) {
                             <form onSubmit={submit} className="mt-8 space-y-6">
                                 {/* Email Field */}
                                 <div>
-                                    <InputLabel htmlFor="email" value="Correo electrónico" className="font-semibold text-slate-700 text-xs uppercase tracking-wider" />
+                                    <InputLabel htmlFor="email" value="Correo electrónico" className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300" />
 
                                     <div className="relative mt-1">
                                         <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
@@ -189,7 +193,7 @@ export default function Login({ status, canResetPassword }) {
                                             type="email"
                                             name="email"
                                             value={data.email}
-                                            className="pl-10 block w-full bg-slate-50/50 border-slate-200 hover:border-slate-350 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                                            className="block w-full rounded-xl border-slate-200 bg-slate-50/50 pl-10 hover:border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                                             autoComplete="username"
                                             isFocused={true}
                                             onChange={(e) => setData('email', e.target.value)}
@@ -201,7 +205,7 @@ export default function Login({ status, canResetPassword }) {
 
                                 {/* Password Field */}
                                 <div>
-                                    <InputLabel htmlFor="password" value="Contraseña" className="font-semibold text-slate-700 text-xs uppercase tracking-wider" />
+                                    <InputLabel htmlFor="password" value="Contraseña" className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300" />
 
                                     <div className="relative mt-1">
                                         <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
@@ -212,7 +216,7 @@ export default function Login({ status, canResetPassword }) {
                                             type="password"
                                             name="password"
                                             value={data.password}
-                                            className="pl-10 block w-full bg-slate-50/50 border-slate-200 hover:border-slate-350 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                                            className="block w-full rounded-xl border-slate-200 bg-slate-50/50 pl-10 hover:border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                                             autoComplete="current-password"
                                             onChange={(e) => setData('password', e.target.value)}
                                         />
@@ -228,9 +232,9 @@ export default function Login({ status, canResetPassword }) {
                                             name="remember"
                                             checked={data.remember}
                                             onChange={(e) => setData('remember', e.target.checked)}
-                                            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-950"
                                         />
-                                        <span className="ms-2 text-sm font-semibold text-slate-600">
+                                        <span className="ms-2 text-sm font-semibold text-slate-600 dark:text-slate-300">
                                             Recordarme
                                         </span>
                                     </label>
@@ -238,7 +242,7 @@ export default function Login({ status, canResetPassword }) {
                                     {canResetPassword && (
                                         <Link
                                             href={route('password.request')}
-                                            className="text-xs font-bold text-indigo-600 hover:text-indigo-700 hover:underline"
+                                            className="text-xs font-bold text-indigo-600 hover:text-indigo-700 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300"
                                         >
                                             ¿Olvidaste tu contraseña?
                                         </Link>
@@ -259,10 +263,10 @@ export default function Login({ status, canResetPassword }) {
                             </form>
 
                             {/* Divider & back link */}
-                            <div className="border-t border-slate-100 mt-6 pt-6 flex justify-center">
+                            <div className="mt-6 flex justify-center border-t border-slate-100 pt-6 dark:border-slate-800">
                                 <Link
                                     href="/"
-                                    className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition"
+                                    className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
                                 >
                                     <ArrowLeft className="h-4 w-4" />
                                     Volver al sitio público

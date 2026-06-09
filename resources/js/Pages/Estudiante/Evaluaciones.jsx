@@ -129,7 +129,7 @@ export default function StudentEvaluaciones() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-bold leading-tight text-slate-800 flex items-center gap-2">
+                <h2 className="flex items-center gap-2 text-xl font-bold leading-tight text-slate-800 dark:text-slate-100">
                     <GraduationCap className="h-6 w-6 text-indigo-600" />
                     Centro de Evaluaciones Académicas
                 </h2>
@@ -218,7 +218,7 @@ export default function StudentEvaluaciones() {
                 {step === 2 && (
                     <div className="space-y-6">
                         {/* Cabecera del examen */}
-                        <div className="sticky top-20 z-40 bg-white/90 backdrop-blur border border-slate-200/80 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div className="sticky top-20 z-40 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 sm:flex-row sm:p-6">
                             <div className="flex items-center gap-3">
                                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 font-bold">
                                     E2
@@ -273,13 +273,13 @@ export default function StudentEvaluaciones() {
                                                             className={`flex items-center gap-3 w-full text-left rounded-xl p-3.5 text-sm transition font-medium ring-1 ${
                                                                 isSelected 
                                                                     ? 'bg-indigo-50/60 ring-indigo-500 text-indigo-900' 
-                                                                    : 'bg-slate-50/50 hover:bg-slate-50 ring-slate-200/60 text-slate-750'
+                                                                    : 'bg-slate-50/50 hover:bg-slate-50 ring-slate-200/60 text-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-slate-800'
                                                             }`}
                                                         >
                                                             <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-black transition ${
                                                                 isSelected 
                                                                     ? 'bg-indigo-600 text-white shadow-md' 
-                                                                    : 'bg-white border border-slate-200 text-slate-500'
+                                                                    : 'border border-slate-200 bg-white text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'
                                                             }`}>
                                                                 {option.key}
                                                             </span>
@@ -357,8 +357,8 @@ export default function StudentEvaluaciones() {
                                                 <div className="flex items-start gap-3">
                                                     <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${
                                                         isCorrect 
-                                                            ? 'bg-emerald-50 text-emerald-700' 
-                                                            : 'bg-rose-50 text-rose-700'
+                                                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                                                            : 'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
                                                     }`}>
                                                         {isCorrect ? <CheckCircle2 className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                                                     </span>
@@ -377,8 +377,8 @@ export default function StudentEvaluaciones() {
                                             {/* Retroalimentación */}
                                             <div className={`mt-3 p-3 rounded-xl border text-[11px] leading-relaxed ${
                                                 isCorrect 
-                                                    ? 'bg-emerald-50/20 border-emerald-100 text-emerald-800' 
-                                                    : 'bg-rose-50/20 border-rose-100 text-rose-800'
+                                                    ? 'border-emerald-100 bg-emerald-50/20 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200'
+                                                    : 'border-rose-100 bg-rose-50/20 text-rose-800 dark:border-rose-800 dark:bg-rose-950/50 dark:text-rose-200'
                                             }`}>
                                                 <span className="font-bold block uppercase text-[9px] tracking-wider mb-1">Recomendación:</span>
                                                 {isCorrect ? q.feedbackSuccess : q.feedbackFail}
@@ -390,7 +390,7 @@ export default function StudentEvaluaciones() {
                         </div>
 
                         {/* Recomendaciones Generales de Learning Analytics */}
-                        <Card className="border-0 bg-gradient-to-br from-indigo-50/30 to-sky-50/20 shadow-sm ring-1 ring-slate-200/80">
+                        <Card className="border-0 bg-gradient-to-br from-indigo-50/30 to-sky-50/20 shadow-sm ring-1 ring-slate-200/80 dark:from-indigo-950/60 dark:to-sky-950/30 dark:ring-slate-800">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-sm font-bold text-slate-900">
                                     <TrendingUp className="h-4.5 w-4.5 text-indigo-600" />
@@ -420,14 +420,14 @@ export default function StudentEvaluaciones() {
                             <button
                                 type="button"
                                 onClick={handleReset}
-                                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs h-10 px-4 transition"
+                                className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                             >
                                 <RefreshCw className="h-4 w-4" />
                                 Volver a evaluaciones
                             </button>
                             
                             <Link href="/">
-                                <button className="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs h-10 px-5 transition shadow-sm">
+                                <button className="inline-flex h-10 items-center gap-2 rounded-xl bg-slate-900 px-5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500">
                                     Finalizar y salir
                                 </button>
                             </Link>

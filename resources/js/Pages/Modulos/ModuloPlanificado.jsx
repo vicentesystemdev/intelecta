@@ -36,13 +36,13 @@ export default function ModuloPlanificado({
                 <div className="flex items-center justify-between">
                     <Link 
                         href="/dashboard" 
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-indigo-600 transition"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-300"
                     >
                         <ArrowLeft className="h-4 w-4" />
                         Volver al panel principal
                     </Link>
                     
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-700/10">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-700/10 dark:bg-indigo-950 dark:text-indigo-300 dark:ring-indigo-800">
                         <Sparkles className="h-3 w-3 animate-pulse" />
                         INTELECTA Roadmap
                     </span>
@@ -76,12 +76,12 @@ export default function ModuloPlanificado({
                     </div>
                 </section>
 
-                {/* Panel de detalles y Mockup Visual */}
+                {/* Panel de detalles y vista conceptual */}
                 <div className="grid gap-6 md:grid-cols-5">
                     {/* Detalles */}
                     <div className="md:col-span-2 space-y-6">
-                        <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
-                            <CardHeader className="border-b border-slate-100 pb-4">
+                        <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
+                            <CardHeader className="border-b border-slate-100 pb-4 dark:border-slate-800">
                                 <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">
                                     Información del Módulo
                                 </CardTitle>
@@ -89,13 +89,13 @@ export default function ModuloPlanificado({
                             <CardContent className="space-y-4 pt-6">
                                 <div className="space-y-1">
                                     <span className="text-xs font-semibold text-slate-400">Estado de la funcionalidad</span>
-                                    <p className="text-sm font-medium text-slate-700">
+                                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                         Funcionalidad preparada dentro del mapa de evolución de INTELECTA.
                                     </p>
                                 </div>
                                 <div className="space-y-1">
                                     <span className="text-xs font-semibold text-slate-400">Frecuencia de integración</span>
-                                    <p className="text-sm font-medium text-slate-700">
+                                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                         Este apartado forma parte del crecimiento progresivo del sistema.
                                     </p>
                                 </div>
@@ -108,31 +108,31 @@ export default function ModuloPlanificado({
                             </CardContent>
                         </Card>
 
-                        <Card className="border-0 bg-gradient-to-br from-indigo-50/50 to-cyan-50/30 shadow-sm ring-1 ring-slate-200/85">
+                        <Card className="border-0 bg-gradient-to-br from-indigo-50/50 to-cyan-50/30 shadow-sm ring-1 ring-slate-200/85 dark:from-indigo-950/70 dark:to-cyan-950/40 dark:ring-slate-800">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                                <CardTitle className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-slate-100">
                                     <Calendar className="h-4 w-4 text-indigo-600" />
                                     Próxima Evolución
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="pt-0">
-                                <p className="text-xs leading-relaxed text-slate-600">
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
                                     {proximaEvolucion}
                                 </p>
                             </CardContent>
                         </Card>
                     </div>
 
-                    {/* Simulación Visual de Estructura Académica (Mockup de Fidelidad Alta) */}
+                    {/* Representación visual de la estructura académica */}
                     <div className="md:col-span-3">
-                        <Card className="h-full border-0 bg-white shadow-sm ring-1 ring-slate-200/80 overflow-hidden flex flex-col justify-between">
-                            <CardHeader className="border-b border-slate-100 bg-slate-50/50">
+                        <Card className="flex h-full flex-col justify-between overflow-hidden border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
+                            <CardHeader className="border-b border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-800/60">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <CardTitle className="text-sm font-bold text-slate-900">
+                                        <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100">
                                             Estructura Operativa
                                         </CardTitle>
-                                        <CardDescription className="text-xs text-slate-500">
+                                        <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
                                             Base institucional preparada para futuras operaciones académicas.
                                         </CardDescription>
                                     </div>
@@ -145,13 +145,13 @@ export default function ModuloPlanificado({
                             <CardContent className="p-6 flex-1 flex flex-col justify-center space-y-6">
                                 {/* Representación de flujo */}
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/50 p-4">
+                                    <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-800/70">
                                         <div className="flex items-center gap-3">
                                             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
                                                 <BookOpen className="h-4 w-4" />
                                             </span>
                                             <div>
-                                                <p className="text-xs font-semibold text-slate-900">Entrada de datos</p>
+                                                <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">Entrada de datos</p>
                                                 <p className="text-[10px] text-slate-400">Postulantes y plantillas académicas</p>
                                             </div>
                                         </div>
@@ -161,14 +161,14 @@ export default function ModuloPlanificado({
                                                 <Layers className="h-4 w-4" />
                                             </span>
                                             <div>
-                                                <p className="text-xs font-semibold text-slate-900">{titulo}</p>
+                                                <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">{titulo}</p>
                                                 <p className="text-[10px] text-slate-400">Procesamiento y análisis</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Gráfico conceptual o esqueleto */}
-                                    <div className="rounded-2xl border border-slate-100 bg-slate-50/30 p-4 space-y-3">
+                                    <div className="space-y-3 rounded-2xl border border-slate-100 bg-slate-50/30 p-4 dark:border-slate-700 dark:bg-slate-800/50">
                                         <div className="flex justify-between items-center text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
                                             <span>Cobertura metodológica</span>
                                             <span>100% planificado</span>
@@ -176,7 +176,7 @@ export default function ModuloPlanificado({
                                         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                                             <div className="h-full w-full bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-500 rounded-full animate-pulse" />
                                         </div>
-                                        <p className="text-[10px] text-slate-500 leading-normal">
+                                        <p className="text-[10px] leading-normal text-slate-500 dark:text-slate-400">
                                             La arquitectura de servicios de INTELECTA cuenta con la reserva operacional para la automatización total de este apartado académico.
                                         </p>
                                     </div>
@@ -185,7 +185,7 @@ export default function ModuloPlanificado({
                                 <div className="flex flex-col sm:flex-row gap-3 justify-end">
                                     {mostrarReportes && (
                                         <Link href={route('reportes-academicos.index')}>
-                                            <Button variant="outline" className="w-full sm:w-auto inline-flex items-center gap-2 rounded-xl text-xs font-semibold h-10 border-slate-200">
+                                            <Button variant="outline" className="inline-flex h-10 w-full items-center gap-2 rounded-xl border-slate-200 text-xs font-semibold dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 sm:w-auto">
                                                 <BarChart3 className="h-4 w-4 text-indigo-600" />
                                                 Ver Reportes Académicos
                                             </Button>

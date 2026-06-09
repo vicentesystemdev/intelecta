@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import MetricCard from '@/Components/MetricCard';
 import StatusBadge from '@/Components/StatusBadge';
+import useTheme from '@/Hooks/useTheme';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { 
@@ -66,16 +67,7 @@ export default function Index({
     const [currentPage, setCurrentPage] = useState(1);
 
     // Detección dinámica de modo oscuro
-    const [isDark, setIsDark] = useState(() => 
-        typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-    );
-    useEffect(() => {
-        const observer = new MutationObserver(() => {
-            setIsDark(document.documentElement.classList.contains('dark'));
-        });
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-        return () => observer.disconnect();
-    }, []);
+    const { isDark } = useTheme();
 
     // Colores y temas de los gráficos
     const gridColor = isDark ? '#334155' : '#e2e8f0'; // slate-700 / slate-200
@@ -425,7 +417,7 @@ export default function Index({
                             </div>
                             <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Carrera principal</span>
-                                <span className="font-black text-slate-800 truncate max-w-[150px]">{carreraLider}</span>
+                                <span className="max-w-[150px] truncate font-black text-slate-800 dark:text-slate-200">{carreraLider}</span>
                             </div>
                             <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Total postulantes</span>
@@ -944,8 +936,8 @@ export default function Index({
                             {filteredPostulantes.length === 0 ? (
                                 <div className="text-center py-10 space-y-2">
                                     <AlertTriangle className="h-8 w-8 text-slate-400 mx-auto" />
-                                    <h3 className="text-sm font-bold text-slate-800">No se encontraron registros</h3>
-                                    <p className="text-xs text-slate-500">Ningún postulante coincide con la búsqueda o filtros seleccionados.</p>
+                                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">No se encontraron registros</h3>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">Ningún postulante coincide con la búsqueda o filtros seleccionados.</p>
                                 </div>
                             ) : (
                                 <Table>

@@ -23,10 +23,10 @@ import {
 function Detail({ label, value }) {
     return (
         <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 {label}
             </dt>
-            <dd className="mt-1 text-sm font-medium text-slate-800">
+            <dd className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-200">
                 {value || 'No registrado'}
             </dd>
         </div>
@@ -103,12 +103,12 @@ export default function Show({ postulante, permisos }) {
                 </div>
 
                 {flash?.success && (
-                    <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                    <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                         {flash.success}
                     </div>
                 )}
 
-                <Card className="mb-6 border-0 bg-gradient-to-r from-indigo-800 to-blue-700 py-0 text-white shadow-lg shadow-indigo-200/50">
+                <Card className="mb-6 border-0 bg-gradient-to-r from-indigo-800 to-blue-700 py-0 text-white shadow-lg shadow-indigo-200/50 dark:shadow-indigo-950/40">
                     <CardContent className="flex flex-col justify-between gap-5 p-6 sm:flex-row sm:items-center">
                         <div className="flex items-center gap-4">
                             <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">

@@ -150,12 +150,12 @@ const recommendations = [
 function SectionHeading({ eyebrow, title, description }) {
     return (
         <div className="mb-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600 dark:text-indigo-400">
                 {eyebrow}
             </p>
-            <h2 className="mt-1 text-xl font-bold text-slate-900">{title}</h2>
+            <h2 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">{title}</h2>
             {description && (
-                <p className="mt-1 text-sm text-slate-500">{description}</p>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
             )}
         </div>
     );
@@ -169,7 +169,7 @@ export default function Dashboard() {
         >
             <Head title="Panel Académico Institucional" />
 
-            <section className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-800 via-blue-700 to-cyan-600 p-6 text-white shadow-lg shadow-indigo-200/60 sm:p-8">
+            <section className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-800 via-blue-700 to-cyan-600 p-6 text-white shadow-lg shadow-indigo-200/60 dark:shadow-indigo-950/40 sm:p-8">
                 <div className="absolute -right-14 -top-20 h-64 w-64 rounded-full border-[42px] border-white/5" />
                 <div className="relative max-w-3xl">
                     <div className="mb-3 flex items-center gap-2 text-sm font-medium text-cyan-100">
@@ -498,7 +498,7 @@ export default function Dashboard() {
             </section>
 
             <section className="mt-8">
-                <Card className="border-0 bg-gradient-to-br from-white to-sky-50/70 shadow-sm ring-1 ring-slate-200/80">
+                <Card className="border-0 bg-gradient-to-br from-white to-sky-50/70 shadow-sm ring-1 ring-slate-200/80 dark:from-slate-900 dark:to-sky-950/40 dark:ring-slate-800">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-lg text-slate-900">
                             <Lightbulb className="h-5 w-5 text-amber-500" />
@@ -512,7 +512,7 @@ export default function Dashboard() {
                         {recommendations.map((recommendation, index) => (
                             <div
                                 key={recommendation}
-                                className="flex gap-3 rounded-xl border border-slate-200 bg-white p-4"
+                                className="flex gap-3 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900"
                             >
                                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
                                     {index === 0 ? (
