@@ -1,7 +1,7 @@
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { Link } from '@inertiajs/react';
-import { LogOut, Menu } from 'lucide-react';
+import { LogOut, Menu, Globe } from 'lucide-react';
 
 export default function AppHeader({
     title,
@@ -46,6 +46,18 @@ export default function AppHeader({
                 </div>
 
                 <div className="flex shrink-0 items-center gap-3">
+                    <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                        className="hidden md:inline-flex items-center gap-2 border-slate-200 text-slate-600 hover:text-slate-900"
+                    >
+                        <Link href="/">
+                            <Globe className="h-4 w-4 text-indigo-500" />
+                            Ver sitio público
+                        </Link>
+                    </Button>
+
                     <div className="hidden text-right sm:block">
                         <p className="max-w-48 truncate text-sm font-semibold text-slate-900">
                             {user?.name || 'Usuario INTELECTA'}
