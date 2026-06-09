@@ -57,24 +57,21 @@ export default function AppHeader({
                 {/* ── Right: actions + user ───────────────────────────── */}
                 <div className="flex shrink-0 items-center gap-2">
 
-                    {/* Theme toggle */}
-                    <ThemeToggle isDark={isDark} onToggle={onToggleTheme} />
-
                     {/* Ver sitio público */}
                     <Button
                         asChild
-                        variant="outline"
-                        size="sm"
-                        className="hidden md:inline-flex items-center gap-2
-                            border-slate-200 text-slate-600 hover:text-slate-900
-                            dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300
-                            dark:hover:bg-slate-700 dark:hover:text-slate-100"
+                        variant="ghost"
+                        className="inline-flex h-9 w-9 p-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition duration-200 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-indigo-400 dark:hover:bg-slate-700 dark:hover:text-indigo-300"
+                        title="Ver sitio público"
+                        aria-label="Ver sitio público"
                     >
                         <Link href="/">
-                            <Globe className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
-                            Ver sitio público
+                            <Globe className="h-4 w-4" aria-hidden="true" />
                         </Link>
                     </Button>
+
+                    {/* Theme toggle */}
+                    <ThemeToggle isDark={isDark} onToggle={onToggleTheme} />
 
                     {/* User name + role badge */}
                     <div className="hidden text-right sm:block">

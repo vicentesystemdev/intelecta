@@ -2,6 +2,7 @@ import ConfirmModal from '@/Components/ConfirmModal';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import PostulanteForm from '@/Components/Postulantes/PostulanteForm';
 import StatusBadge from '@/Components/StatusBadge';
+import Pagination from '@/Components/Pagination';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -180,17 +181,16 @@ export default function Index({
                     </AlertDescription>
                 </Alert>
             )}
-
-            <Card className="mb-6 border-0 bg-white py-0 shadow-sm ring-1 ring-slate-200/80">
+            <Card className="mb-6 border-0 bg-white dark:bg-slate-900 py-0 shadow-sm ring-1 ring-slate-200/80 dark:ring-slate-800">
                 <CardContent className="p-4">
                     <form
                         onSubmit={submitFilters}
-                        className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_1fr_1fr_1fr_150px_auto]"
+                        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 w-full"
                     >
-                        <div className="relative">
+                        <div className="relative col-span-1 md:col-span-2 xl:col-span-2">
                             <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                             <Input
-                                className="h-10 bg-white pl-9"
+                                className="h-10 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 border-slate-200 dark:border-slate-800 pl-9 w-full"
                                 placeholder="Buscar por nombre, CI o correo"
                                 value={filters.buscar}
                                 onChange={(event) =>
@@ -202,7 +202,7 @@ export default function Index({
                             />
                         </div>
                         <select
-                            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500"
                             value={filters.id_col}
                             onChange={(event) =>
                                 setFilters({
@@ -222,7 +222,7 @@ export default function Index({
                             ))}
                         </select>
                         <select
-                            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500"
                             value={filters.id_uni}
                             onChange={(event) =>
                                 changeUniversidad(event.target.value)
@@ -240,7 +240,7 @@ export default function Index({
                             ))}
                         </select>
                         <select
-                            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 xl:col-span-4"
                             value={filters.id_car}
                             onChange={(event) =>
                                 setFilters({
@@ -263,7 +263,7 @@ export default function Index({
                             ))}
                         </select>
                         <select
-                            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500"
                             value={filters.estado_post}
                             onChange={(event) =>
                                 setFilters({
@@ -276,15 +276,15 @@ export default function Index({
                             <option value="activo">Activo</option>
                             <option value="inactivo">Inactivo</option>
                         </select>
-                        <div className="flex gap-2">
-                            <Button type="submit" className="h-10 bg-indigo-700">
+                        <div className="flex gap-2 w-full col-span-1 md:col-span-2 xl:col-span-1">
+                            <Button type="submit" className="h-10 bg-indigo-700 hover:bg-indigo-800 flex-1">
                                 Filtrar
                             </Button>
                             <Button
                                 type="button"
                                 variant="outline"
                                 size="icon"
-                                className="h-10 w-10"
+                                className="h-10 w-10 shrink-0 border-slate-200 dark:border-slate-800 dark:text-slate-200"
                                 onClick={clearFilters}
                                 aria-label="Limpiar filtros"
                             >
@@ -295,7 +295,7 @@ export default function Index({
                 </CardContent>
             </Card>
 
-            <Card className="border-0 bg-white py-0 shadow-sm ring-1 ring-slate-200/80">
+            <Card className="border-0 bg-white dark:bg-slate-900 py-0 shadow-sm ring-1 ring-slate-200/80 dark:ring-slate-800">
                 <CardContent className="px-0">
                     <Table>
                         <TableHeader>
@@ -325,33 +325,33 @@ export default function Index({
                                 </TableRow>
                             ) : (
                                 postulantes.data.map((postulante) => (
-                                    <TableRow key={postulante.id_post}>
-                                        <TableCell className="pl-5">
-                                            <p className="font-semibold text-slate-900">
+                                    <TableRow key={postulante.id_post} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
+                                        <TableCell className="pl-5 max-w-[200px] whitespace-normal break-words leading-snug">
+                                            <p className="font-semibold text-slate-900 dark:text-slate-100">
                                                 {postulante.apellidos_post},{' '}
                                                 {postulante.nombres_post}
                                             </p>
-                                            <p className="text-xs text-slate-500">
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">
                                                 {postulante.email_post ||
                                                     'Sin correo registrado'}
                                             </p>
                                         </TableCell>
-                                        <TableCell className="max-w-52 truncate text-slate-600">
+                                        <TableCell className="max-w-[200px] whitespace-normal break-words leading-snug text-slate-600 dark:text-slate-300">
                                             {postulante.colegio?.nombre_col ||
                                                 'Sin asignar'}
                                         </TableCell>
-                                        <TableCell className="text-slate-600">
+                                        <TableCell className="max-w-[150px] whitespace-normal break-words leading-snug text-slate-600 dark:text-slate-300">
                                             {postulante.carrera?.universidad
                                                 ?.sigla_uni ||
                                                 postulante.carrera?.universidad
                                                     ?.nombre_uni ||
                                                 'Sin asignar'}
                                         </TableCell>
-                                        <TableCell className="max-w-52 truncate text-slate-600">
+                                        <TableCell className="max-w-[200px] whitespace-normal break-words leading-snug text-slate-600 dark:text-slate-300">
                                             {postulante.carrera?.nombre_car ||
                                                 'Sin asignar'}
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="text-slate-700 dark:text-slate-300">
                                             {postulante.edad_post || '—'}
                                         </TableCell>
                                         <TableCell>
@@ -432,36 +432,7 @@ export default function Index({
                 </CardContent>
             </Card>
 
-            {postulantes.links.length > 3 && (
-                <div className="mt-5 flex flex-wrap justify-center gap-1">
-                    {postulantes.links.map((link, index) => (
-                        <Button
-                            key={`${link.label}-${index}`}
-                            asChild={Boolean(link.url)}
-                            disabled={!link.url}
-                            variant={link.active ? 'default' : 'outline'}
-                            size="sm"
-                            className={link.active ? 'bg-indigo-700' : ''}
-                        >
-                            {link.url ? (
-                                <Link
-                                    href={link.url}
-                                    preserveScroll
-                                    dangerouslySetInnerHTML={{
-                                        __html: link.label,
-                                    }}
-                                />
-                            ) : (
-                                <span
-                                    dangerouslySetInnerHTML={{
-                                        __html: link.label,
-                                    }}
-                                />
-                            )}
-                        </Button>
-                    ))}
-                </div>
-            )}
+            <Pagination links={postulantes.links} />
 
             <ModalInstitucional
                 open={formModal.open}

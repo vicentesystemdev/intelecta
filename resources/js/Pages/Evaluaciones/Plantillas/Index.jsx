@@ -1,4 +1,5 @@
 import StatusBadge from '@/Components/StatusBadge';
+import Pagination from '@/Components/Pagination';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import ConfirmModal from '@/Components/ConfirmModal';
 import PlantillaEvaluacionForm from '@/Components/Evaluaciones/PlantillaEvaluacionForm';
@@ -89,44 +90,76 @@ export default function Index({ plantillas, preguntasDisponibles = [], filtros =
                 {plantillas.data.map((plantilla) => {
                     const totalPuntaje = Number(plantilla.puntaje_total || 0);
                     return (
-                        <Card key={plantilla.id_plan} className="gap-0 overflow-hidden border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/50 dark:ring-slate-800">
-                            <div className="h-1.5 bg-gradient-to-r from-indigo-600 to-cyan-400" />
-                            <CardContent className="p-5">
-                                <div className="mb-4 flex items-start justify-between gap-3">
-                                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                                        <FileCheck2 className="h-5 w-5" />
-                                    </div>
-                                    <StatusBadge status={plantilla.estado_plan === 'activa' ? 'Activa' : 'Inactiva'} />
-                                </div>
-                                <h2 className="min-h-14 font-semibold leading-6 text-slate-900 dark:text-slate-100">{plantilla.nombre_plan}</h2>
-                                <p className="mt-2 line-clamp-2 min-h-10 text-sm text-slate-500 dark:text-slate-400">{plantilla.descripcion_plan || 'Instrumento académico institucional.'}</p>
+                        <Card key={plantilla.id_plan} className="h-full min-h-[230px] flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                            <div className="h-1.5 bg-gradient-to-r from-indigo-600 to-cyan-400 shrink-0" />
+                            
+                            {/* Header: title (left) + difficulty badge (right) */}
+                            <div className="flex items-start justify-between gap-4 p-5 pb-4">
+                                <h3 
+                                    className="flex-1 text-base font-semibold leading-snug text-slate-900 dark:text-slate-100 min-h-[44px] pr-2 break-words" 
+                                    title={plantilla.nombre_plan}
+                                    style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                                >
+                                    {plantilla.nombre_plan}
+                                </h3>
+                                <Badge variant="outline" className="capitalize shrink-0 mt-0.5 border-indigo-100 bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300">
+                                    {plantilla.dificultad_plan?.replace('-', ' ') || 'No definida'}
+                                </Badge>
+                            </div>
+
+                            {/* Body: description, statistics grid, and progress bar */}
+                            <div className="px-5 py-4 space-y-4 flex-1 flex flex-col">
+                                <p 
+                                    className="text-xs text-slate-500 dark:text-slate-400 min-h-[32px] leading-relaxed break-words"
+                                    style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                                >
+                                    {plantilla.descripcion_plan || 'Instrumento académico institucional.'}
+                                </p>
                                 
-                                <div className="mt-5 grid grid-cols-3 gap-2 rounded-xl bg-slate-50 dark:bg-slate-900 p-3 text-center">
+                                <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-50 dark:bg-slate-950 p-3 text-center">
                                     <div>
-                                        <p className="text-lg font-bold text-indigo-700 dark:text-indigo-400">{plantilla.preguntas_count}</p>
-                                        <p className="text-[11px] text-slate-500">Preguntas</p>
+                                        <p className="text-base font-bold text-slate-900 dark:text-slate-100">{plantilla.preguntas_count}</p>
+                                        <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Preguntas</p>
                                     </div>
                                     <div>
-                                        <p className="text-lg font-bold text-indigo-700 dark:text-indigo-400">{totalPuntaje.toFixed(0)}</p>
-                                        <p className="text-[11px] text-slate-500">Puntos</p>
+                                        <p className="text-base font-bold text-slate-900 dark:text-slate-100">{totalPuntaje.toFixed(0)}</p>
+                                        <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Puntos</p>
                                     </div>
                                     <div>
-                                        <p className="flex items-center justify-center gap-1 text-lg font-bold text-indigo-700 dark:text-indigo-400">
-                                            <Clock3 className="h-4 w-4" />{plantilla.duracion_minutos_plan || '—'}
+                                        <p className="flex items-center justify-center gap-1 text-base font-bold text-slate-900 dark:text-slate-100">
+                                            <Clock3 className="h-3.5 w-3.5 text-slate-400" />{plantilla.duracion_minutos_plan || '—'}
                                         </p>
-                                        <p className="text-[11px] text-slate-500">Minutos</p>
+                                        <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Minutos</p>
                                     </div>
                                 </div>
                                 
-                                <div className="mt-4 flex items-center justify-between">
-                                    <Badge variant="outline" className="capitalize">{plantilla.dificultad_plan?.replace('-', ' ') || 'No definida'}</Badge>
-                                    <div className="flex gap-1">
+                                {/* Progress bar */}
+                                <div className="space-y-1">
+                                    <div className="flex justify-between text-xs font-medium text-slate-500 dark:text-slate-400">
+                                        <span>Progreso de ponderación</span>
+                                        <span className={Math.abs(totalPuntaje - 100) < 0.01 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-500 dark:text-amber-400'}>
+                                            {totalPuntaje.toFixed(0)}% / 100%
+                                        </span>
+                                    </div>
+                                    <Progress value={Math.min(totalPuntaje, 100)} className="h-1.5" />
+                                </div>
+                            </div>
+                            
+                            {/* Footer: status + actions */}
+                            <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800 px-5 py-4 bg-slate-50/20 dark:bg-slate-900/60">
+                                <span className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[10px] truncate shrink-0">
+                                    <span className="hidden sm:inline">TODAS SOBRE </span>100 PTS
+                                </span>
+                                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                                    <StatusBadge status={plantilla.estado_plan === 'activa' ? 'Activa' : 'Inactiva'} />
+                                    <div className="flex items-center gap-1 border-l border-slate-200 dark:border-slate-800 pl-2">
                                         <Button 
                                             type="button" 
                                             variant="ghost" 
                                             size="icon"
                                             onClick={() => setDetailModal({ open: true, plantilla })}
                                             aria-label="Ver detalle"
+                                            className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
                                         >
                                             <Eye className="h-4 w-4" />
                                         </Button>
@@ -137,6 +170,7 @@ export default function Index({ plantillas, preguntasDisponibles = [], filtros =
                                                 size="icon"
                                                 onClick={() => setFormModal({ open: true, plantilla })}
                                                 aria-label="Editar plantilla"
+                                                className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
                                             >
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
@@ -147,17 +181,20 @@ export default function Index({ plantillas, preguntasDisponibles = [], filtros =
                                                 size="icon" 
                                                 onClick={() => handleOpenStatusModal(plantilla)}
                                                 aria-label="Cambiar estado"
+                                                className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
                                             >
                                                 <ToggleLeft className="h-4 w-4" />
                                             </Button>
                                         )}
                                     </div>
                                 </div>
-                            </CardContent>
+                            </div>
                         </Card>
                     );
                 })}
             </div>
+            
+            <Pagination links={plantillas.links} />
 
             {/* Modal para Crear y Editar Plantillas */}
             <ModalInstitucional

@@ -30,11 +30,6 @@ const navigationGroups = [
                 href: '/dashboard',
                 routeName: 'dashboard',
             },
-            {
-                label: 'Ver sitio público',
-                icon: Globe,
-                href: '/',
-            },
         ],
     },
     {

@@ -217,141 +217,133 @@ export default function Dashboard() {
                 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {/* Tarjeta A: Gestión Académica */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-indigo-300 transition duration-300">
-                        <CardHeader className="pb-3 border-b border-slate-50">
-                            <div className="flex items-center gap-2">
-                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
-                                    <GraduationCap className="h-4.5 w-4.5" />
-                                </span>
-                                <CardTitle className="text-sm font-bold text-slate-800">
-                                    Gestión Académica
-                                </CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="pt-4 space-y-2">
-                            <Link href="/postulantes" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition duration-300">
+                        <div className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800/60 flex items-center gap-2">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+                                <GraduationCap className="h-4.5 w-4.5" />
+                            </span>
+                            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                                Gestión Académica
+                            </h3>
+                        </div>
+                        <div className="p-5 pt-4 space-y-2">
+                            <Link href="/postulantes" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-700 dark:hover:text-indigo-300 transition">
                                 <span>Postulantes</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link href="/admin/gestion-academica/docentes" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                            <Link href="/admin/gestion-academica/docentes" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-700 dark:hover:text-indigo-300 transition">
                                 <span>Docentes</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link href="/admin/gestion-academica/carreras" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                            <Link href="/admin/gestion-academica/carreras" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-700 dark:hover:text-indigo-300 transition">
                                 <span>Carreras</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link href="/admin/gestion-academica/colegios" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                            <Link href="/admin/gestion-academica/colegios" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-700 dark:hover:text-indigo-300 transition">
                                 <span>Colegios</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                        </CardContent>
+                        </div>
                     </Card>
 
                     {/* Tarjeta B: Evaluaciones */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-cyan-300 transition duration-300">
-                        <CardHeader className="pb-3 border-b border-slate-50">
-                            <div className="flex items-center gap-2">
-                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-50 text-cyan-600">
-                                    <ClipboardList className="h-4.5 w-4.5" />
-                                </span>
-                                <CardTitle className="text-sm font-bold text-slate-800">
-                                    Evaluaciones
-                                </CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="pt-4 space-y-2">
-                            <Link href="/plantillas-evaluacion" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-cyan-50 hover:text-cyan-700 transition">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition duration-300">
+                        <div className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800/60 flex items-center gap-2">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400">
+                                <ClipboardList className="h-4.5 w-4.5" />
+                            </span>
+                            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                                Evaluaciones
+                            </h3>
+                        </div>
+                        <div className="p-5 pt-4 space-y-2">
+                            <Link href="/plantillas-evaluacion" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-cyan-50 dark:hover:bg-cyan-950/40 hover:text-cyan-700 dark:hover:text-cyan-300 transition">
                                 <span>Plantillas</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link href="/preguntas" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-cyan-50 hover:text-cyan-700 transition">
+                            <Link href="/preguntas" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-cyan-50 dark:hover:bg-cyan-950/40 hover:text-cyan-700 dark:hover:text-cyan-300 transition">
                                 <span>Banco de Preguntas</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link href="/admin/evaluaciones" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-cyan-50 hover:text-cyan-700 transition">
+                            <Link href="/admin/evaluaciones" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-cyan-50 dark:hover:bg-cyan-950/40 hover:text-cyan-700 dark:hover:text-cyan-300 transition">
                                 <span>Evaluaciones</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link href="/admin/evaluaciones/resultados" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-cyan-50 hover:text-cyan-700 transition">
+                            <Link href="/admin/evaluaciones/resultados" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-cyan-50 dark:hover:bg-cyan-950/40 hover:text-cyan-700 dark:hover:text-cyan-300 transition">
                                 <span>Resultados</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                        </CardContent>
+                        </div>
                     </Card>
 
                     {/* Tarjeta C: Análisis Académico */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-violet-300 transition duration-300">
-                        <CardHeader className="pb-3 border-b border-slate-50">
-                            <div className="flex items-center gap-2">
-                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
-                                    <TrendingUp className="h-4.5 w-4.5" />
-                                </span>
-                                <CardTitle className="text-sm font-bold text-slate-800">
-                                    Análisis Académico
-                                </CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="pt-4 space-y-2">
-                            <Link href="/reportes-academicos" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-violet-50 hover:text-violet-700 transition">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition duration-300">
+                        <div className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800/60 flex items-center gap-2">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400">
+                                <TrendingUp className="h-4.5 w-4.5" />
+                            </span>
+                            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                                Análisis Académico
+                            </h3>
+                        </div>
+                        <div className="p-5 pt-4 space-y-2">
+                            <Link href="/reportes-academicos" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-300 transition">
                                 <span>Reportes Académicos</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link href="/admin/analisis/learning-analytics" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-violet-50 hover:text-violet-750 transition">
+                            <Link href="/admin/analisis/learning-analytics" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-300 transition">
                                 <span>Learning Analytics</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link href="/admin/analisis/riesgo-academico" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-violet-50 hover:text-violet-750 transition">
+                            <Link href="/admin/analisis/riesgo-academico" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-300 transition">
                                 <span>Riesgo Académico</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                        </CardContent>
+                        </div>
                     </Card>
 
                     {/* Tarjeta D: Sistema */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-slate-400 transition duration-300">
-                        <CardHeader className="pb-3 border-b border-slate-50">
-                            <div className="flex items-center gap-2">
-                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
-                                    <Settings className="h-4.5 w-4.5" />
-                                </span>
-                                <CardTitle className="text-sm font-bold text-slate-800">
-                                    Sistema
-                                </CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="pt-4 space-y-2">
-                            <Link href="/admin/sistema/usuarios" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-slate-950 transition">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition duration-300">
+                        <div className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800/60 flex items-center gap-2">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                <Settings className="h-4.5 w-4.5" />
+                            </span>
+                            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                                Sistema
+                            </h3>
+                        </div>
+                        <div className="p-5 pt-4 space-y-2">
+                            <Link href="/admin/sistema/usuarios" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-slate-105 transition">
                                 <span>Usuarios</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link href="/admin/sistema/roles-permisos" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-slate-950 transition">
+                            <Link href="/admin/sistema/roles-permisos" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-slate-105 transition">
                                 <span>Roles y Permisos</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link href="/admin/sistema/configuracion" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-slate-950 transition">
+                            <Link href="/admin/sistema/configuracion" className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-slate-105 transition">
                                 <span>Configuración</span>
                                 <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                        </CardContent>
+                        </div>
                     </Card>
                 </div>
             </section>
 
             <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,1fr)]">
-                <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
-                    <CardHeader className="border-b border-slate-100">
-                        <CardTitle className="text-lg text-slate-900">
+                <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                    <div className="mb-4 flex flex-col">
+                        <h3 className="text-lg font-semibold leading-snug text-slate-900 dark:text-slate-100">
                             Evaluaciones recientes
-                        </CardTitle>
-                        <CardDescription>
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                             Organización y estado del ciclo lógico-matemático
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="px-0">
+                        </p>
+                    </div>
+                    <div className="mt-4 overflow-x-auto">
                         <Table>
                             <TableHeader>
-                                <TableRow className="bg-slate-50/80">
+                                <TableRow className="bg-slate-50/80 dark:bg-slate-800/40">
                                     <TableHead className="pl-5">Evaluación</TableHead>
                                     <TableHead>Carrera o área</TableHead>
                                     <TableHead>Fecha</TableHead>
@@ -363,17 +355,17 @@ export default function Dashboard() {
                             </TableHeader>
                             <TableBody>
                                 {evaluations.map((evaluation) => (
-                                    <TableRow key={evaluation.name}>
-                                        <TableCell className="pl-5 font-medium text-slate-900">
+                                    <TableRow key={evaluation.name} className="dark:hover:bg-slate-800/50">
+                                        <TableCell className="pl-5 font-medium text-slate-900 dark:text-slate-100">
                                             {evaluation.name}
                                         </TableCell>
-                                        <TableCell className="text-slate-600">
+                                        <TableCell className="text-slate-600 dark:text-slate-400">
                                             {evaluation.audience}
                                         </TableCell>
-                                        <TableCell className="text-slate-500">
+                                        <TableCell className="text-slate-500 dark:text-slate-400">
                                             {evaluation.date}
                                         </TableCell>
-                                        <TableCell className="text-center font-medium">
+                                        <TableCell className="text-center font-medium text-slate-700 dark:text-slate-300">
                                             {evaluation.participants}
                                         </TableCell>
                                         <TableCell className="pr-5">
@@ -383,138 +375,138 @@ export default function Dashboard() {
                                 ))}
                             </TableBody>
                         </Table>
-                    </CardContent>
+                    </div>
                 </Card>
 
-                <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
-                    <CardHeader className="border-b border-slate-100">
-                        <CardTitle className="flex items-center gap-2 text-lg text-slate-900">
-                            <AlertTriangle className="h-5 w-5 text-rose-500" />
+                <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                    <div className="mb-4 flex flex-col">
+                        <h3 className="flex items-center gap-2 text-lg font-semibold leading-snug text-slate-900 dark:text-slate-100">
+                            <AlertTriangle className="h-5 w-5 text-rose-500 shrink-0" />
                             Postulantes con atención prioritaria
-                        </CardTitle>
-                        <CardDescription>
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                             Seguimiento por desempeño lógico-matemático
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-5">
+                        </p>
+                    </div>
+                    <div className="mt-4 space-y-4">
                         {priorityApplicants.map((applicant) => (
-                            <div key={applicant.name}>
+                            <div key={applicant.name} className="py-2 border-b border-slate-100 dark:border-slate-850 last:border-0 last:pb-0">
                                 <div className="mb-2 flex items-start justify-between gap-3">
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-900">
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                                             {applicant.name}
                                         </p>
-                                        <p className="text-xs text-slate-500">
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                             {applicant.program}
                                         </p>
                                     </div>
                                     <StatusBadge status="Prioritario" />
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-3 mt-3">
                                     <Progress
                                         value={applicant.score}
-                                        className="h-2 bg-rose-100 [&_[data-slot=progress-indicator]]:bg-rose-500"
+                                        className="h-2 bg-rose-100 dark:bg-rose-950/30 [&_[data-slot=progress-indicator]]:bg-rose-500 flex-1"
                                     />
-                                    <span className="w-8 text-right text-xs font-bold text-rose-600">
+                                    <span className="w-8 text-right text-xs font-bold text-rose-600 dark:text-rose-400 shrink-0">
                                         {applicant.score}
                                     </span>
                                 </div>
                             </div>
                         ))}
-                    </CardContent>
+                    </div>
                 </Card>
             </section>
 
             <section className="mt-8 grid gap-6 xl:grid-cols-2">
-                <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-lg text-slate-900">
-                            <GraduationCap className="h-5 w-5 text-blue-600" />
+                <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                    <div className="mb-4 flex flex-col">
+                        <h3 className="flex items-center gap-2 text-lg font-semibold leading-snug text-slate-900 dark:text-slate-100">
+                            <GraduationCap className="h-5 w-5 text-blue-600 shrink-0" />
                             Distribución por carrera postulada
-                        </CardTitle>
-                        <CardDescription>
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                             Participación registrada en el periodo académico
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+                        </p>
+                    </div>
+                    <div className="mt-4 space-y-4">
                         {careerDistribution.map((career) => (
-                            <div key={career.label}>
-                                <div className="mb-2 flex items-center justify-between gap-4 text-sm">
-                                    <span className="font-medium text-slate-700">
+                            <div key={career.label} className="space-y-2">
+                                <div className="flex items-center justify-between gap-4 text-sm">
+                                    <span className="font-medium text-slate-700 dark:text-slate-300">
                                         {career.label}
                                     </span>
-                                    <span className="text-xs text-slate-500">
+                                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                                         {career.applicants} postulantes · {career.value}%
                                     </span>
                                 </div>
                                 <Progress
                                     value={career.value}
-                                    className="h-2 bg-blue-100 [&_[data-slot=progress-indicator]]:bg-blue-600"
+                                    className="h-2 bg-blue-100 dark:bg-blue-950/30 [&_[data-slot=progress-indicator]]:bg-blue-600"
                                 />
                             </div>
                         ))}
-                    </CardContent>
+                    </div>
                 </Card>
 
-                <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-lg text-slate-900">
-                            <BrainCircuit className="h-5 w-5 text-indigo-600" />
+                <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                    <div className="mb-4 flex flex-col">
+                        <h3 className="flex items-center gap-2 text-lg font-semibold leading-snug text-slate-900 dark:text-slate-100">
+                            <BrainCircuit className="h-5 w-5 text-indigo-600 shrink-0" />
                             Indicadores de Learning Analytics
-                        </CardTitle>
-                        <CardDescription>
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                             Análisis preliminar de competencias evaluadas
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                        </p>
+                    </div>
+                    <div className="mt-4">
                         <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
                             {analyticsIndicators.map((indicator) => (
-                                <div key={indicator.label}>
-                                    <div className="mb-2 flex justify-between text-sm">
-                                        <span className="font-medium text-slate-700">
+                                <div key={indicator.label} className="space-y-2">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="font-medium text-slate-700 dark:text-slate-300">
                                             {indicator.label}
                                         </span>
-                                        <span className="font-bold text-indigo-700">
+                                        <span className="font-bold text-indigo-700 dark:text-indigo-400">
                                             {indicator.value}%
                                         </span>
                                     </div>
                                     <Progress
                                         value={indicator.value}
-                                        className="h-2 bg-indigo-100 [&_[data-slot=progress-indicator]]:bg-gradient-to-r [&_[data-slot=progress-indicator]]:from-indigo-600 [&_[data-slot=progress-indicator]]:to-cyan-500"
+                                        className="h-2 bg-indigo-100 dark:bg-indigo-950/30 [&_[data-slot=progress-indicator]]:bg-gradient-to-r [&_[data-slot=progress-indicator]]:from-indigo-600 [&_[data-slot=progress-indicator]]:to-cyan-500"
                                     />
                                 </div>
                             ))}
                         </div>
-                        <Alert className="mt-6 border-indigo-100 bg-indigo-50/70 p-4 text-indigo-950">
+                        <Alert className="mt-6 border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/70 dark:bg-indigo-950/20 p-4 text-indigo-950 dark:text-indigo-200">
                             <TrendingUp className="h-5 w-5 text-indigo-600" />
                             <AlertTitle>Lectura institucional</AlertTitle>
-                            <AlertDescription className="mt-1 text-indigo-700">
+                            <AlertDescription className="mt-1 text-indigo-700 dark:text-indigo-300">
                                 La información académica está preparada para ampliar el
                                 análisis hacia patrones de desempeño y modelos predictivos.
                             </AlertDescription>
                         </Alert>
-                    </CardContent>
+                    </div>
                 </Card>
             </section>
 
             <section className="mt-8">
-                <Card className="border-0 bg-gradient-to-br from-white to-sky-50/70 shadow-sm ring-1 ring-slate-200/80 dark:from-slate-900 dark:to-sky-950/40 dark:ring-slate-800">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-lg text-slate-900">
-                            <Lightbulb className="h-5 w-5 text-amber-500" />
+                <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                    <div className="mb-4 flex flex-col">
+                        <h3 className="flex items-center gap-2 text-lg font-semibold leading-snug text-slate-900 dark:text-slate-100">
+                            <Lightbulb className="h-5 w-5 text-amber-500 shrink-0" />
                             Recomendaciones académicas preliminares
-                        </CardTitle>
-                        <CardDescription>
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                             Orientaciones derivadas de los indicadores institucionales
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-3 lg:grid-cols-3">
+                        </p>
+                    </div>
+                    <div className="mt-4 grid gap-4 lg:grid-cols-3">
                         {recommendations.map((recommendation, index) => (
                             <div
                                 key={recommendation}
-                                className="flex gap-3 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900"
+                                className="flex gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
                             >
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
                                     {index === 0 ? (
                                         <Sigma className="h-4 w-4" />
                                     ) : index === 1 ? (
@@ -523,12 +515,12 @@ export default function Dashboard() {
                                         <Sparkles className="h-4 w-4" />
                                     )}
                                 </span>
-                                <p className="text-sm leading-6 text-slate-700">
+                                <p className="text-sm leading-6 text-slate-700 dark:text-slate-300">
                                     {recommendation}
                                 </p>
                             </div>
                         ))}
-                    </CardContent>
+                    </div>
                 </Card>
             </section>
         </AdminLayout>

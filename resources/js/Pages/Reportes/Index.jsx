@@ -5,6 +5,7 @@ import MetricCard from '@/Components/MetricCard';
 import StatusBadge from '@/Components/StatusBadge';
 import useTheme from '@/Hooks/useTheme';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Badge } from '@/Components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { 
     GraduationCap, 
@@ -21,6 +22,8 @@ import {
     Search,
     ChevronDown,
     ChevronUp,
+    ChevronLeft,
+    ChevronRight,
     BookmarkCheck,
     Layers,
     Activity,
@@ -379,22 +382,19 @@ export default function Index({
                             if (metric.accent === 'amber') cardColor = 'text-amber-600 bg-amber-50/50 hover:ring-amber-300';
 
                             return (
-                                <Card key={metric.title} className={`border-0 bg-white shadow-sm ring-1 ring-slate-200/80 transition duration-300 ${cardColor}
-                                    dark:bg-slate-900 dark:ring-slate-800`}>
-                                    <CardHeader className="p-4 pb-2">
-                                        <div className="flex items-center justify-between">
-                                            <CardDescription className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
-                                                {metric.title}
-                                            </CardDescription>
-                                            <span className="p-1 rounded-lg bg-white shadow-sm dark:bg-slate-800">
-                                                <Icon className="h-4 w-4" />
-                                            </span>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="p-4 pt-0">
+                                <Card key={metric.title} className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm transition duration-300 ${cardColor}`}>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
+                                            {metric.title}
+                                        </span>
+                                        <span className="p-1 rounded-lg bg-white shadow-sm dark:bg-slate-800">
+                                            <Icon className="h-4 w-4" />
+                                        </span>
+                                    </div>
+                                    <div className="mt-2.5">
                                         <p className="text-2xl font-black text-slate-900 dark:text-slate-100 leading-none">{metric.value}</p>
                                         <p className="text-[9px] text-slate-400 mt-1 font-semibold leading-none">{metric.detail}</p>
-                                    </CardContent>
+                                    </div>
                                 </Card>
                             );
                         })}
@@ -403,14 +403,14 @@ export default function Index({
 
                 {/* 3. Panel Estado general del instituto */}
                 <section className="grid gap-6 md:grid-cols-3">
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
-                        <CardHeader className="pb-3 border-b border-slate-50">
-                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                        <div className="flex flex-col border-b border-slate-100 dark:border-slate-800/80 pb-3">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <GraduationCap className="h-5 w-5 text-indigo-600" />
                                 Demanda Académica
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-4 space-y-4 text-xs font-medium text-slate-600 dark:text-slate-400">
+                            </h3>
+                        </div>
+                        <div className="mt-4 space-y-4 text-xs font-medium text-slate-650 dark:text-slate-400">
                             <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Universidad principal</span>
                                 <span className="font-black text-slate-800 dark:text-slate-200">{uniLider}</span>
@@ -423,17 +423,17 @@ export default function Index({
                                 <span>Total postulantes</span>
                                 <span className="font-black text-indigo-600">{metricas?.totalPostulantes ?? 0}</span>
                             </div>
-                        </CardContent>
+                        </div>
                     </Card>
 
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
-                        <CardHeader className="pb-3 border-b border-slate-50">
-                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                        <div className="flex flex-col border-b border-slate-100 dark:border-slate-800/80 pb-3">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <BookCopy className="h-5 w-5 text-indigo-600" />
                                 Cobertura Evaluativa
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-4 space-y-4 text-xs font-medium text-slate-600 dark:text-slate-400">
+                            </h3>
+                        </div>
+                        <div className="mt-4 space-y-4 text-xs font-medium text-slate-650 dark:text-slate-400">
                             <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Áreas evaluadas</span>
                                 <span className="font-black text-slate-800 dark:text-slate-200">{metricas?.totalAreas ?? 0}</span>
@@ -446,17 +446,17 @@ export default function Index({
                                 <span>Plantillas activas</span>
                                 <span className="font-black text-indigo-600">{metricas?.totalPlantillas ?? 0}</span>
                             </div>
-                        </CardContent>
+                        </div>
                     </Card>
 
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
-                        <CardHeader className="pb-3 border-b border-slate-50">
-                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                        <div className="flex flex-col border-b border-slate-100 dark:border-slate-800/80 pb-3">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <Activity className="h-5 w-5 text-indigo-600" />
                                 Preparación para Learning Analytics
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-4 space-y-4 text-xs font-medium text-slate-600 dark:text-slate-400">
+                            </h3>
+                        </div>
+                        <div className="mt-4 space-y-4 text-xs font-medium text-slate-650 dark:text-slate-400">
                             <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                 <span>Registros consolidados</span>
                                 <span className="font-black text-emerald-600">Listo</span>
@@ -469,7 +469,7 @@ export default function Index({
                                 <span>Base analítica</span>
                                 <span className="font-black text-indigo-650">Completada</span>
                             </div>
-                        </CardContent>
+                        </div>
                     </Card>
                 </section>
 
@@ -478,17 +478,17 @@ export default function Index({
                 <section className="grid gap-6 md:grid-cols-2">
                     
                     {/* A. Postulantes por universidad (PieChart tipo Donut) */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                        <div className="flex flex-col">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <Building2 className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Postulantes por universidad
-                            </CardTitle>
-                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                 Segmentación y porcentaje de postulantes agrupados por universidad meta.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-2">
+                            </p>
+                        </div>
+                        <div className="mt-4">
                             {dataUni.length === 0 ? (
                                 <EmptyState message="No hay datos de universidades meta registradas." />
                             ) : (
@@ -540,21 +540,21 @@ export default function Index({
                                     </div>
                                 </div>
                             )}
-                        </CardContent>
+                        </div>
                     </Card>
 
                     {/* B. Postulantes por carrera (BarChart horizontal) */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                        <div className="flex flex-col">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <SlidersHorizontal className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Postulantes por carrera
-                            </CardTitle>
-                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                 Demanda registrada y distribución de las top 8 carreras seleccionadas.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-2">
+                            </p>
+                        </div>
+                        <div className="mt-4">
                             {topCarreras.length === 0 ? (
                                 <EmptyState message="No hay datos de carreras registradas." />
                             ) : (
@@ -581,21 +581,21 @@ export default function Index({
                                     </ResponsiveContainer>
                                 </div>
                             )}
-                        </CardContent>
+                        </div>
                     </Card>
 
                     {/* C. Postulantes por colegio (BarChart horizontal) */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                        <div className="flex flex-col">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <GraduationCap className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Postulantes por colegio
-                            </CardTitle>
-                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                 Top 8 unidades educativas de procedencia con mayor representación.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-2">
+                            </p>
+                        </div>
+                        <div className="mt-4">
                             {topColegios.length === 0 ? (
                                 <EmptyState message="No hay datos de colegios registrados." />
                             ) : (
@@ -622,21 +622,21 @@ export default function Index({
                                     </ResponsiveContainer>
                                 </div>
                             )}
-                        </CardContent>
+                        </div>
                     </Card>
 
                     {/* D. Banco de preguntas por área (BarChart) */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                        <div className="flex flex-col">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <Layers className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Banco de preguntas por área
-                            </CardTitle>
-                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                 Cobertura del banco de reactivos por área lógico-matemática.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-2">
+                            </p>
+                        </div>
+                        <div className="mt-4">
                             {dataAreas.length === 0 ? (
                                 <EmptyState message="No hay preguntas ni áreas de conocimiento registradas." />
                             ) : (
@@ -662,21 +662,21 @@ export default function Index({
                                     </ResponsiveContainer>
                                 </div>
                             )}
-                        </CardContent>
+                        </div>
                     </Card>
 
                     {/* E. Dificultad del banco de reactivos (PieChart) */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                        <div className="flex flex-col">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <TrendingUp className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Dificultad del banco de reactivos
-                            </CardTitle>
-                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                 Equilibrio de complejidad en las preguntas registradas.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-2">
+                            </p>
+                        </div>
+                        <div className="mt-4">
                             {dataDificultad.length === 0 ? (
                                 <EmptyState message="No hay preguntas para categorizar su dificultad." />
                             ) : (
@@ -727,21 +727,21 @@ export default function Index({
                                     </div>
                                 </div>
                             )}
-                        </CardContent>
+                        </div>
                     </Card>
 
                     {/* F. Nivel de exigencia matemática (BarChart) */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+                        <div className="flex flex-col">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <Award className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Distribución por nivel de exigencia matemática
-                            </CardTitle>
-                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                 Clasificación de postulantes según la exigencia lógica de su carrera objetivo.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-2">
+                            </p>
+                        </div>
+                        <div className="mt-4">
                             {dataExigencia.every(d => d.total === 0) ? (
                                 <EmptyState message="No hay datos de exigencia matemática registrados." />
                             ) : (
@@ -767,21 +767,21 @@ export default function Index({
                                     </ResponsiveContainer>
                                 </div>
                             )}
-                        </CardContent>
+                        </div>
                     </Card>
 
                     {/* G. Síntesis Conceptual del Volumen Académico */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 md:col-span-2 dark:bg-slate-900 dark:ring-slate-800">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm md:col-span-2">
+                        <div className="flex flex-col">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                                 <Sparkles className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
                                 Síntesis del volumen académico consolidado
-                            </CardTitle>
-                            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                 Muestra una lectura institucional simplificada del crecimiento y escala de los componentes cargados en el sistema.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-2">
+                            </p>
+                        </div>
+                        <div className="mt-4">
                             <div className="h-64 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart
@@ -802,7 +802,7 @@ export default function Index({
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
-                        </CardContent>
+                        </div>
                     </Card>
 
                 </section>
@@ -816,43 +816,58 @@ export default function Index({
                     </div>
 
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {plantillasDetalle.map((plantilla) => (
-                            <Card key={plantilla.id_plan} className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 hover:ring-indigo-300 transition duration-300 flex flex-col justify-between
-                                dark:bg-slate-900 dark:ring-slate-800 dark:hover:ring-indigo-700">
-                                <CardHeader className="pb-3 border-b border-slate-50 dark:border-slate-800">
-                                    <div className="flex items-start justify-between gap-3">
-                                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">{plantilla.nombre_plan}</h3>
-                                        <span className="capitalize text-[9px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full shrink-0
-                                            dark:bg-slate-800 dark:text-slate-300">
-                                            {plantilla.dificultad_plan}
+                        {plantillasDetalle.map((plantilla) => {
+                            const totalPuntaje = Number(plantilla.puntaje_total || 0);
+                            return (
+                                <Card key={plantilla.id_plan} className="h-full min-h-[230px] flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition duration-300">
+                                    <div className="h-1.5 bg-gradient-to-r from-indigo-600 to-cyan-400 shrink-0" />
+                                    
+                                    {/* Header: title (left) + difficulty badge (right) */}
+                                    <div className="flex items-start justify-between gap-4 p-5 pb-4">
+                                        <h3 
+                                            className="flex-1 text-base font-semibold leading-snug text-slate-900 dark:text-slate-100 min-h-[44px] pr-2 break-words" 
+                                            title={plantilla.nombre_plan}
+                                            style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                                        >
+                                            {plantilla.nombre_plan}
+                                        </h3>
+                                        <span className="capitalize text-[10px] font-bold border border-indigo-100 bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full shrink-0 mt-0.5">
+                                            {plantilla.dificultad_plan?.replace('-', ' ') || 'No definida'}
                                         </span>
                                     </div>
-                                </CardHeader>
-                                <CardContent className="pt-4 space-y-4">
-                                    <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-                                        <span>Cantidad de reactivos:</span>
-                                        <span className="font-bold text-slate-800 dark:text-slate-200">{plantilla.cantidad_preguntas}</span>
+
+                                    {/* Body: metrics & progress bar */}
+                                    <div className="px-5 py-4 space-y-4 flex-1 flex flex-col justify-between">
+                                        <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+                                            <span>Cantidad de reactivos:</span>
+                                            <span className="font-bold text-slate-800 dark:text-slate-200">{plantilla.cantidad_preguntas}</span>
+                                        </div>
+                                        
+                                        {/* Progress bar */}
+                                        <div className="space-y-1.5">
+                                            <div className="flex justify-between text-xs font-semibold text-indigo-700 dark:text-indigo-400">
+                                                <span>Puntaje de examen:</span>
+                                                <span>{totalPuntaje.toFixed(0)} / 100 Pts</span>
+                                            </div>
+                                            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-100 dark:border-slate-700">
+                                                <div 
+                                                    className="h-full bg-indigo-600 rounded-full transition-all"
+                                                    style={{ width: `${Math.min(totalPuntaje, 100)}%` }}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                     
-                                    <div className="space-y-1.5">
-                                        <div className="flex justify-between text-xs font-semibold text-indigo-700 dark:text-indigo-400">
-                                            <span>Puntaje de examen:</span>
-                                            <span>{plantilla.puntaje_total} / 100 Pts</span>
-                                        </div>
-                                        <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-100 dark:border-slate-700">
-                                            <div 
-                                                className="h-full bg-indigo-600 rounded-full transition-all"
-                                                style={{ width: `${plantilla.puntaje_total}%` }}
-                                            />
-                                        </div>
+                                    {/* Footer: status */}
+                                    <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800 px-5 py-4 bg-slate-50/20 dark:bg-slate-900/60">
+                                        <span className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[10px] truncate shrink-0">
+                                            <span className="hidden sm:inline">TODAS SOBRE </span>100 PTS
+                                        </span>
+                                        <StatusBadge status={plantilla.estado_plan === 'activo' ? 'Activa' : plantilla.estado_plan} />
                                     </div>
-                                </CardContent>
-                                <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between rounded-b-3xl dark:bg-slate-800/50 dark:border-slate-700">
-                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Todas sobre 100 Pts</span>
-                                    <StatusBadge status={plantilla.estado_plan === 'activo' ? 'Activa' : plantilla.estado_plan} />
-                                </div>
-                            </Card>
-                        ))}
+                                </Card>
+                            );
+                        })}
                     </div>
                 </section>
 
@@ -864,7 +879,7 @@ export default function Index({
                     </div>
 
                     {/* Barra de Búsqueda y Filtros */}
-                    <div className="grid gap-4 md:grid-cols-5 bg-white p-5 rounded-3xl ring-1 ring-slate-200/80 shadow-sm dark:bg-slate-900 dark:ring-slate-800">
+                    <div className="grid gap-4 md:grid-cols-5 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                         {/* Buscador */}
                         <div className="relative md:col-span-2">
                             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -884,7 +899,7 @@ export default function Index({
                         <select
                             value={filterUni}
                             onChange={handleFilterChange(setFilterUni)}
-                            className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                            className="h-10 w-full rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                         >
                             <option value="">Universidad (Todas)</option>
                             {universidadesUnicas.map(u => (
@@ -896,7 +911,7 @@ export default function Index({
                         <select
                             value={filterCarrera}
                             onChange={handleFilterChange(setFilterCarrera)}
-                            className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                            className="h-10 w-full rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                         >
                             <option value="">Carrera (Todas)</option>
                             {carrerasUnicas.map(c => (
@@ -908,7 +923,7 @@ export default function Index({
                         <select
                             value={filterExigencia}
                             onChange={handleFilterChange(setFilterExigencia)}
-                            className="h-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                            className="h-10 w-full rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                         >
                             <option value="">Exigencia (Todas)</option>
                             {exigenciasUnicas.map(ex => {
@@ -919,7 +934,7 @@ export default function Index({
                     </div>
 
                     {/* Tabla de Postulantes */}
-                    <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 overflow-hidden dark:bg-slate-900 dark:ring-slate-800">
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
                         {/* Barra de estado de filtros */}
                         <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-800/40">
                             <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
@@ -983,16 +998,16 @@ export default function Index({
                                             return (
                                                 <React.Fragment key={post.id_post}>
                                                     <TableRow className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
-                                                        <TableCell className="pl-5 font-bold text-slate-900 dark:text-slate-100">
+                                                        <TableCell className="pl-5 font-bold text-slate-900 dark:text-slate-100 max-w-[180px] whitespace-normal break-words leading-snug">
                                                             <div>
                                                                 <p className="text-sm">{post.nombre_completo}</p>
                                                                 <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">{post.edad} años</p>
                                                             </div>
                                                         </TableCell>
-                                                        <TableCell className="text-slate-600 dark:text-slate-400 text-xs font-semibold max-w-[150px] truncate">
+                                                        <TableCell className="text-slate-600 dark:text-slate-400 text-xs font-semibold max-w-[150px] whitespace-normal break-words leading-snug">
                                                             {post.colegio}
                                                         </TableCell>
-                                                        <TableCell className="text-xs">
+                                                        <TableCell className="text-xs max-w-[180px] whitespace-normal break-words leading-snug">
                                                             <div className="font-semibold text-slate-800 dark:text-slate-200">{post.carrera}</div>
                                                             <div className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">{post.universidad}</div>
                                                         </TableCell>
@@ -1059,21 +1074,21 @@ export default function Index({
                                 <button
                                     onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); setExpandedPostulanteId(null); }}
                                     disabled={currentPage === 1}
-                                    className="px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition
-                                        dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-250 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                    aria-label="Página anterior"
                                 >
-                                    ← Anterior
+                                    <ChevronLeft className="h-4.5 w-4.5" />
                                 </button>
-                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 px-2">
+                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 px-3 bg-slate-50 dark:bg-slate-950 py-1.5 rounded-lg border border-slate-100 dark:border-slate-800">
                                     {currentPage} / {totalPages}
                                 </span>
                                 <button
                                     onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); setExpandedPostulanteId(null); }}
                                     disabled={currentPage === totalPages}
-                                    className="px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition
-                                        dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-250 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                    aria-label="Página siguiente"
                                 >
-                                    Siguiente →
+                                    <ChevronRight className="h-4.5 w-4.5" />
                                 </button>
                             </div>
                         )}

@@ -1,4 +1,5 @@
 import StatusBadge from '@/Components/StatusBadge';
+import Pagination from '@/Components/Pagination';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import ConfirmModal from '@/Components/ConfirmModal';
 import PreguntaForm from '@/Components/Evaluaciones/PreguntaForm';
@@ -81,40 +82,39 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                     </Button>
                 )}
             </div>
-            
-            <Card className="mb-5 border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/50 dark:ring-slate-800">
+                    <Card className="mb-5 border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/50 dark:ring-slate-800">
                 <CardContent className="p-4">
-                    <form onSubmit={submit} className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                        <div className="relative xl:col-span-2">
+                    <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 w-full">
+                        <div className="relative col-span-1 md:col-span-2 xl:col-span-2">
                             <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                            <Input className="pl-9 bg-white dark:bg-slate-950 dark:border-slate-800 text-slate-900 dark:text-slate-100" value={filters.buscar} onChange={(e) => setFilters({ ...filters, buscar: e.target.value })} placeholder="Buscar por contenido del enunciado" />
+                            <Input className="pl-9 bg-white dark:bg-slate-950 dark:border-slate-800 text-slate-900 dark:text-slate-100 w-full h-10" value={filters.buscar} onChange={(e) => setFilters({ ...filters, buscar: e.target.value })} placeholder="Buscar por contenido del enunciado" />
                         </div>
-                        <select className="h-10 rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm" value={filters.id_area} onChange={(e) => setFilters({ ...filters, id_area: e.target.value, id_tem: '' })}>
+                        <select className="h-10 w-full rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm px-3" value={filters.id_area} onChange={(e) => setFilters({ ...filters, id_area: e.target.value, id_tem: '' })}>
                             <option value="">Todas las áreas</option>
                             {opciones.areas.map((area) => <option key={area.id_area} value={area.id_area}>{area.nombre_area}</option>)}
                         </select>
-                        <select className="h-10 rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm" value={filters.id_tem} onChange={(e) => setFilters({ ...filters, id_tem: e.target.value })}>
+                        <select className="h-10 w-full rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm px-3 xl:col-span-2" value={filters.id_tem} onChange={(e) => setFilters({ ...filters, id_tem: e.target.value })}>
                             <option value="">Todos los temas</option>
                             {temas.map((tema) => <option key={tema.id_tem} value={tema.id_tem}>{tema.nombre_tem}</option>)}
                         </select>
-                        <select className="h-10 rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm" value={filters.dificultad_preg} onChange={(e) => setFilters({ ...filters, dificultad_preg: e.target.value })}>
+                        <select className="h-10 w-full rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm px-3" value={filters.dificultad_preg} onChange={(e) => setFilters({ ...filters, dificultad_preg: e.target.value })}>
                             <option value="">Toda dificultad</option>
                             <option value="basica">Básica</option>
                             <option value="media">Media</option>
                             <option value="avanzada">Avanzada</option>
                         </select>
-                        <select className="h-10 rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm" value={filters.tipo_preg} onChange={(e) => setFilters({ ...filters, tipo_preg: e.target.value })}>
+                        <select className="h-10 w-full rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm px-3" value={filters.tipo_preg} onChange={(e) => setFilters({ ...filters, tipo_preg: e.target.value })}>
                             <option value="">Todos los tipos</option>
                             {Object.entries(typeLabel).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                         </select>
-                        <select className="h-10 rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm" value={filters.estado_preg} onChange={(e) => setFilters({ ...filters, estado_preg: e.target.value })}>
+                        <select className="h-10 w-full rounded-lg border-slate-200 dark:border-slate-850 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm px-3" value={filters.estado_preg} onChange={(e) => setFilters({ ...filters, estado_preg: e.target.value })}>
                             <option value="">Todos los estados</option>
                             <option value="activo">Activo</option>
                             <option value="inactivo">Inactivo</option>
                         </select>
-                        <div className="flex gap-2">
-                            <Button className="bg-indigo-700 hover:bg-indigo-800">Filtrar</Button>
-                            <Button type="button" variant="outline" size="icon" onClick={reset}><RotateCcw className="h-4 w-4" /></Button>
+                        <div className="flex gap-2 w-full col-span-1 md:col-span-1 xl:col-span-2">
+                            <Button className="bg-indigo-700 hover:bg-indigo-800 flex-1 h-10">Filtrar</Button>
+                            <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0 border-slate-200 dark:border-slate-800 dark:text-slate-200" onClick={reset}><RotateCcw className="h-4 w-4" /></Button>
                         </div>
                     </form>
                 </CardContent>
@@ -136,9 +136,24 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                         <TableBody>
                             {preguntas.data.map((pregunta) => (
                                 <TableRow key={pregunta.id_preg} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
-                                    <TableCell className="max-w-md pl-5">
-                                        <p className="line-clamp-2 font-medium text-slate-900 dark:text-slate-100">{pregunta.enunciado_preg}</p>
-                                        <span className="text-xs text-slate-400">Código P-{String(pregunta.id_preg).padStart(4, '0')}</span>
+                                    <TableCell className="max-w-[520px] pl-5 pr-4">
+                                        <div className="max-w-xl pr-2">
+                                            <p 
+                                                className="text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100 whitespace-normal break-words"
+                                                style={{
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 3,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                }}
+                                                title={pregunta.enunciado_preg}
+                                            >
+                                                {pregunta.enunciado_preg}
+                                            </p>
+                                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                                Código P-{String(pregunta.id_preg).padStart(4, '0')}
+                                            </p>
+                                        </div>
                                     </TableCell>
                                     <TableCell>
                                         <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{pregunta.tema?.area?.nombre_area || 'Área general'}</p>
@@ -188,26 +203,7 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                 </CardContent>
             </Card>
             
-            {preguntas.links.length > 3 && (
-                <div className="mt-5 flex justify-center gap-1">
-                    {preguntas.links.map((link, index) => (
-                        <Button 
-                            key={index} 
-                            asChild={Boolean(link.url)} 
-                            disabled={!link.url} 
-                            size="sm" 
-                            variant={link.active ? 'default' : 'outline'} 
-                            className={link.active ? 'bg-indigo-700' : ''}
-                        >
-                            {link.url ? (
-                                <Link href={link.url} dangerouslySetInnerHTML={{ __html: link.label }} />
-                            ) : (
-                                <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                            )}
-                        </Button>
-                    ))}
-                </div>
-            )}
+            <Pagination links={preguntas.links} />
 
             {/* Modal para Crear y Editar Preguntas */}
             <ModalInstitucional
