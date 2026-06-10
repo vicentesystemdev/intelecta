@@ -25,10 +25,10 @@ import { useState } from 'react';
 function Detail({ label, value }) {
     return (
         <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+            <dt className="text-xs font-semibold uppercase tracking-wider text-text-muted">
                 {label}
             </dt>
-            <dd className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-200">
+            <dd className="mt-1 text-sm font-medium text-text-main">
                 {value || 'No registrado'}
             </dd>
         </div>
@@ -113,7 +113,7 @@ export default function Show({ postulante, permisos }) {
                     </div>
                 )}
 
-                <Card className="mb-6 border-0 bg-gradient-to-r from-brand-primary to-brand-secondary py-0 text-white shadow-lg shadow-brand-primary/20 dark:shadow-brand-primary/40">
+                <Card className="mb-6 border-0 bg-gradient-to-br from-brand-primary via-brand-primary to-brand-secondary py-0 text-white shadow-lg shadow-brand-primary/20 dark:shadow-brand-primary/40">
                     <CardContent className="flex flex-col justify-between gap-5 p-6 sm:flex-row sm:items-center">
                         <div className="flex items-center gap-4">
                             <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
@@ -127,20 +127,20 @@ export default function Show({ postulante, permisos }) {
                                 </p>
                             </div>
                         </div>
-                        <StatusBadge
-                            status={
-                                postulante.estado_post === 'activo'
-                                    ? 'Activo'
-                                    : 'Inactivo'
-                            }
-                        />
+                        <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
+                            postulante.estado_post === 'activo'
+                                ? 'bg-brand-success/10 text-brand-success border-brand-success/20'
+                                : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                        }`}>
+                            {postulante.estado_post === 'activo' ? 'Activo' : 'Inactivo'}
+                        </span>
                     </CardContent>
                 </Card>
 
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <Card className="gap-0 border-0 bg-white py-0 shadow-sm ring-1 ring-slate-200/80">
-                        <CardHeader className="border-b border-slate-100 p-5">
-                            <CardTitle className="flex items-center gap-2 text-lg">
+                    <Card className="bg-brand-card border border-brand-border rounded-2xl">
+                        <CardHeader className="border-b border-brand-border p-5">
+                            <CardTitle className="flex items-center gap-2 text-lg text-text-main">
                                 <UserRound className="h-5 w-5 text-brand-secondary" />
                                 Información personal
                             </CardTitle>
@@ -167,7 +167,7 @@ export default function Show({ postulante, permisos }) {
                                     />
                                 </div>
                             </dl>
-                            <div className="mt-5 flex flex-wrap gap-3 text-xs text-slate-500">
+                            <div className="mt-5 flex flex-wrap gap-3 text-xs text-text-muted">
                                 {postulante.email_post && (
                                     <span className="flex items-center gap-1.5">
                                         <Mail className="h-3.5 w-3.5" />
@@ -184,10 +184,10 @@ export default function Show({ postulante, permisos }) {
                         </CardContent>
                     </Card>
 
-                    <Card className="gap-0 border-0 bg-white py-0 shadow-sm ring-1 ring-slate-200/80">
-                        <CardHeader className="border-b border-slate-100 p-5">
-                            <CardTitle className="flex items-center gap-2 text-lg">
-                                <GraduationCap className="h-5 w-5 text-blue-600" />
+                    <Card className="bg-brand-card border border-brand-border rounded-2xl">
+                        <CardHeader className="border-b border-brand-border p-5">
+                            <CardTitle className="flex items-center gap-2 text-lg text-text-main">
+                                <GraduationCap className="h-5 w-5 text-brand-secondary" />
                                 Información académica
                             </CardTitle>
                         </CardHeader>
@@ -254,7 +254,7 @@ export default function Show({ postulante, permisos }) {
                                     />
                                 </div>
                             </dl>
-                            <div className="mt-5 flex items-center gap-2 text-xs text-slate-500">
+                            <div className="mt-5 flex items-center gap-2 text-xs text-text-muted">
                                 <Building2 className="h-3.5 w-3.5" />
                                 Registro del proceso preuniversitario
                             </div>
@@ -262,12 +262,12 @@ export default function Show({ postulante, permisos }) {
                     </Card>
                 </div>
 
-                <Card className="mt-6 gap-0 border-0 bg-white py-0 shadow-sm ring-1 ring-slate-200/80">
-                    <CardHeader className="border-b border-slate-100 p-5">
-                        <CardTitle className="text-lg">Observaciones</CardTitle>
+                <Card className="mt-6 bg-brand-card border border-brand-border rounded-2xl">
+                    <CardHeader className="border-b border-brand-border p-5">
+                        <CardTitle className="text-lg text-text-main">Observaciones</CardTitle>
                     </CardHeader>
                     <CardContent className="p-5">
-                        <p className="whitespace-pre-line text-sm leading-6 text-slate-600">
+                        <p className="whitespace-pre-line text-sm leading-6 text-text-muted">
                             {postulante.observaciones_post ||
                                 'No se registraron observaciones para este postulante.'}
                         </p>

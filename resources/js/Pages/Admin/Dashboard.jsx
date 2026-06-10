@@ -19,6 +19,7 @@ import {
     BookCopy,
     BookOpenCheck,
     BrainCircuit,
+    CalendarDays,
     FileQuestion,
     GraduationCap,
     Layers3,
@@ -98,6 +99,7 @@ export default function Dashboard({
     preguntasSinMateria = 0,
     plantillasRecientes = [],
     postulantesPorCarrera = [],
+    gestionInstitucional = {},
 }) {
     const metrics = [
         {
@@ -155,6 +157,39 @@ export default function Dashboard({
         0,
     );
 
+    const institutionalMetrics = [
+        {
+            label: 'Programas activos',
+            value: gestionInstitucional.programasActivos ?? 0,
+            icon: BookOpenCheck,
+        },
+        {
+            label: 'Grupos activos',
+            value: gestionInstitucional.gruposActivos ?? 0,
+            icon: Layers3,
+        },
+        {
+            label: 'Postulantes inscritos',
+            value: gestionInstitucional.postulantesInscritos ?? 0,
+            icon: GraduationCap,
+        },
+        {
+            label: 'Próximos simulacros',
+            value: gestionInstitucional.proximosSimulacros ?? 0,
+            icon: CalendarDays,
+        },
+        {
+            label: 'Promedio institucional',
+            value: Number(gestionInstitucional.promedioInstitucional ?? 0).toFixed(1),
+            icon: BarChart3,
+        },
+        {
+            label: 'Seguimiento prioritario',
+            value: gestionInstitucional.seguimientoPrioritario ?? 0,
+            icon: Users,
+        },
+    ];
+
     return (
         <AdminLayout
             title="Panel Académico Institucional"
@@ -189,6 +224,34 @@ export default function Dashboard({
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {metrics.map((metric) => (
                         <MetricCard key={metric.title} {...metric} />
+                    ))}
+                </div>
+            </section>
+
+            <section className="mt-8">
+                <SectionHeading
+                    eyebrow="Gestión institucional"
+                    title="Operación académica"
+                    description="Programas, grupos, inscripciones, simulacros y seguimiento institucional."
+                />
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                    {institutionalMetrics.map(({ label, value, icon: Icon }) => (
+                        <Card
+                            key={label}
+                            className="rounded-2xl border border-brand-border bg-brand-card shadow-sm dark:shadow-black/20"
+                        >
+                            <CardContent className="p-5">
+                                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-secondary/10 text-brand-secondary">
+                                    <Icon className="h-5 w-5" />
+                                </span>
+                                <p className="mt-4 text-2xl font-black text-text-main">
+                                    {value}
+                                </p>
+                                <p className="mt-1 text-xs font-semibold leading-5 text-text-muted">
+                                    {label}
+                                </p>
+                            </CardContent>
+                        </Card>
                     ))}
                 </div>
             </section>

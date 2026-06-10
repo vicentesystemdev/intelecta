@@ -36,10 +36,10 @@ import { useMemo, useState } from 'react';
 function DetailField({ label, value }) {
     return (
         <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+            <dt className="text-xs font-semibold uppercase tracking-wider text-text-muted">
                 {label}
             </dt>
-            <dd className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-200">
+            <dd className="mt-1 text-sm font-medium text-text-main">
                 {value || 'No registrado'}
             </dd>
         </div>
@@ -493,11 +493,12 @@ export default function Index({
                 title="Detalle del Postulante"
                 description="Información académica y personal registrada en el sistema."
                 size="xl"
+                className="bg-brand-card text-text-main border border-brand-border rounded-2xl shadow-xl"
             >
                 {detailModal.postulante && (
                     <div className="space-y-6">
                         {/* Tarjeta de cabecera con gradiente */}
-                        <div className="rounded-2xl bg-gradient-to-r from-indigo-800 to-blue-700 p-6 text-white shadow-lg dark:from-indigo-950 dark:to-blue-900">
+                        <div className="rounded-2xl bg-gradient-to-br from-brand-primary via-brand-primary to-brand-secondary p-6 text-white shadow-lg">
                             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                                 <div className="flex items-center gap-4">
                                     <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
@@ -512,23 +513,23 @@ export default function Index({
                                         </p>
                                     </div>
                                 </div>
-                                <StatusBadge
-                                    status={
-                                        detailModal.postulante.estado_post === 'activo'
-                                            ? 'Activo'
-                                            : 'Inactivo'
-                                    }
-                                />
+                                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
+                                    detailModal.postulante.estado_post === 'activo'
+                                        ? 'bg-brand-success/10 text-brand-success border-brand-success/20'
+                                        : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                                }`}>
+                                    {detailModal.postulante.estado_post === 'activo' ? 'Activo' : 'Inactivo'}
+                                </span>
                             </div>
                         </div>
 
                         {/* Grid con información */}
                         <div className="grid gap-6 lg:grid-cols-2">
                             {/* Información personal */}
-                            <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
-                                <CardHeader className="border-b border-slate-100 dark:border-slate-800/60 p-5">
-                                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                                        <UserRound className="h-4 w-4 text-brand-secondary dark:text-brand-secondary" />
+                            <Card className="bg-brand-card border border-brand-border rounded-2xl">
+                                <CardHeader className="border-b border-brand-border p-5">
+                                    <CardTitle className="flex items-center gap-2 text-base font-semibold text-text-main">
+                                        <UserRound className="h-4 w-4 text-brand-secondary" />
                                         Información personal
                                     </CardTitle>
                                 </CardHeader>
@@ -542,7 +543,7 @@ export default function Index({
                                             <DetailField label="Correo electrónico" value={detailModal.postulante.email_post} />
                                         </div>
                                     </dl>
-                                    <div className="mt-5 flex flex-wrap gap-3 text-xs text-slate-500">
+                                    <div className="mt-5 flex flex-wrap gap-3 text-xs text-text-muted">
                                         {detailModal.postulante.email_post && (
                                             <span className="flex items-center gap-1.5">
                                                 <Mail className="h-3.5 w-3.5" />
@@ -560,10 +561,10 @@ export default function Index({
                             </Card>
 
                             {/* Información académica */}
-                            <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
-                                <CardHeader className="border-b border-slate-100 dark:border-slate-800/60 p-5">
-                                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                                        <GraduationCap className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            <Card className="bg-brand-card border border-brand-border rounded-2xl">
+                                <CardHeader className="border-b border-brand-border p-5">
+                                    <CardTitle className="flex items-center gap-2 text-base font-semibold text-text-main">
+                                        <GraduationCap className="h-4 w-4 text-brand-secondary" />
                                         Información académica
                                     </CardTitle>
                                 </CardHeader>
@@ -589,7 +590,7 @@ export default function Index({
                                             <DetailField label="Gestión" value={detailModal.postulante.gestion_post} />
                                         </div>
                                     </dl>
-                                    <div className="mt-5 flex items-center gap-2 text-xs text-slate-500">
+                                    <div className="mt-5 flex items-center gap-2 text-xs text-text-muted">
                                         <Building2 className="h-3.5 w-3.5" />
                                         Registro del proceso preuniversitario
                                     </div>
@@ -598,12 +599,12 @@ export default function Index({
                         </div>
 
                         {/* Observaciones */}
-                        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
-                            <CardHeader className="border-b border-slate-100 dark:border-slate-800/60 p-5">
-                                <CardTitle className="text-base font-semibold">Observaciones</CardTitle>
+                        <Card className="bg-brand-card border border-brand-border rounded-2xl">
+                            <CardHeader className="border-b border-brand-border p-5">
+                                <CardTitle className="text-base font-semibold text-text-main">Observaciones</CardTitle>
                             </CardHeader>
                             <CardContent className="p-5">
-                                <p className="whitespace-pre-line text-sm leading-6 text-slate-600 dark:text-slate-300">
+                                <p className="whitespace-pre-line text-sm leading-6 text-text-muted">
                                     {detailModal.postulante.observaciones_post || 'No se registraron observaciones para este postulante.'}
                                 </p>
                             </CardContent>

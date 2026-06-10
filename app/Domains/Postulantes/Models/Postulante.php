@@ -2,12 +2,15 @@
 
 namespace App\Domains\Postulantes\Models;
 
+use App\Domains\Academico\Models\InscripcionAcademica;
+use App\Domains\Academico\Models\RendimientoPostulante;
 use App\Domains\Institucional\Models\Carrera;
 use App\Domains\Institucional\Models\Colegio;
 use App\Domains\Institucional\Models\Universidad;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -59,5 +62,15 @@ class Postulante extends Model
             'id_car',
             'id_uni',
         );
+    }
+
+    public function inscripcionesAcademicas(): HasMany
+    {
+        return $this->hasMany(InscripcionAcademica::class, 'id_post', 'id_post');
+    }
+
+    public function rendimientosAcademicos(): HasMany
+    {
+        return $this->hasMany(RendimientoPostulante::class, 'id_post', 'id_post');
     }
 }

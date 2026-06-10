@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\Academico\Services\AcademicoService;
 use App\Domains\Evaluaciones\Models\AreaConocimiento;
 use App\Domains\Evaluaciones\Models\Materia;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
@@ -11,12 +12,16 @@ use App\Domains\Postulantes\Models\Postulante;
 use App\Domains\Reportes\Services\CoberturaCurricularService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function __invoke(CoberturaCurricularService $cobertura): Response|RedirectResponse
+    public function __invoke(
+        CoberturaCurricularService $cobertura,
+        AcademicoService $academico,
+    ): Response|RedirectResponse
     {
         if (auth()->user()->hasRole('Estudiante')) {
             return redirect('/');
@@ -50,6 +55,25 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        $gestionInstitucional = [
+            'programasActivos' => 0,
+            'gruposActivos' => 0,
+            'postulantesInscritos' => 0,
+            'proximosSimulacros' => 0,
+            'promedioInstitucional' => 0,
+            'seguimientoPrioritario' => 0,
+        ];
+
+        if (
+            Schema::hasTable('programas_academicos')
+            && Schema::hasTable('grupos_academicos')
+            && Schema::hasTable('inscripciones_academicas')
+            && Schema::hasTable('simulacros_programados')
+            && Schema::hasTable('rendimientos_postulante')
+        ) {
+            $gestionInstitucional = $academico->dashboardMetrics();
+        }
+
         return Inertia::render('Admin/Dashboard', [
             'metricas' => [
                 'postulantes' => Postulante::count(),
@@ -63,6 +87,7 @@ class DashboardController extends Controller
             'preguntasSinMateria' => $cobertura->preguntasSinMateria(),
             'plantillasRecientes' => $plantillasRecientes,
             'postulantesPorCarrera' => $postulantesPorCarrera,
+            'gestionInstitucional' => $gestionInstitucional,
         ]);
     }
 }

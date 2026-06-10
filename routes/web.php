@@ -4,6 +4,12 @@ use App\Http\Controllers\Admin\RolPermisoController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\AreaConocimientoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Institucional\FichaAcademicaController;
+use App\Http\Controllers\Institucional\GrupoAcademicoController;
+use App\Http\Controllers\Institucional\InscripcionAcademicaController;
+use App\Http\Controllers\Institucional\ProgramaAcademicoController;
+use App\Http\Controllers\Institucional\RankingAcademicoController;
+use App\Http\Controllers\Institucional\SimulacroProgramadoController;
 use App\Http\Controllers\PlantillaEvaluacionController;
 use App\Http\Controllers\PostulanteController;
 use App\Http\Controllers\PreguntaController;
@@ -98,6 +104,44 @@ Route::middleware('auth')->group(function () {
 
     // Rutas planificadas del panel administrativo
     Route::prefix('admin')->group(function () {
+        Route::prefix('institucional')
+            ->middleware('verified')
+            ->name('admin.institucional.')
+            ->group(function () {
+                Route::get('/programas', [ProgramaAcademicoController::class, 'index'])
+                    ->name('programas.index');
+                Route::post('/programas', [ProgramaAcademicoController::class, 'store'])
+                    ->name('programas.store');
+                Route::put('/programas/{programa}', [ProgramaAcademicoController::class, 'update'])
+                    ->name('programas.update');
+
+                Route::get('/grupos', [GrupoAcademicoController::class, 'index'])
+                    ->name('grupos.index');
+                Route::post('/grupos', [GrupoAcademicoController::class, 'store'])
+                    ->name('grupos.store');
+                Route::put('/grupos/{grupo}', [GrupoAcademicoController::class, 'update'])
+                    ->name('grupos.update');
+
+                Route::get('/inscripciones', [InscripcionAcademicaController::class, 'index'])
+                    ->name('inscripciones.index');
+                Route::post('/inscripciones', [InscripcionAcademicaController::class, 'store'])
+                    ->name('inscripciones.store');
+                Route::patch('/inscripciones/{inscripcion}', [InscripcionAcademicaController::class, 'update'])
+                    ->name('inscripciones.update');
+
+                Route::get('/simulacros', [SimulacroProgramadoController::class, 'index'])
+                    ->name('simulacros.index');
+                Route::post('/simulacros', [SimulacroProgramadoController::class, 'store'])
+                    ->name('simulacros.store');
+                Route::put('/simulacros/{simulacro}', [SimulacroProgramadoController::class, 'update'])
+                    ->name('simulacros.update');
+
+                Route::get('/ranking', [RankingAcademicoController::class, 'index'])
+                    ->name('ranking.index');
+                Route::get('/ficha-academica/{postulante}', [FichaAcademicaController::class, 'show'])
+                    ->name('ficha.postulante');
+            });
+
         Route::prefix('gestion-academica')->group(function () {
             Route::get('/docentes', function () {
                 return Inertia::render('Modulos/TutoresAcademicos');
