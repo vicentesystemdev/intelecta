@@ -190,10 +190,10 @@ export default function StudentEvaluaciones() {
                 {/* ETAPA 1: INICIO */}
                 {step === 1 && (
                     <div className="space-y-6">
-                        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-800 to-indigo-950 p-8 text-white shadow-xl shadow-indigo-900/10">
+                        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary via-brand-primary to-brand-secondary p-8 text-white shadow-xl">
                             <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:20px_20px]" />
                             <div className="relative z-10 space-y-4">
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-secondary/20 px-3 py-1 text-xs font-semibold text-brand-secondary ring-1 ring-brand-secondary/20">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-brand-accent border border-white/10">
                                     <Clock className="h-3.5 w-3.5" />
                                     Evaluación Activa
                                 </span>
@@ -221,21 +221,21 @@ export default function StudentEvaluaciones() {
                                             key={evaluation.id}
                                             type="button"
                                             onClick={() => setSelectedEvaluation(evaluation)}
-                                            className={`rounded-2xl border p-4 text-left transition ${
+                                            className={`rounded-2xl border p-4 text-left transition group ${
                                                 selected
-                                                    ? 'border-brand-primary bg-brand-primary/5 ring-2 ring-brand-primary/15 dark:bg-brand-primary/20'
-                                                    : 'border-slate-200 bg-white hover:border-brand-secondary/30 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800'
+                                                    ? 'border-brand-secondary bg-brand-secondary/5 shadow-md'
+                                                    : 'bg-brand-card border border-brand-border hover:border-brand-secondary/40 hover:bg-brand-secondary/5'
                                             }`}
                                         >
-                                            <span className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${
+                                            <span className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl transition ${
                                                 selected
-                                                    ? 'bg-brand-primary text-white'
-                                                    : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                                                    ? 'bg-brand-secondary text-white'
+                                                    : 'bg-brand-primary/5 text-text-muted group-hover:text-brand-secondary'
                                             }`}>
                                                 <Icon className="h-5 w-5" />
                                             </span>
-                                            <span className="block text-sm font-bold text-slate-900 dark:text-slate-100">{evaluation.name}</span>
-                                            <span className="mt-1 block text-[11px] leading-4 text-slate-500 dark:text-slate-400">{evaluation.description}</span>
+                                            <span className="block text-sm font-bold text-text-main">{evaluation.name}</span>
+                                            <span className="mt-1 block text-[11px] leading-4 text-text-muted">{evaluation.description}</span>
                                         </button>
                                     );
                                 })}
@@ -289,7 +289,7 @@ export default function StudentEvaluaciones() {
                             </div>
                             <button
                                 onClick={handleStart}
-                                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-primary hover:bg-brand-primary/90 text-white font-semibold text-sm px-8 py-3.5 shadow-lg shadow-brand-primary/10 transition"
+                                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-secondary hover:bg-brand-secondary/90 text-white font-semibold text-sm px-8 py-3.5 shadow-lg shadow-brand-secondary/10 transition"
                             >
                                 Iniciar evaluación guiada
                                 <ArrowRight className="h-4 w-4" />
@@ -328,7 +328,7 @@ export default function StudentEvaluaciones() {
                         {/* Barra de progreso visual */}
                         <Progress 
                             value={(answeredCount / totalQuestions) * 100} 
-                            className="h-2 bg-brand-primary/10 [&_[data-slot=progress-indicator]]:bg-brand-primary"
+                            className="h-2 bg-brand-border [&_[data-slot=progress-indicator]]:bg-brand-secondary"
                         />
 
                         {/* Cuestionario de preguntas */}
@@ -356,13 +356,13 @@ export default function StudentEvaluaciones() {
                                                             onClick={() => handleSelectOption(q.id, option.key)}
                                                             className={`flex items-center gap-3 w-full text-left rounded-xl p-3.5 text-sm transition font-medium ring-1 ${
                                                                 isSelected 
-                                                                    ? 'bg-brand-primary/5 ring-brand-primary text-brand-primary' 
+                                                                    ? 'bg-brand-secondary/5 ring-brand-secondary text-brand-secondary' 
                                                                     : 'bg-slate-50/50 hover:bg-slate-50 ring-slate-200/60 text-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-slate-800'
                                                             }`}
                                                         >
                                                             <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-black transition ${
                                                                 isSelected 
-                                                                    ? 'bg-brand-primary text-white shadow-md' 
+                                                                    ? 'bg-brand-secondary text-white shadow-md' 
                                                                     : 'border border-slate-200 bg-white text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'
                                                             }`}>
                                                                 {option.key}
@@ -386,8 +386,8 @@ export default function StudentEvaluaciones() {
                                 disabled={answeredCount < totalQuestions}
                                 className={`inline-flex items-center justify-center gap-2 rounded-2xl font-bold text-sm px-8 py-3.5 shadow-lg transition ${
                                     answeredCount === totalQuestions
-                                        ? 'bg-brand-primary hover:bg-brand-primary/90 text-white shadow-brand-primary/10'
-                                        : 'bg-slate-200 text-slate-450 cursor-not-allowed shadow-none'
+                                        ? 'bg-brand-secondary hover:bg-brand-secondary/90 text-white shadow-brand-secondary/10'
+                                        : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                                 }`}
                             >
                                 Enviar respuestas y calificar
@@ -416,7 +416,7 @@ export default function StudentEvaluaciones() {
                                 </div>
 
                                 <div className="relative flex items-center justify-center my-6">
-                                    <div className="text-center bg-brand-primary/5 ring-4 ring-brand-primary/10 h-28 w-28 rounded-full flex flex-col justify-center items-center">
+                                    <div className="text-center bg-brand-secondary/10 ring-4 ring-brand-secondary/5 h-28 w-28 rounded-full flex flex-col justify-center items-center">
                                         <span className="text-3xl font-black text-brand-primary leading-none">{score}</span>
                                         <span className="text-[10px] font-bold text-brand-secondary mt-1 uppercase tracking-wider">de 100 Pts</span>
                                     </div>
@@ -441,8 +441,8 @@ export default function StudentEvaluaciones() {
                                                 <div className="flex items-start gap-3">
                                                     <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${
                                                         isCorrect 
-                                                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                                                            : 'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                                                            ? 'bg-brand-success/10 text-brand-success'
+                                                            : 'bg-brand-danger/10 text-brand-danger'
                                                     }`}>
                                                         {isCorrect ? <CheckCircle2 className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                                                     </span>
@@ -454,15 +454,15 @@ export default function StudentEvaluaciones() {
 
                                                 <div className="flex items-center gap-3 shrink-0 text-xs">
                                                     <span className="text-slate-400">Tu respuesta: <span className="font-bold text-slate-700">{answers[q.id]}</span></span>
-                                                    <span className="text-slate-400">Correcta: <span className="font-bold text-emerald-600">{q.correct}</span></span>
+                                                    <span className="text-slate-400">Correcta: <span className="font-bold text-brand-success">{q.correct}</span></span>
                                                 </div>
                                             </div>
 
                                             {/* Retroalimentación */}
                                             <div className={`mt-3 p-3 rounded-xl border text-[11px] leading-relaxed ${
                                                 isCorrect 
-                                                    ? 'border-emerald-100 bg-emerald-50/20 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200'
-                                                    : 'border-rose-100 bg-rose-50/20 text-rose-800 dark:border-rose-800 dark:bg-rose-950/50 dark:text-rose-200'
+                                                    ? 'border-brand-success/20 bg-brand-success/5 text-brand-success'
+                                                    : 'border-brand-danger/20 bg-brand-danger/5 text-brand-danger'
                                             }`}>
                                                 <span className="font-bold block uppercase text-[9px] tracking-wider mb-1">Recomendación:</span>
                                                 {isCorrect ? q.feedbackSuccess : q.feedbackFail}
@@ -511,7 +511,7 @@ export default function StudentEvaluaciones() {
                             </button>
                             
                             <Link href="/">
-                                <button className="inline-flex h-10 items-center gap-2 rounded-xl bg-slate-900 px-5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-brand-primary dark:hover:bg-brand-primary/90">
+                                <button className="inline-flex h-10 items-center gap-2 rounded-xl bg-brand-secondary px-5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-secondary/90">
                                     Finalizar y salir
                                 </button>
                             </Link>
