@@ -164,10 +164,10 @@ export default function Index({
                 {permisos.crear && (
                     <Button
                         type="button"
-                        className="h-10 bg-indigo-700 px-4 hover:bg-indigo-800"
+                        className="inline-flex items-center gap-2 rounded-xl bg-brand-secondary px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-brand-secondary/90 active:scale-95"
                         onClick={openCreateModal}
                     >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-4 w-4 text-white" />
                         Nuevo postulante
                     </Button>
                 )}
@@ -202,7 +202,7 @@ export default function Index({
                             />
                         </div>
                         <select
-                            className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 text-sm focus:border-brand-secondary focus:ring-brand-secondary"
                             value={filters.id_col}
                             onChange={(event) =>
                                 setFilters({
@@ -222,7 +222,7 @@ export default function Index({
                             ))}
                         </select>
                         <select
-                            className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 text-sm focus:border-brand-secondary focus:ring-brand-secondary"
                             value={filters.id_uni}
                             onChange={(event) =>
                                 changeUniversidad(event.target.value)
@@ -263,7 +263,7 @@ export default function Index({
                             ))}
                         </select>
                         <select
-                            className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 text-sm focus:border-brand-secondary focus:ring-brand-secondary"
                             value={filters.estado_post}
                             onChange={(event) =>
                                 setFilters({
@@ -277,7 +277,7 @@ export default function Index({
                             <option value="inactivo">Inactivo</option>
                         </select>
                         <div className="flex gap-2 w-full col-span-1 md:col-span-2 xl:col-span-1">
-                            <Button type="submit" className="h-10 bg-indigo-700 hover:bg-indigo-800 flex-1">
+                            <Button type="submit" className="inline-flex items-center justify-center rounded-xl bg-brand-secondary px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-brand-secondary/90 active:scale-95 flex-1 h-10">
                                 Filtrar
                             </Button>
                             <Button
@@ -507,7 +507,7 @@ export default function Index({
                                         <h3 className="text-xl font-bold">
                                             {detailModal.postulante.nombres_post} {detailModal.postulante.apellidos_post}
                                         </h3>
-                                        <p className="mt-1 text-sm text-indigo-100">
+                                        <p className="mt-1 text-sm text-slate-200">
                                             C.I. {detailModal.postulante.ci_post || 'no registrado'} · Gestión {detailModal.postulante.gestion_post}
                                         </p>
                                     </div>
@@ -528,7 +528,7 @@ export default function Index({
                             <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
                                 <CardHeader className="border-b border-slate-100 dark:border-slate-800/60 p-5">
                                     <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                                        <UserRound className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                                        <UserRound className="h-4 w-4 text-brand-secondary dark:text-brand-secondary" />
                                         Información personal
                                     </CardTitle>
                                 </CardHeader>

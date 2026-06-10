@@ -100,12 +100,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->group(function () {
         Route::prefix('gestion-academica')->group(function () {
             Route::get('/docentes', function () {
-                return Inertia::render('Modulos/ModuloPlanificado', [
-                    'titulo' => 'Docentes',
-                    'descripcion' => 'Gestión de tutores, carga académica e intervención en evaluaciones lógico-matemáticas.',
-                    'moduloRelacionado' => 'Postulantes y Evaluaciones',
-                    'proximaEvolucion' => 'Monitoreo de la asignación de tutores y flujos de revisión para los bancos de preguntas preuniversitarios.'
-                ]);
+                return Inertia::render('Modulos/TutoresAcademicos');
             })->name('admin.docentes');
 
             Route::get('/carreras', function () {
@@ -129,32 +124,17 @@ Route::middleware('auth')->group(function () {
 
         Route::prefix('evaluaciones')->group(function () {
             Route::get('/', function () {
-                return Inertia::render('Modulos/ModuloPlanificado', [
-                    'titulo' => 'Evaluaciones',
-                    'descripcion' => 'Programación académica de evaluaciones a partir de plantillas y bancos de preguntas.',
-                    'moduloRelacionado' => 'Plantillas de Evaluación',
-                    'proximaEvolucion' => 'Calendarización interactiva, asignación de fechas de examen, y control de estados de pruebas.'
-                ]);
+                return Inertia::render('Modulos/CentroEvaluaciones');
             })->name('admin.evaluaciones.index');
 
             Route::get('/resultados', function () {
-                return Inertia::render('Modulos/ModuloPlanificado', [
-                    'titulo' => 'Resultados',
-                    'descripcion' => 'Concentrado académico preparado para registrar resultados y desempeño por área evaluada.',
-                    'moduloRelacionado' => 'Reportes Académicos',
-                    'proximaEvolucion' => 'Centralización de notas obtenidas en pruebas guiadas, cálculo de desvíos estándar e historiales.'
-                ]);
+                return Inertia::render('Modulos/ResultadosSeguimiento');
             })->name('admin.evaluaciones.resultados');
         });
 
         Route::prefix('analisis')->group(function () {
             Route::get('/learning-analytics', function () {
-                return Inertia::render('Modulos/ModuloPlanificado', [
-                    'titulo' => 'Learning Analytics',
-                    'descripcion' => 'Base de análisis preparada para consolidar indicadores académicos y futura predicción de desempeño.',
-                    'moduloRelacionado' => 'Reportes Académicos',
-                    'proximaEvolucion' => 'Algoritmos estadísticos avanzados aplicados a la evolución lógica de los postulantes.'
-                ]);
+                return Inertia::render('Analisis/LearningAnalytics');
             })->name('admin.analisis.learning-analytics');
 
             Route::get('/riesgo-academico', function () {

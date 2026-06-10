@@ -76,7 +76,7 @@ export default function EvaluacionesPostulante() {
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex h-20 items-center justify-between">
                             <Link href="/" className="flex items-center gap-3">
-                                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-600/20">
+                                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-secondary text-white shadow-lg shadow-brand-primary/20">
                                     <GraduationCap className="h-6 w-6" />
                                 </span>
                                 <span className="text-2xl font-black tracking-[0.15em] text-slate-900">
@@ -86,7 +86,7 @@ export default function EvaluacionesPostulante() {
 
                             <Link 
                                 href="/"
-                                className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-indigo-600 transition"
+                                className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-brand-secondary transition"
                             >
                                 <ArrowLeft className="h-4 w-4" />
                                 Volver a Inicio
@@ -98,10 +98,10 @@ export default function EvaluacionesPostulante() {
                 {/* Hero / Banner principal */}
                 <section className="relative overflow-hidden py-16 sm:py-20 bg-gradient-to-b from-indigo-950 via-indigo-900 to-blue-950 text-white text-center">
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:20px_20px]" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-primary/10 rounded-full blur-3xl pointer-events-none" />
                     
                     <div className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6">
-                        <span className="inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold text-cyan-300 ring-1 ring-cyan-500/20 mb-6">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-brand-secondary/10 px-4 py-1.5 text-xs font-semibold text-brand-secondary ring-1 ring-brand-secondary/20 mb-6">
                             <Award className="h-4 w-4" />
                             Instrumentos de Evaluación Académica
                         </span>
@@ -110,7 +110,7 @@ export default function EvaluacionesPostulante() {
                             Evaluaciones académicas para postulantes
                         </h1>
                         
-                        <p className="mt-4 text-base sm:text-lg text-indigo-200">
+                        <p className="mt-4 text-base sm:text-lg text-slate-300">
                             Explora las áreas lógico-matemáticas y plantillas académicas disponibles para el seguimiento preuniversitario.
                         </p>
                     </div>
@@ -147,7 +147,7 @@ export default function EvaluacionesPostulante() {
                                 <h2 className="text-2xl font-black text-slate-900">Plantillas Disponibles</h2>
                                 <p className="text-sm text-slate-500 mt-1">Modelos de pruebas configuradas según exigencias institucionales.</p>
                             </div>
-                            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-brand-secondary bg-brand-secondary/10 px-3 py-1.5 rounded-full">
                                 {publicTemplates.length} Exámenes planificados
                             </span>
                         </div>
@@ -156,7 +156,7 @@ export default function EvaluacionesPostulante() {
                             {publicTemplates.map((template) => (
                                 <div 
                                     key={template.name}
-                                    className="group relative flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-350 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-500/5"
+                                    className="group relative flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-350 hover:border-brand-secondary/30 hover:shadow-lg hover:shadow-brand-secondary/5"
                                 >
                                     <div className="space-y-4">
                                         <div className="flex justify-between items-center">
@@ -170,7 +170,7 @@ export default function EvaluacionesPostulante() {
                                         </div>
 
                                         <div className="space-y-1">
-                                            <h3 className="text-base font-bold text-slate-950 leading-snug group-hover:text-indigo-950">
+                                            <h3 className="text-base font-bold text-slate-950 leading-snug group-hover:text-brand-primary">
                                                 {template.name}
                                             </h3>
                                             <p className="text-xs leading-relaxed text-slate-500">
@@ -181,7 +181,7 @@ export default function EvaluacionesPostulante() {
 
                                     <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                                         <span className="text-slate-500 font-medium">Reactivos: <span className="font-bold text-slate-800">{template.questions}</span></span>
-                                        <span className="text-slate-500 font-medium">Dificultad: <span className="font-bold text-indigo-600">{template.difficulty}</span></span>
+                                        <span className="text-slate-500 font-medium">Dificultad: <span className="font-bold text-brand-secondary">{template.difficulty}</span></span>
                                     </div>
                                 </div>
                             ))}
@@ -203,7 +203,7 @@ export default function EvaluacionesPostulante() {
                                         key={area.name}
                                         className="flex gap-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:border-slate-300 transition"
                                     >
-                                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+                                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary">
                                             <Icon className="h-6 w-6" />
                                         </span>
                                         <div className="space-y-1">
@@ -221,12 +221,12 @@ export default function EvaluacionesPostulante() {
                         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:16px_16px]" />
                         <div className="relative z-10 max-w-xl mx-auto space-y-6">
                             <h3 className="text-xl font-bold">¿Listo para resolver tu evaluación?</h3>
-                            <p className="text-sm text-indigo-200">
+                            <p className="text-sm text-slate-300">
                                 Inicia sesión para responder de forma interactiva el simulacro y recibir tu diagnóstico de desempeño inmediato.
                             </p>
                             <div className="flex flex-wrap gap-4 justify-center">
                                 <Link href={route('login')}>
-                                    <button className="inline-flex items-center justify-center gap-2 rounded-2xl bg-cyan-400 hover:bg-cyan-500 text-indigo-950 font-bold text-xs px-6 py-3.5 shadow-lg shadow-cyan-400/10 transition">
+                                    <button className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-secondary hover:bg-brand-secondary/90 text-white font-bold text-xs px-6 py-3.5 shadow-lg shadow-brand-secondary/10 transition">
                                         Ingresar al Sistema
                                         <ArrowRight className="h-4 w-4" />
                                     </button>

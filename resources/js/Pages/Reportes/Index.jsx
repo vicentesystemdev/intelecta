@@ -44,13 +44,13 @@ import {
 } from 'recharts';
 
 const chartColors = [
-    '#4f46e5',
-    '#0ea5e9',
-    '#06b6d4',
-    '#7c3aed',
-    '#f59e0b',
+    '#16213E',
+    '#0F766E',
+    '#E0B84C',
+    '#0F4B70',
+    '#1A5C5C',
     '#10b981',
-    '#f43f5e',
+    '#f59e0b',
 ];
 
 const difficultyColors = {
@@ -70,7 +70,7 @@ function ChartCard({ icon: Icon, title, description, children }) {
         <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-slate-900 dark:text-slate-100">
-                    <Icon className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
+                    <Icon className="h-4.5 w-4.5 text-brand-secondary dark:text-brand-secondary" />
                     {title}
                 </CardTitle>
                 <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">
@@ -122,35 +122,35 @@ export default function Index({
             value: metricas.totalPostulantes ?? 0,
             detail: 'Perfiles registrados',
             icon: GraduationCap,
-            color: 'text-indigo-600',
+            color: 'text-brand-primary dark:text-slate-300',
         },
         {
             title: 'Materias',
             value: metricas.totalMaterias ?? 0,
             detail: 'Base curricular',
             icon: LibraryBig,
-            color: 'text-blue-600',
+            color: 'text-brand-primary dark:text-slate-300',
         },
         {
             title: 'Preguntas',
             value: metricas.totalPreguntas ?? 0,
             detail: 'Banco académico',
             icon: FileQuestion,
-            color: 'text-cyan-600',
+            color: 'text-brand-secondary dark:text-brand-secondary',
         },
         {
             title: 'Plantillas activas',
             value: metricas.totalPlantillasActivas ?? 0,
             detail: 'Instrumentos disponibles',
             icon: BookCopy,
-            color: 'text-violet-600',
+            color: 'text-brand-secondary dark:text-brand-secondary',
         },
         {
             title: 'Áreas',
             value: metricas.totalAreas ?? 0,
             detail: 'Campos curriculares',
             icon: Layers3,
-            color: 'text-sky-600',
+            color: 'text-brand-primary dark:text-slate-300',
         },
         {
             title: 'Temas',
@@ -171,7 +171,7 @@ export default function Index({
             value: metricas.totalCarreras ?? 0,
             detail: 'Opciones postuladas',
             icon: BarChart3,
-            color: 'text-rose-600',
+            color: 'text-slate-500',
         },
     ];
 
@@ -250,7 +250,7 @@ export default function Index({
             <div className="space-y-8">
                 <section className="flex flex-col justify-between gap-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:flex-row md:items-center">
                     <div>
-                        <Badge className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 dark:bg-indigo-950 dark:text-indigo-300">
+                        <Badge className="bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/15 dark:bg-brand-primary/20 dark:text-slate-200">
                             <Sparkles className="mr-1 h-3.5 w-3.5" />
                             Lectura institucional
                         </Badge>
@@ -849,7 +849,7 @@ export default function Index({
                                                                         : postulante.id_post,
                                                                 )
                                                             }
-                                                            className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-[10px] font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
+                                                            className="inline-flex items-center gap-1 rounded-lg bg-brand-primary/10 px-2.5 py-1.5 text-[10px] font-bold text-brand-primary dark:bg-brand-primary/20 dark:text-slate-200"
                                                         >
                                                             Ver contexto
                                                             {expanded ? (
@@ -868,8 +868,8 @@ export default function Index({
                                                             colSpan={6}
                                                             className="px-4 py-4"
                                                         >
-                                                            <div className="rounded-xl border border-indigo-100 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
-                                                                <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300">
+                                                            <div className="rounded-xl border border-brand-primary/20 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                                                                <p className="text-xs font-bold text-brand-primary dark:text-slate-200">
                                                                     Lectura
                                                                     institucional
                                                                 </p>
@@ -978,7 +978,7 @@ export default function Index({
                                                                 : postulante.id_post,
                                                         )
                                                     }
-                                                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-[10px] font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
+                                                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-brand-primary/10 px-2.5 py-1.5 text-[10px] font-bold text-brand-primary dark:bg-brand-primary/20 dark:text-slate-200"
                                                 >
                                                     Ver contexto
                                                     {expanded ? (
@@ -989,8 +989,8 @@ export default function Index({
                                                 </button>
                                             </div>
                                             {expanded && (
-                                                <div className="mt-3 rounded-xl border border-indigo-100 bg-indigo-50/40 p-3 dark:border-indigo-900 dark:bg-indigo-950/20">
-                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                                                <div className="mt-3 rounded-xl border border-brand-secondary/20 bg-brand-secondary/5 p-3 dark:border-brand-secondary/30 dark:bg-brand-secondary/10">
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-brand-secondary dark:text-brand-secondary">
                                                         Lectura institucional
                                                     </p>
                                                     <p className="mt-1 whitespace-normal break-words text-xs leading-5 text-slate-600 dark:text-slate-400">
@@ -1043,7 +1043,7 @@ export default function Index({
                             key={item.title}
                             className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
                         >
-                            <BrainCircuit className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                            <BrainCircuit className="h-5 w-5 text-brand-secondary dark:text-brand-secondary" />
                             <h3 className="mt-3 text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
                                 {item.title}
                             </h3>
@@ -1054,16 +1054,16 @@ export default function Index({
                     ))}
                 </section>
 
-                <section className="rounded-3xl border border-indigo-100 bg-indigo-50/60 p-6 dark:border-indigo-900/50 dark:bg-indigo-950/30">
+                <section className="rounded-3xl border border-brand-primary/20 bg-brand-primary/5 p-6 dark:border-brand-primary/30 dark:bg-brand-primary/10">
                     <div className="flex gap-4">
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary dark:bg-brand-primary/20 dark:text-slate-200">
                             <BrainCircuit className="h-5 w-5" />
                         </span>
                         <div>
-                            <h3 className="font-bold text-indigo-950 dark:text-indigo-100">
+                            <h3 className="font-bold text-brand-primary dark:text-slate-100">
                                 Interpretación responsable
                             </h3>
-                            <p className="mt-1 text-sm leading-6 text-indigo-800 dark:text-indigo-300">
+                            <p className="mt-1 text-sm leading-6 text-slate-700 dark:text-slate-300">
                                 Los datos actuales representan cobertura académica
                                 y lectura institucional. No constituyen resultados
                                 de admisión ni permiten estimar el ingreso. El análisis

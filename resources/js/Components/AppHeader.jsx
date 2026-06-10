@@ -42,13 +42,13 @@ export default function AppHeader({
                         <Menu className="h-5 w-5" />
                     </Button>
                     <div className="min-w-0">
-                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600 dark:text-indigo-400">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-secondary">
                             INTELECTA
                         </p>
-                        <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 sm:text-xl leading-tight">
+                        <h1 className="text-lg font-bold text-text-main sm:text-xl leading-tight">
                             {title}
                         </h1>
-                        <p className="mt-0.5 hidden max-w-2xl text-xs text-slate-500 dark:text-slate-400 md:block">
+                        <p className="mt-0.5 hidden max-w-2xl text-xs text-text-muted md:block">
                             {subtitle}
                         </p>
                     </div>
@@ -61,7 +61,7 @@ export default function AppHeader({
                     <Button
                         asChild
                         variant="ghost"
-                        className="inline-flex h-9 w-9 p-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition duration-200 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-indigo-400 dark:hover:bg-slate-700 dark:hover:text-indigo-300"
+                        className="inline-flex h-9 w-9 p-0 items-center justify-center rounded-xl border border-brand-border bg-brand-card text-text-muted transition duration-200 hover:bg-brand-border/30 hover:text-brand-secondary"
                         title="Ver sitio público"
                         aria-label="Ver sitio público"
                     >
@@ -75,13 +75,12 @@ export default function AppHeader({
 
                     {/* User name + role badge */}
                     <div className="hidden text-right sm:block">
-                        <p className="max-w-48 truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        <p className="max-w-48 truncate text-sm font-semibold text-text-main">
                             {user?.name || 'Usuario INTELECTA'}
                         </p>
                         <Badge
                             variant="outline"
-                            className="mt-1 border-indigo-100 bg-indigo-50 text-[10px] text-indigo-700
-                                dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300"
+                            className="mt-1 border-brand-secondary/20 bg-brand-secondary/10 text-[10px] text-brand-secondary"
                         >
                             {role}
                         </Badge>
@@ -89,8 +88,7 @@ export default function AppHeader({
 
                     {/* Avatar */}
                     <div className="flex h-9 w-9 items-center justify-center rounded-full
-                        bg-indigo-100 text-sm font-bold text-indigo-700 ring-4 ring-indigo-50
-                        dark:bg-indigo-900 dark:text-indigo-300 dark:ring-indigo-950">
+                        bg-brand-secondary/10 text-sm font-bold text-brand-secondary ring-4 ring-brand-secondary/5">
                         {initials}
                     </div>
 
@@ -99,8 +97,7 @@ export default function AppHeader({
                         asChild
                         variant="ghost"
                         size="icon"
-                        className="text-slate-500 hover:bg-red-50 hover:text-red-600
-                            dark:text-slate-400 dark:hover:bg-red-950 dark:hover:text-red-400"
+                        className="text-text-muted hover:bg-brand-border/30 hover:text-brand-secondary transition-colors duration-200"
                     >
                         <Link
                             href={route('logout')}

@@ -25,7 +25,7 @@ export default function Index({ areas, permisos }) {
                     {areas.total} áreas académicas configuradas
                 </p>
                 {permisos.crear && (
-                    <Button asChild className="bg-indigo-700 hover:bg-indigo-800">
+                    <Button asChild className="bg-brand-primary hover:bg-brand-primary/90">
                         <Link href={route('areas-conocimiento.create')}>
                             <Plus className="h-4 w-4" /> Nueva área
                         </Link>

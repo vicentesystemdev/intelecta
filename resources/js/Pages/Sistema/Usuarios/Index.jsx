@@ -30,27 +30,27 @@ import {
 import { useMemo, useState } from 'react';
 
 const metricCards = [
-    { key: 'total', label: 'Total usuarios', icon: Users, tone: 'indigo' },
+    { key: 'total', label: 'Total usuarios', icon: Users, tone: 'primary' },
     {
         key: 'administradores',
         label: 'Administradores',
         icon: ShieldCheck,
-        tone: 'blue',
+        tone: 'accent',
     },
-    { key: 'docentes', label: 'Docentes', icon: UserCog, tone: 'sky' },
+    { key: 'docentes', label: 'Docentes', icon: UserCog, tone: 'secondary' },
     {
         key: 'estudiantes',
         label: 'Estudiantes',
         icon: GraduationCap,
-        tone: 'cyan',
+        tone: 'muted',
     },
 ];
 
 const toneClasses = {
-    indigo: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300',
-    blue: 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
-    sky: 'bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300',
-    cyan: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-300',
+    primary: 'bg-brand-primary/10 text-brand-primary dark:bg-brand-primary/20 dark:text-slate-200',
+    accent: 'bg-brand-accent/10 text-brand-primary dark:bg-brand-accent/20 dark:text-brand-accent',
+    secondary: 'bg-brand-secondary/10 text-brand-secondary dark:bg-brand-secondary/20 dark:text-brand-secondary',
+    muted: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
 };
 
 export default function Index({
@@ -156,7 +156,7 @@ export default function Index({
                 {permisos.crear && (
                     <Button
                         type="button"
-                        className="h-10 bg-indigo-700 px-4 text-white hover:bg-indigo-800"
+                        className="h-10 bg-brand-primary px-4 text-white hover:bg-brand-primary/90"
                         onClick={() =>
                             setFormModal({ open: true, usuario: null })
                         }
@@ -205,7 +205,7 @@ export default function Index({
                             ))}
                         </select>
                         <div className="flex gap-2">
-                            <Button className="h-10 flex-1 bg-indigo-700 text-white hover:bg-indigo-800">
+                            <Button className="h-10 flex-1 bg-brand-primary text-white hover:bg-brand-primary/90">
                                 Filtrar
                             </Button>
                             <Button
@@ -242,7 +242,7 @@ export default function Index({
                                 <TableRow key={usuario.id}>
                                     <TableCell className="pl-5">
                                         <div className="flex items-center gap-3">
-                                            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-xs font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                                            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary/10 text-xs font-bold text-brand-primary dark:bg-brand-primary/20 dark:text-slate-200">
                                                 {usuario.name
                                                     .split(' ')
                                                     .map((part) => part[0])
@@ -256,7 +256,7 @@ export default function Index({
                                                 </p>
                                                 {usuario.id ===
                                                     usuarioActualId && (
-                                                    <p className="text-xs text-indigo-600 dark:text-indigo-400">
+                                                    <p className="text-xs text-brand-secondary dark:text-brand-secondary">
                                                         Sesión actual
                                                     </p>
                                                 )}
@@ -272,7 +272,7 @@ export default function Index({
                                                 <Badge
                                                     key={role.id}
                                                     variant="outline"
-                                                    className="border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/50 dark:text-indigo-300"
+                                                    className="border-brand-primary/20 bg-brand-primary/5 text-brand-primary dark:border-brand-primary/30 dark:bg-brand-primary/10 dark:text-slate-200"
                                                 >
                                                     {role.name}
                                                 </Badge>
@@ -381,11 +381,11 @@ export default function Index({
             >
                 {detailModal.usuario && (
                     <div className="space-y-5">
-                        <div className="rounded-2xl bg-gradient-to-r from-indigo-800 to-blue-700 p-5 text-white">
+                        <div className="rounded-2xl bg-gradient-to-r from-brand-primary to-brand-secondary p-5 text-white">
                             <p className="text-lg font-bold">
                                 {detailModal.usuario.name}
                             </p>
-                            <p className="mt-1 text-sm text-indigo-100">
+                            <p className="mt-1 text-sm text-slate-200">
                                 {detailModal.usuario.email}
                             </p>
                         </div>

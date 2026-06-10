@@ -64,11 +64,11 @@ function PermissionEditor({ role, grupos, onClose }) {
     return (
         <>
             <div className="space-y-5">
-                <div className="rounded-2xl border border-indigo-100 bg-indigo-50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
-                    <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
+                <div className="rounded-2xl border border-brand-primary/20 bg-brand-primary/5 p-4 dark:border-brand-primary/30 dark:bg-brand-primary/10">
+                    <p className="text-sm font-semibold text-brand-primary dark:text-slate-200">
                         {role.name}
                     </p>
-                    <p className="mt-1 text-xs leading-5 text-indigo-700 dark:text-indigo-300">
+                    <p className="mt-1 text-xs leading-5 text-slate-600 dark:text-slate-400">
                         Seleccione las capacidades que corresponden a este perfil
                         institucional.
                     </p>
@@ -88,11 +88,11 @@ function PermissionEditor({ role, grupos, onClose }) {
                                 {permissions.map((permission) => (
                                     <label
                                         key={permission.id}
-                                        className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition hover:border-indigo-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-indigo-700"
+                                        className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition hover:border-brand-secondary/40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-brand-secondary/60"
                                     >
                                         <input
                                             type="checkbox"
-                                            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950"
+                                            className="rounded border-slate-300 text-brand-secondary focus:ring-brand-secondary dark:border-slate-700 dark:bg-slate-950"
                                             checked={selected.includes(
                                                 permission.name,
                                             )}
@@ -121,7 +121,7 @@ function PermissionEditor({ role, grupos, onClose }) {
                     </Button>
                     <Button
                         type="button"
-                        className="h-10 bg-indigo-700 px-5 text-white hover:bg-indigo-800"
+                        className="h-10 bg-brand-primary px-5 text-white hover:bg-brand-primary/90"
                         onClick={() => setConfirmOpen(true)}
                     >
                         <ShieldCheck className="h-4 w-4" />
@@ -180,7 +180,7 @@ export default function Index({ roles, permisosAgrupados, puedeEditar }) {
             <div className="mb-6 grid gap-4 sm:grid-cols-3">
                 <Card className="border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/60 dark:ring-slate-800">
                     <CardContent className="flex items-center gap-4 p-5">
-                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary dark:bg-brand-primary/20 dark:text-slate-200">
                             <ShieldCheck className="h-5 w-5" />
                         </span>
                         <div>
@@ -208,7 +208,7 @@ export default function Index({ roles, permisosAgrupados, puedeEditar }) {
                 </Card>
                 <Card className="border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/60 dark:ring-slate-800">
                     <CardContent className="flex items-center gap-4 p-5">
-                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-300">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-secondary/10 text-brand-secondary dark:bg-brand-secondary/20 dark:text-brand-secondary">
                             <Users className="h-5 w-5" />
                         </span>
                         <div>
@@ -255,7 +255,7 @@ export default function Index({ roles, permisosAgrupados, puedeEditar }) {
                                         centralizada por módulos.
                                     </p>
                                 </div>
-                                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary dark:bg-brand-primary/20 dark:text-slate-200">
                                     <ShieldCheck className="h-5 w-5" />
                                 </span>
                             </div>
@@ -291,7 +291,7 @@ export default function Index({ roles, permisosAgrupados, puedeEditar }) {
                                 {puedeEditar && role.editable && (
                                     <Button
                                         type="button"
-                                        className="bg-indigo-700 text-white hover:bg-indigo-800"
+                                        className="bg-brand-primary text-white hover:bg-brand-primary/90"
                                         onClick={() => setEditRole(role)}
                                     >
                                         <Pencil className="h-4 w-4" />
@@ -348,7 +348,7 @@ export default function Index({ roles, permisosAgrupados, puedeEditar }) {
                                     <Badge
                                         key={permission}
                                         variant="outline"
-                                        className="border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-300"
+                                        className="border-brand-primary/20 bg-brand-primary/5 text-brand-primary dark:border-brand-primary/30 dark:bg-brand-primary/10 dark:text-slate-200"
                                     >
                                         {permission}
                                     </Badge>

@@ -71,10 +71,10 @@ export default function Index({ plantillas, preguntasDisponibles = [], materias 
                 {permisos.crear && (
                     <Button 
                         type="button" 
-                        className="bg-indigo-700 hover:bg-indigo-800"
+                        className="inline-flex items-center gap-2 rounded-xl bg-brand-secondary px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-brand-secondary/90 active:scale-95"
                         onClick={() => setFormModal({ open: true, plantilla: null })}
                     >
-                        <Plus className="h-4 w-4" />Nueva plantilla
+                        <Plus className="h-4 w-4 text-white" />Nueva plantilla
                     </Button>
                 )}
             </div>
@@ -95,7 +95,7 @@ export default function Index({ plantillas, preguntasDisponibles = [], materias 
                             <option value="activa">Activas</option>
                             <option value="inactiva">Inactivas</option>
                         </select>
-                        <Button className="bg-indigo-700 hover:bg-indigo-800">Filtrar</Button>
+                        <Button className="inline-flex items-center justify-center rounded-xl bg-brand-secondary px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-brand-secondary/90 active:scale-95">Filtrar</Button>
                     </form>
                 </CardContent>
             </Card>
@@ -106,7 +106,7 @@ export default function Index({ plantillas, preguntasDisponibles = [], materias 
                     const composition = compositionBySubject(plantilla);
                     return (
                         <Card key={plantilla.id_plan} className="h-full min-h-[230px] flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-                            <div className="h-1.5 bg-gradient-to-r from-indigo-600 to-cyan-400 shrink-0" />
+                            <div className="h-1.5 bg-gradient-to-r from-brand-primary to-brand-secondary shrink-0" />
                             
                             {/* Header: title (left) + difficulty badge (right) */}
                             <div className="flex items-start justify-between gap-4 p-5 pb-4">
@@ -117,7 +117,7 @@ export default function Index({ plantillas, preguntasDisponibles = [], materias 
                                 >
                                     {plantilla.nombre_plan}
                                 </h3>
-                                <Badge variant="outline" className="capitalize shrink-0 mt-0.5 border-indigo-100 bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300">
+                                <Badge variant="outline" className="capitalize shrink-0 mt-0.5 border-brand-primary/20 bg-brand-primary/5 dark:border-brand-primary/30 dark:bg-brand-primary/10 text-brand-primary dark:text-slate-200">
                                     {plantilla.dificultad_plan?.replace('-', ' ') || 'No definida'}
                                 </Badge>
                             </div>
@@ -254,7 +254,7 @@ export default function Index({ plantillas, preguntasDisponibles = [], materias 
                     return (
                         <div className="space-y-5">
                             <Card className="gap-0 overflow-hidden border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/50 dark:ring-slate-800">
-                                <div className="h-2 bg-gradient-to-r from-indigo-700 via-blue-500 to-cyan-400" />
+                                <div className="h-2 bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-accent" />
                                 <CardContent className="p-6">
                                     <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                                         <div className="max-w-3xl">
@@ -273,23 +273,23 @@ export default function Index({ plantillas, preguntasDisponibles = [], materias 
                                             </div>
                                             
                                             {detailModal.plantilla.objetivo_plan && (
-                                                <div className="mt-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 p-4">
-                                                    <p className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Objetivo académico</p>
-                                                    <p className="mt-1 text-sm text-indigo-900 dark:text-indigo-200">{detailModal.plantilla.objetivo_plan}</p>
+                                                <div className="mt-4 rounded-xl bg-brand-secondary/5 dark:bg-brand-secondary/10 p-4">
+                                                    <p className="text-xs font-semibold uppercase tracking-wider text-brand-secondary dark:text-brand-secondary">Objetivo académico</p>
+                                                    <p className="mt-1 text-sm text-slate-800 dark:text-slate-200">{detailModal.plantilla.objetivo_plan}</p>
                                                 </div>
                                             )}
                                         </div>
                                         <div className="grid min-w-64 grid-cols-3 gap-3 text-center">
                                             <div className="rounded-xl bg-slate-50 dark:bg-slate-900 p-3">
-                                                <p className="text-xl font-bold text-indigo-700 dark:text-indigo-400">{detailModal.plantilla.preguntas?.length || 0}</p>
+                                                <p className="text-xl font-bold text-brand-primary dark:text-brand-secondary">{detailModal.plantilla.preguntas?.length || 0}</p>
                                                 <p className="text-xs text-slate-500">Preguntas</p>
                                             </div>
                                             <div className="rounded-xl bg-slate-50 dark:bg-slate-900 p-3">
-                                                <p className="text-xl font-bold text-indigo-700 dark:text-indigo-400">{total.toFixed(0)}</p>
+                                                <p className="text-xl font-bold text-brand-primary dark:text-brand-secondary">{total.toFixed(0)}</p>
                                                 <p className="text-xs text-slate-500">Puntos</p>
                                             </div>
                                             <div className="rounded-xl bg-slate-50 dark:bg-slate-900 p-3">
-                                                <p className="flex items-center justify-center gap-1 text-xl font-bold text-indigo-700 dark:text-indigo-400">
+                                                <p className="flex items-center justify-center gap-1 text-xl font-bold text-brand-primary dark:text-brand-secondary">
                                                     <Clock3 className="h-4 w-4" />{detailModal.plantilla.duracion_minutos_plan}
                                                 </p>
                                                 <p className="text-xs text-slate-500">Minutos</p>
@@ -315,7 +315,7 @@ export default function Index({ plantillas, preguntasDisponibles = [], materias 
                                 <CardContent className="divide-y divide-slate-100 dark:divide-slate-800 p-0">
                                     {detailModal.plantilla.preguntas && detailModal.plantilla.preguntas.map((pregunta, index) => (
                                         <div key={pregunta.id_preg} className="grid gap-3 p-5 md:grid-cols-[40px_1fr_100px] md:items-center">
-                                            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-950 font-bold text-indigo-700 dark:text-indigo-300">
+                                            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-primary/10 dark:bg-brand-primary/20 font-bold text-brand-primary dark:text-slate-200">
                                                 {index + 1}
                                             </span>
                                             <div>
@@ -325,7 +325,7 @@ export default function Index({ plantillas, preguntasDisponibles = [], materias 
                                                 </p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-lg font-bold text-indigo-700 dark:text-indigo-400">{Number(pregunta.pivot?.puntaje_pp || 0).toFixed(2)}</p>
+                                                <p className="text-lg font-bold text-brand-primary dark:text-brand-secondary">{Number(pregunta.pivot?.puntaje_pp || 0).toFixed(2)}</p>
                                                 <p className="text-xs text-slate-500">puntos</p>
                                             </div>
                                         </div>

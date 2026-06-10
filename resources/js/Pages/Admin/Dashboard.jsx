@@ -31,21 +31,21 @@ import {
 const matterStyles = {
     MAT: {
         progress:
-            '[&_[data-slot=progress-indicator]]:bg-indigo-600',
-        icon: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300',
+            '[&_[data-slot=progress-indicator]]:bg-brand-primary',
+        icon: 'bg-brand-primary/10 text-brand-primary dark:bg-brand-primary/20 dark:text-slate-200',
     },
     FIS: {
-        progress: '[&_[data-slot=progress-indicator]]:bg-sky-500',
-        icon: 'bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300',
+        progress: '[&_[data-slot=progress-indicator]]:bg-brand-secondary',
+        icon: 'bg-brand-secondary/10 text-brand-secondary dark:bg-brand-secondary/20 dark:text-brand-secondary',
     },
     QMC: {
-        progress: '[&_[data-slot=progress-indicator]]:bg-cyan-500',
-        icon: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300',
+        progress: '[&_[data-slot=progress-indicator]]:bg-brand-accent',
+        icon: 'bg-brand-accent/10 text-brand-primary dark:bg-brand-accent/20 dark:text-brand-accent',
     },
     PAA: {
         progress:
-            '[&_[data-slot=progress-indicator]]:bg-violet-600',
-        icon: 'bg-violet-50 text-violet-700 dark:bg-violet-950/50 dark:text-violet-300',
+            '[&_[data-slot=progress-indicator]]:bg-slate-600',
+        icon: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
     },
 };
 
@@ -55,7 +55,7 @@ const coverageBadge = {
     'En ampliación':
         'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300',
     'Base diagnóstica':
-        'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-300',
+        'border-brand-secondary/30 bg-brand-secondary/5 text-brand-secondary dark:border-brand-secondary/40 dark:bg-brand-secondary/10 dark:text-brand-secondary',
 };
 
 const quickLinks = [
@@ -79,7 +79,7 @@ const shortMatterLabel = (name) => {
 function SectionHeading({ eyebrow, title, description }) {
     return (
         <div className="mb-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600 dark:text-indigo-400">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-secondary dark:text-brand-secondary">
                 {eyebrow}
             </p>
             <h2 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">
@@ -106,7 +106,7 @@ export default function Dashboard({
             detail: 'Perfiles preuniversitarios registrados',
             trend: 'neutral',
             icon: GraduationCap,
-            accent: 'indigo',
+            accent: 'primary',
         },
         {
             title: 'Materias académicas',
@@ -114,7 +114,7 @@ export default function Dashboard({
             detail: 'Estructura curricular institucional',
             trend: 'neutral',
             icon: LibraryBig,
-            accent: 'blue',
+            accent: 'secondary',
         },
         {
             title: 'Banco de preguntas',
@@ -122,7 +122,7 @@ export default function Dashboard({
             detail: 'Reactivos disponibles para evaluación',
             trend: 'neutral',
             icon: FileQuestion,
-            accent: 'cyan',
+            accent: 'accent',
         },
         {
             title: 'Plantillas activas',
@@ -130,7 +130,7 @@ export default function Dashboard({
             detail: 'Instrumentos disponibles para aplicación',
             trend: 'neutral',
             icon: BookOpenCheck,
-            accent: 'sky',
+            accent: 'slate',
         },
         {
             title: 'Áreas curriculares',
@@ -138,7 +138,7 @@ export default function Dashboard({
             detail: 'Organización por campo de conocimiento',
             trend: 'neutral',
             icon: Layers3,
-            accent: 'violet',
+            accent: 'slate',
         },
         {
             title: 'Temas evaluables',
@@ -146,7 +146,7 @@ export default function Dashboard({
             detail: 'Contenidos clasificados en el banco',
             trend: 'neutral',
             icon: Tags,
-            accent: 'rose',
+            accent: 'amber',
         },
     ];
 
@@ -162,17 +162,17 @@ export default function Dashboard({
         >
             <Head title="Panel Académico Institucional" />
 
-            <section className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-800 via-blue-700 to-cyan-600 p-6 text-white shadow-lg shadow-indigo-200/60 dark:shadow-indigo-950/40 sm:p-8">
+            <section className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-[#16213E] via-[#0F2A3A] to-[#0F766E]/80 p-6 text-white shadow-lg shadow-brand-primary/20 dark:shadow-brand-primary/40 sm:p-8">
                 <div className="absolute -right-14 -top-20 h-64 w-64 rounded-full border-[42px] border-white/5" />
                 <div className="relative max-w-3xl">
-                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-cyan-100">
+                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-brand-accent">
                         <BrainCircuit className="h-4 w-4" />
                         Lectura institucional de la estructura académica
                     </div>
                     <h2 className="text-2xl font-bold sm:text-3xl">
                         Cobertura para materias de Ingeniería
                     </h2>
-                    <p className="mt-3 max-w-2xl text-sm leading-6 text-indigo-100 sm:text-base">
+                    <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
                         INTELECTA consolida Matemática, Física, Química y
                         Razonamiento Académico mediante áreas, temas, preguntas y
                         plantillas diagnósticas.
@@ -289,17 +289,17 @@ export default function Dashboard({
                         <Link
                             key={label}
                             href={href}
-                            className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-indigo-200 hover:bg-indigo-50/40 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-indigo-900 dark:hover:bg-indigo-950/20"
+                            className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-secondary/30 hover:bg-brand-secondary/5 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-brand-secondary/40 dark:hover:bg-brand-secondary/10"
                         >
                             <span className="flex items-center gap-3">
-                                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700 dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-indigo-950 dark:group-hover:text-indigo-300">
+                                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 group-hover:bg-brand-secondary/10 group-hover:text-brand-secondary dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-brand-secondary/20 dark:group-hover:text-brand-secondary">
                                     <Icon className="h-5 w-5" />
                                 </span>
                                 <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
                                     {label}
                                 </span>
                             </span>
-                            <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-1 group-hover:text-indigo-600" />
+                            <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-1 group-hover:text-brand-secondary" />
                         </Link>
                     ))}
                 </div>
@@ -479,7 +479,7 @@ export default function Dashboard({
                                     </div>
                                     <Progress
                                         value={porcentaje}
-                                        className="h-2 bg-blue-100 dark:bg-blue-950/30 [&_[data-slot=progress-indicator]]:bg-blue-600"
+                                        className="h-2 bg-brand-primary/10 dark:bg-brand-primary/20 [&_[data-slot=progress-indicator]]:bg-brand-primary"
                                     />
                                 </div>
                             );
@@ -494,16 +494,16 @@ export default function Dashboard({
             </section>
 
             <section className="mt-8">
-                <Card className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-5 shadow-sm dark:border-indigo-900/50 dark:bg-indigo-950/30 sm:p-6">
+                <Card className="rounded-2xl border border-brand-primary/20 bg-brand-primary/5 p-5 shadow-sm dark:border-brand-primary/30 dark:bg-brand-primary/10 sm:p-6">
                     <div className="flex gap-4">
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary dark:bg-brand-primary/20 dark:text-slate-200">
                             <BrainCircuit className="h-5 w-5" />
                         </span>
                         <div>
-                            <h3 className="font-bold text-indigo-950 dark:text-indigo-100">
+                            <h3 className="font-bold text-brand-primary dark:text-slate-100">
                                 Base para Learning Analytics
                             </h3>
-                            <p className="mt-1 text-sm leading-6 text-indigo-800 dark:text-indigo-300">
+                            <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">
                                 El banco clasifica reactivos por materia, área,
                                 tema, dificultad y habilidad evaluada. Esta
                                 estructura permite construir futuras lecturas por

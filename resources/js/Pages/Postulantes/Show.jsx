@@ -113,7 +113,7 @@ export default function Show({ postulante, permisos }) {
                     </div>
                 )}
 
-                <Card className="mb-6 border-0 bg-gradient-to-r from-indigo-800 to-blue-700 py-0 text-white shadow-lg shadow-indigo-200/50 dark:shadow-indigo-950/40">
+                <Card className="mb-6 border-0 bg-gradient-to-r from-brand-primary to-brand-secondary py-0 text-white shadow-lg shadow-brand-primary/20 dark:shadow-brand-primary/40">
                     <CardContent className="flex flex-col justify-between gap-5 p-6 sm:flex-row sm:items-center">
                         <div className="flex items-center gap-4">
                             <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
@@ -121,7 +121,7 @@ export default function Show({ postulante, permisos }) {
                             </span>
                             <div>
                                 <h2 className="text-2xl font-bold">{fullName}</h2>
-                                <p className="mt-1 text-sm text-indigo-100">
+                                <p className="mt-1 text-sm text-slate-200">
                                     C.I. {postulante.ci_post || 'no registrado'} ·
                                     Gestión {postulante.gestion_post}
                                 </p>
@@ -141,7 +141,7 @@ export default function Show({ postulante, permisos }) {
                     <Card className="gap-0 border-0 bg-white py-0 shadow-sm ring-1 ring-slate-200/80">
                         <CardHeader className="border-b border-slate-100 p-5">
                             <CardTitle className="flex items-center gap-2 text-lg">
-                                <UserRound className="h-5 w-5 text-indigo-600" />
+                                <UserRound className="h-5 w-5 text-brand-secondary" />
                                 Información personal
                             </CardTitle>
                         </CardHeader>

@@ -15,7 +15,7 @@ export default function Index({ temas, areas, filtros = {}, permisos }) {
                     <option value="">Todas las áreas</option>
                     {areas.map((area) => <option key={area.id_area} value={area.id_area}>{area.nombre_area}</option>)}
                 </select>
-                {permisos.crear && <Button asChild className="bg-indigo-700"><Link href={route('temas.create')}><Plus className="h-4 w-4" />Nuevo tema</Link></Button>}
+                {permisos.crear && <Button asChild className="bg-brand-primary hover:bg-brand-primary/90"><Link href={route('temas.create')}><Plus className="h-4 w-4" />Nuevo tema</Link></Button>}
             </div>
             <Card className="border-0 py-0 shadow-sm ring-1 ring-slate-200"><CardContent className="px-0"><Table>
                 <TableHeader><TableRow className="bg-slate-50"><TableHead className="pl-5">Tema</TableHead><TableHead>Área</TableHead><TableHead>Nivel</TableHead><TableHead>Preguntas</TableHead><TableHead>Estado</TableHead><TableHead className="pr-5 text-right">Acciones</TableHead></TableRow></TableHeader>

@@ -8,9 +8,23 @@
 @layer base {
   .theme {
     --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif
+    --font-sans: 'Geist Variable', sans-serif;
   }
   :root {
+    --color-primary: 22 33 62;
+    --color-secondary: 15 118 110;
+    --color-accent: 224 184 76;
+    --color-bg: 248 250 252;
+    --color-card: 255 255 255;
+    --color-border: 229 231 235;
+    --text-main: 17 24 39;
+    --text-muted: 107 114 128;
+
+    --color-success: 21 128 61;
+    --color-warning: 217 119 6;
+    --color-danger: 220 38 38;
+    --color-info: 37 99 235;
+
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -42,9 +56,23 @@
     --sidebar-accent: oklch(0.97 0 0);
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0)
+    --sidebar-ring: oklch(0.708 0 0);
   }
   .dark {
+    --color-primary: 22 33 62;
+    --color-secondary: 20 184 166;
+    --color-accent: 251 191 36;
+    --color-bg: 10 16 32;
+    --color-card: 16 24 39;
+    --color-border: 31 41 55;
+    --text-main: 249 250 251;
+    --text-muted: 156 163 175;
+
+    --color-success: 34 197 94;
+    --color-warning: 245 158 11;
+    --color-danger: 239 68 68;
+    --color-info: 59 130 246;
+
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
@@ -75,7 +103,7 @@
     --sidebar-accent: oklch(0.269 0 0);
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0)
+    --sidebar-ring: oklch(0.556 0 0);
   }
  
   * {

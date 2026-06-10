@@ -33,7 +33,7 @@ export function AreaForm({ data, setData, errors, processing, onSubmit, label })
                     <div><Label htmlFor="estado_area">Estado</Label><select id="estado_area" className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm" value={data.estado_area} onChange={(e) => setData('estado_area', e.target.value)}><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div>
                 </CardContent>
             </Card>
-            <div className="flex justify-end gap-3"><Button variant="outline" asChild><Link href={route('areas-conocimiento.index')}>Cancelar</Link></Button><Button disabled={processing} className="bg-indigo-700"><Save className="h-4 w-4" />{label}</Button></div>
+            <div className="flex justify-end gap-3"><Button variant="outline" asChild><Link href={route('areas-conocimiento.index')}>Cancelar</Link></Button><Button disabled={processing} className="bg-brand-primary"><Save className="h-4 w-4" />{label}</Button></div>
         </form>
     );
 }

@@ -81,10 +81,10 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                 {permisos.crear && (
                     <Button 
                         type="button" 
-                        className="bg-indigo-700 hover:bg-indigo-800"
+                        className="inline-flex items-center gap-2 rounded-xl bg-brand-secondary px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-brand-secondary/90 active:scale-95"
                         onClick={() => setFormModal({ open: true, pregunta: null })}
                     >
-                        <Plus className="h-4 w-4" />Nueva pregunta
+                        <Plus className="h-4 w-4 text-white" />Nueva pregunta
                     </Button>
                 )}
             </div>
@@ -123,7 +123,7 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                             <option value="inactivo">Inactivo</option>
                         </select>
                         <div className="flex gap-2 w-full col-span-1 md:col-span-1 xl:col-span-2">
-                            <Button className="bg-indigo-700 hover:bg-indigo-800 flex-1 h-10">Filtrar</Button>
+                            <Button className="inline-flex items-center justify-center rounded-xl bg-brand-secondary px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-brand-secondary/90 active:scale-95 flex-1 h-10">Filtrar</Button>
                             <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0 border-slate-200 dark:border-slate-800 dark:text-slate-200" onClick={reset}><RotateCcw className="h-4 w-4" /></Button>
                         </div>
                     </form>
@@ -167,7 +167,7 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 dark:bg-indigo-950 dark:text-indigo-200">
+                                        <Badge className="bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/15 dark:bg-brand-primary/20 dark:text-slate-200">
                                             {pregunta.tema?.area?.materia?.codigo_mat || 'General'}
                                         </Badge>
                                         <p className="mt-1 text-xs text-slate-500">
@@ -258,7 +258,7 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                         <Card className="gap-0 border-0 py-0 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/50 dark:ring-slate-800">
                             <CardHeader className="border-b p-5 dark:border-slate-800">
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <Badge className="bg-indigo-700">
+                                    <Badge className="bg-brand-primary">
                                         {detailModal.pregunta.tema?.area?.materia?.nombre_mat || 'Materia general'}
                                     </Badge>
                                     <Badge>{detailModal.pregunta.tema?.area?.nombre_area || 'Área general'}</Badge>
@@ -319,7 +319,7 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                                                     : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
                                             }`}
                                         >
-                                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white dark:bg-slate-950 font-bold text-indigo-700 dark:text-indigo-400 ring-1 ring-slate-200 dark:ring-slate-800">
+                                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white dark:bg-slate-950 font-bold text-brand-primary dark:text-brand-secondary ring-1 ring-slate-200 dark:ring-slate-800">
                                                 {alt.letra_alt}
                                             </span>
                                             <p className="flex-1 text-sm text-slate-800 dark:text-slate-200">{alt.texto_alt}</p>
@@ -331,10 +331,10 @@ export default function Index({ preguntas, opciones, filtros = {}, permisos }) {
                         )}
 
                         {detailModal.pregunta.explicacion_preg && (
-                            <Card className="border-sky-200 bg-sky-50 dark:bg-sky-950/20 dark:border-sky-900 py-0">
+                            <Card className="border-brand-secondary/30 bg-brand-secondary/5 dark:bg-brand-secondary/10 dark:border-brand-secondary/40 py-0">
                                 <CardContent className="p-5">
-                                    <p className="mb-2 text-sm font-semibold text-sky-900 dark:text-sky-300">Fundamento de la respuesta</p>
-                                    <p className="text-sm leading-6 text-sky-800 dark:text-sky-200">{detailModal.pregunta.explicacion_preg}</p>
+                                    <p className="mb-2 text-sm font-semibold text-brand-primary dark:text-slate-200">Fundamento de la respuesta</p>
+                                    <p className="text-sm leading-6 text-slate-700 dark:text-slate-300">{detailModal.pregunta.explicacion_preg}</p>
                                 </CardContent>
                             </Card>
                         )}
