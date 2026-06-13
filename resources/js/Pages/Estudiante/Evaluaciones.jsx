@@ -100,13 +100,15 @@ const evaluationTypes = [
     },
 ];
 
-export default function StudentEvaluaciones() {
+export default function StudentEvaluaciones({ habilitacionAcademica = null }) {
     // Etapas: 1 (Inicio), 2 (Resolución), 3 (Resultado preliminar)
     const [step, setStep] = useState(1);
     const [answers, setAnswers] = useState({});
     const [secondsLeft, setSecondsLeft] = useState(900); // 15 minutos
     const [isActive, setIsActive] = useState(false);
     const [selectedEvaluation, setSelectedEvaluation] = useState(evaluationTypes[0]);
+    const accessRestricted =
+        habilitacionAcademica?.habilitado_evaluaciones_hab === false;
     
     // Temporizador
     useEffect(() => {
@@ -134,6 +136,8 @@ export default function StudentEvaluaciones() {
     };
 
     const handleStart = () => {
+        if (accessRestricted) return;
+
         setStep(2);
         setAnswers({});
         setSecondsLeft(900);
@@ -186,6 +190,24 @@ export default function StudentEvaluaciones() {
             <Head title="Evaluaciones de Postulante" />
 
             <div className="py-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                {accessRestricted && (
+                    <div className="mb-6 flex items-start gap-3 rounded-2xl border border-brand-danger/20 bg-brand-danger/10 p-5 text-brand-danger">
+                        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+                        <div>
+                            <p className="text-sm font-bold">
+                                Habilitación académica temporalmente restringida
+                            </p>
+                            <p className="mt-1 text-xs leading-5">
+                                Tu acceso a evaluaciones se encuentra temporalmente restringido. Consulta con administración académica para regularizar tu habilitación.
+                            </p>
+                            {habilitacionAcademica?.motivo_hab && (
+                                <p className="mt-2 text-xs font-semibold">
+                                    Referencia: {habilitacionAcademica.motivo_hab}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                )}
                 
                 {/* ETAPA 1: INICIO */}
                 {step === 1 && (
@@ -289,9 +311,12 @@ export default function StudentEvaluaciones() {
                             </div>
                             <button
                                 onClick={handleStart}
-                                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-secondary hover:bg-brand-secondary/90 text-white font-semibold text-sm px-8 py-3.5 shadow-lg shadow-brand-secondary/10 transition"
+                                disabled={accessRestricted}
+                                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-secondary hover:bg-brand-secondary/90 text-white font-semibold text-sm px-8 py-3.5 shadow-lg shadow-brand-secondary/10 transition disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                Iniciar evaluación guiada
+                                {accessRestricted
+                                    ? 'Acceso temporalmente restringido'
+                                    : 'Iniciar evaluación guiada'}
                                 <ArrowRight className="h-4 w-4" />
                             </button>
                         </Card>

@@ -6,6 +6,7 @@ use App\Domains\Postulantes\Models\Postulante;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
     'id_prog',
@@ -39,5 +40,15 @@ class InscripcionAcademica extends Model
     public function postulante(): BelongsTo
     {
         return $this->belongsTo(Postulante::class, 'id_post', 'id_post');
+    }
+
+    public function matricula(): HasOne
+    {
+        return $this->hasOne(MatriculaAcademica::class, 'id_insc', 'id_insc');
+    }
+
+    public function habilitacion(): HasOne
+    {
+        return $this->hasOne(HabilitacionAcademica::class, 'id_insc', 'id_insc');
     }
 }

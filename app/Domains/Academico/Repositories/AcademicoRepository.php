@@ -8,7 +8,9 @@ use App\Domains\Academico\DTOs\ProgramaAcademicoData;
 use App\Domains\Academico\DTOs\SimulacroProgramadoData;
 use App\Domains\Academico\Models\AsignacionTutor;
 use App\Domains\Academico\Models\GrupoAcademico;
+use App\Domains\Academico\Models\HabilitacionAcademica;
 use App\Domains\Academico\Models\InscripcionAcademica;
+use App\Domains\Academico\Models\MatriculaAcademica;
 use App\Domains\Academico\Models\ProgramaAcademico;
 use App\Domains\Academico\Models\RendimientoPostulante;
 use App\Domains\Academico\Models\SimulacroProgramado;
@@ -300,6 +302,7 @@ class AcademicoRepository
             ->sortByDesc('fecha_inscripcion')
             ->first();
         $tutorAsignado = null;
+        $administracion = null;
 
         if (
             $inscripcion
@@ -329,6 +332,46 @@ class AcademicoRepository
             $tutorAsignado = $asignacion?->tutor;
         }
 
+        if (
+            Schema::hasTable('matriculas_academicas')
+            && Schema::hasTable('cuotas_academicas')
+            && Schema::hasTable('habilitaciones_academicas')
+        ) {
+            $matricula = MatriculaAcademica::query()
+                ->with(['cuotas', 'habilitacion'])
+                ->where('id_post', $postulante->id_post)
+                ->when($inscripcion, fn (Builder $query) => $query->where('id_insc', $inscripcion->id_insc))
+                ->latest('fecha_matricula_mat')
+                ->latest('id_mat')
+                ->first();
+
+            if ($matricula) {
+                $overdue = $matricula->cuotas->where('estado_cuota', 'vencida');
+                $pending = $matricula->cuotas->where('estado_cuota', 'pendiente');
+                $administracion = [
+                    'matricula' => $matricula->only([
+                        'id_mat',
+                        'codigo_mat',
+                        'estado_matricula_mat',
+                        'tipo_beneficio_mat',
+                        'monto_matricula_mat',
+                        'observacion_mat',
+                    ]),
+                    'habilitacion' => $matricula->habilitacion,
+                    'estadoCuotas' => $overdue->isNotEmpty()
+                        ? 'vencido'
+                        : ($pending->isNotEmpty() ? 'pendiente' : 'al día'),
+                    'saldoPendiente' => round((float) $matricula->cuotas
+                        ->whereIn('estado_cuota', ['pendiente', 'vencida'])
+                        ->sum('monto_cuota'), 2),
+                    'totalCuotas' => $matricula->cuotas->count(),
+                    'cuotasPagadas' => $matricula->cuotas->where('estado_cuota', 'pagada')->count(),
+                    'cuotasPendientes' => $pending->count(),
+                    'cuotasVencidas' => $overdue->count(),
+                ];
+            }
+        }
+
         $position = null;
         $percentile = null;
         if ($rendimiento?->id_prog) {
@@ -354,6 +397,7 @@ class AcademicoRepository
             'percentil' => $percentile,
             'recomendacion' => $this->recommendation($rendimiento?->nivel_riesgo_rend),
             'tutorAsignado' => $tutorAsignado,
+            'administracion' => $administracion,
         ];
     }
 
@@ -378,6 +422,21 @@ class AcademicoRepository
                 : 0,
             'asignacionesActivas' => Schema::hasTable('asignaciones_tutores')
                 ? AsignacionTutor::where('estado_asig', 'activo')->count()
+                : 0,
+            'matriculasActivas' => Schema::hasTable('matriculas_academicas')
+                ? MatriculaAcademica::where('estado_matricula_mat', 'activa')->count()
+                : 0,
+            'cuotasPendientes' => Schema::hasTable('cuotas_academicas')
+                ? \App\Domains\Academico\Models\CuotaAcademica::where('estado_cuota', 'pendiente')->count()
+                : 0,
+            'cuotasVencidas' => Schema::hasTable('cuotas_academicas')
+                ? \App\Domains\Academico\Models\CuotaAcademica::where('estado_cuota', 'vencida')->count()
+                : 0,
+            'postulantesHabilitados' => Schema::hasTable('habilitaciones_academicas')
+                ? HabilitacionAcademica::where('estado_hab', 'habilitado')->count()
+                : 0,
+            'postulantesRestringidos' => Schema::hasTable('habilitaciones_academicas')
+                ? HabilitacionAcademica::where('estado_hab', 'restringido')->count()
                 : 0,
             'seguimientoPrioritario' => RendimientoPostulante::where('nivel_riesgo_rend', 'Atención prioritaria')->count(),
         ];

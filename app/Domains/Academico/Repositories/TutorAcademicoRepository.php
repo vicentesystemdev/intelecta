@@ -58,7 +58,7 @@ class TutorAcademicoRepository
     {
         return $tutor->load([
             'user:id,name,email',
-            'asignaciones' => fn (Builder $query) => $query
+            'asignaciones' => fn ($query) => $query
                 ->with([
                     'programa:id_prog,nombre_prog,codigo_prog',
                     'grupo:id_grupo,nombre_grupo,codigo_grupo',

@@ -19,12 +19,26 @@ const statusStyles = {
     activa: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
     aplicado: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
     aprobado: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
+    habilitado: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
+    pagada: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
+    'al día': 'border-brand-success/25 bg-brand-success/10 text-brand-success',
+    becada: 'border-brand-accent/35 bg-brand-accent/10 text-brand-primary dark:text-brand-accent',
+    becado: 'border-brand-accent/35 bg-brand-accent/10 text-brand-primary dark:text-brand-accent',
+    exenta: 'border-brand-accent/35 bg-brand-accent/10 text-brand-primary dark:text-brand-accent',
+    exento: 'border-brand-accent/35 bg-brand-accent/10 text-brand-primary dark:text-brand-accent',
     inactivo: 'border-brand-border bg-brand-border/30 text-text-muted',
     inactiva: 'border-brand-border bg-brand-border/30 text-text-muted',
     programado: 'border-brand-info/25 bg-brand-info/10 text-brand-info',
     'en preparación':
         'border-brand-warning/25 bg-brand-warning/10 text-brand-warning',
     cerrado: 'border-brand-border bg-brand-border/30 text-text-muted',
+    pendiente: 'border-brand-warning/30 bg-brand-warning/10 text-brand-warning',
+    observada: 'border-brand-warning/30 bg-brand-warning/10 text-brand-warning',
+    observado: 'border-brand-warning/30 bg-brand-warning/10 text-brand-warning',
+    temporal: 'border-brand-info/25 bg-brand-info/10 text-brand-info',
+    vencida: 'border-brand-danger/25 bg-brand-danger/10 text-brand-danger',
+    vencido: 'border-brand-danger/25 bg-brand-danger/10 text-brand-danger',
+    restringido: 'border-brand-danger/25 bg-brand-danger/10 text-brand-danger',
     'Alto rendimiento':
         'border-brand-accent/35 bg-brand-accent/10 text-brand-primary dark:text-brand-accent',
     'Seguimiento regular':
@@ -75,6 +89,7 @@ export function MetricTile({ label, value, note, icon: Icon, tone = 'primary' })
         info: 'bg-brand-info/10 text-brand-info',
         warning: 'bg-brand-warning/10 text-brand-warning',
         success: 'bg-brand-success/10 text-brand-success',
+        danger: 'bg-brand-danger/10 text-brand-danger',
     };
 
     return (

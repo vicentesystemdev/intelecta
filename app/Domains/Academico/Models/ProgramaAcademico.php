@@ -85,4 +85,9 @@ class ProgramaAcademico extends Model
             ->where('estado_asig', 'activo')
             ->latestOfMany('id_asig');
     }
+
+    public function matriculas(): HasMany
+    {
+        return $this->hasMany(MatriculaAcademica::class, 'id_prog', 'id_prog');
+    }
 }

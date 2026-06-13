@@ -65,6 +65,11 @@ class DashboardController extends Controller
             'tutoresActivos' => 0,
             'gruposConTutor' => 0,
             'asignacionesActivas' => 0,
+            'matriculasActivas' => 0,
+            'cuotasPendientes' => 0,
+            'cuotasVencidas' => 0,
+            'postulantesHabilitados' => 0,
+            'postulantesRestringidos' => 0,
         ];
 
         if (

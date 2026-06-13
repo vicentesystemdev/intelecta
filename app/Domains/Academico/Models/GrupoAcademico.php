@@ -76,4 +76,9 @@ class GrupoAcademico extends Model
             ->where('estado_asig', 'activo')
             ->latestOfMany('id_asig');
     }
+
+    public function matriculas(): HasMany
+    {
+        return $this->hasMany(MatriculaAcademica::class, 'id_grupo', 'id_grupo');
+    }
 }

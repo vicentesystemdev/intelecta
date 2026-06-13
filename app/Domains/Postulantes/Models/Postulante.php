@@ -3,6 +3,8 @@
 namespace App\Domains\Postulantes\Models;
 
 use App\Domains\Academico\Models\InscripcionAcademica;
+use App\Domains\Academico\Models\HabilitacionAcademica;
+use App\Domains\Academico\Models\MatriculaAcademica;
 use App\Domains\Academico\Models\RendimientoPostulante;
 use App\Domains\Institucional\Models\Carrera;
 use App\Domains\Institucional\Models\Colegio;
@@ -72,5 +74,15 @@ class Postulante extends Model
     public function rendimientosAcademicos(): HasMany
     {
         return $this->hasMany(RendimientoPostulante::class, 'id_post', 'id_post');
+    }
+
+    public function matriculasAcademicas(): HasMany
+    {
+        return $this->hasMany(MatriculaAcademica::class, 'id_post', 'id_post');
+    }
+
+    public function habilitacionesAcademicas(): HasMany
+    {
+        return $this->hasMany(HabilitacionAcademica::class, 'id_post', 'id_post');
     }
 }

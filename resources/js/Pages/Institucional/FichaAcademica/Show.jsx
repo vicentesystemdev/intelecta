@@ -16,6 +16,7 @@ import {
     School,
     Target,
     UserRoundCheck,
+    WalletCards,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -23,6 +24,7 @@ const tabs = [
     ['datos', 'Datos académicos'],
     ['programa', 'Programa y grupo'],
     ['rendimiento', 'Rendimiento'],
+    ['administracion', 'Estado administrativo'],
     ['seguimiento', 'Seguimiento'],
 ];
 
@@ -34,6 +36,7 @@ export default function Show({
     percentil,
     recomendacion,
     tutorAsignado,
+    administracion,
 }) {
     const [activeTab, setActiveTab] = useState('datos');
     const fullName = `${postulante.nombres_post} ${postulante.apellidos_post}`;
@@ -131,6 +134,67 @@ export default function Show({
                                     return <div key={label} className="rounded-2xl border border-brand-border p-5"><p className="text-xs font-bold text-text-muted">{label}</p><p className="mt-3 text-3xl font-black text-text-main">{score(value)}</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-brand-border"><div className={`h-full rounded-full ${color}`} style={{ width: `${Math.min(100, numeric)}%` }} /></div></div>;
                                 })}
                             </div>
+                        </div>
+                    )}
+                    {activeTab === 'administracion' && (
+                        <div>
+                            <h2 className="flex items-center gap-2 text-lg font-black text-text-main">
+                                <WalletCards className="h-5 w-5 text-brand-secondary" />
+                                Estado administrativo académico
+                            </h2>
+                            <p className="mt-1 text-sm text-text-muted">
+                                Lectura interna de matrícula, cuotas y habilitación vigente.
+                            </p>
+                            {administracion ? (
+                                <>
+                                    <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                                        {detail('Código de matrícula', administracion.matricula?.codigo_mat)}
+                                        <div className="rounded-xl border border-brand-border bg-brand-card p-4">
+                                            <p className="text-xs text-text-muted">Estado de matrícula</p>
+                                            <div className="mt-2"><InstitutionalStatus status={administracion.matricula?.estado_matricula_mat} /></div>
+                                        </div>
+                                        <div className="rounded-xl border border-brand-border bg-brand-card p-4">
+                                            <p className="text-xs text-text-muted">Estado de cuotas</p>
+                                            <div className="mt-2"><InstitutionalStatus status={administracion.estadoCuotas} /></div>
+                                        </div>
+                                        {detail('Saldo pendiente referencial', `Bs ${Number(administracion.saldoPendiente || 0).toFixed(2)}`)}
+                                        <div className="rounded-xl border border-brand-border bg-brand-card p-4">
+                                            <p className="text-xs text-text-muted">Habilitación académica</p>
+                                            <div className="mt-2"><InstitutionalStatus status={administracion.habilitacion?.estado_hab || 'Sin registro'} /></div>
+                                        </div>
+                                        {detail('Beneficio', administracion.matricula?.tipo_beneficio_mat)}
+                                    </div>
+                                    <div className="mt-5 grid gap-4 sm:grid-cols-3">
+                                        {[
+                                            ['Evaluaciones', administracion.habilitacion?.habilitado_evaluaciones_hab],
+                                            ['Simulacros', administracion.habilitacion?.habilitado_simulacros_hab],
+                                            ['Reportes', administracion.habilitacion?.habilitado_reportes_hab],
+                                        ].map(([label, enabled]) => (
+                                            <div key={label} className="rounded-2xl border border-brand-border p-4">
+                                                <p className="text-xs font-bold text-text-muted">{label}</p>
+                                                <p className={`mt-2 text-sm font-black ${enabled ? 'text-brand-success' : 'text-text-muted'}`}>
+                                                    {enabled ? 'Acceso habilitado' : 'Acceso restringido'}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="mt-5 rounded-2xl bg-brand-bg p-5">
+                                        <p className="text-xs font-bold uppercase tracking-wider text-text-muted">Observación administrativa</p>
+                                        <p className="mt-3 text-sm leading-6 text-text-main">
+                                            {administracion.habilitacion?.observacion_hab ||
+                                                administracion.matricula?.observacion_mat ||
+                                                'Sin observaciones administrativas vigentes.'}
+                                        </p>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="mt-5 rounded-2xl border border-dashed border-brand-border p-8 text-center">
+                                    <p className="font-bold text-text-main">Sin registro administrativo</p>
+                                    <p className="mt-1 text-sm text-text-muted">
+                                        No existe una matrícula académica asociada a la inscripción vigente.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
                     {activeTab === 'seguimiento' && (

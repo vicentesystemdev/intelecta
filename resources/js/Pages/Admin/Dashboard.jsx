@@ -24,12 +24,16 @@ import {
     GraduationCap,
     Layers3,
     LibraryBig,
+    ShieldAlert,
     ShieldCheck,
     Tags,
     Users,
     UserRoundCheck,
     Waypoints,
     Link2,
+    WalletCards,
+    CircleDollarSign,
+    BadgeCheck,
 } from 'lucide-react';
 
 const matterStyles = {
@@ -205,6 +209,31 @@ export default function Dashboard({
             label: 'Asignaciones activas',
             value: gestionInstitucional.asignacionesActivas ?? 0,
             icon: Link2,
+        },
+        {
+            label: 'Matrículas activas',
+            value: gestionInstitucional.matriculasActivas ?? 0,
+            icon: WalletCards,
+        },
+        {
+            label: 'Cuotas pendientes',
+            value: gestionInstitucional.cuotasPendientes ?? 0,
+            icon: CircleDollarSign,
+        },
+        {
+            label: 'Cuotas vencidas',
+            value: gestionInstitucional.cuotasVencidas ?? 0,
+            icon: ShieldAlert,
+        },
+        {
+            label: 'Postulantes habilitados',
+            value: gestionInstitucional.postulantesHabilitados ?? 0,
+            icon: BadgeCheck,
+        },
+        {
+            label: 'Postulantes restringidos',
+            value: gestionInstitucional.postulantesRestringidos ?? 0,
+            icon: ShieldAlert,
         },
     ];
 

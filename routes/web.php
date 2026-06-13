@@ -7,7 +7,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Institucional\AsignacionTutorController;
 use App\Http\Controllers\Institucional\FichaAcademicaController;
 use App\Http\Controllers\Institucional\GrupoAcademicoController;
+use App\Http\Controllers\Institucional\HabilitacionAcademicaController;
 use App\Http\Controllers\Institucional\InscripcionAcademicaController;
+use App\Http\Controllers\Institucional\MatriculaCuotaController;
 use App\Http\Controllers\Institucional\ProgramaAcademicoController;
 use App\Http\Controllers\Institucional\RankingAcademicoController;
 use App\Http\Controllers\Institucional\SimulacroProgramadoController;
@@ -18,8 +20,11 @@ use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReporteAcademicoController;
 use App\Http\Controllers\TemaController;
+use App\Domains\Academico\Models\HabilitacionAcademica;
+use App\Domains\Postulantes\Models\Postulante;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -158,6 +163,22 @@ Route::middleware('auth')->group(function () {
                     ->name('asignacion-tutores.store');
                 Route::patch('/asignacion-tutores/{asignacion}', [AsignacionTutorController::class, 'update'])
                     ->name('asignacion-tutores.update');
+
+                Route::get('/matriculas-cuotas', [MatriculaCuotaController::class, 'index'])
+                    ->name('matriculas-cuotas.index');
+                Route::post('/matriculas-cuotas', [MatriculaCuotaController::class, 'storeMatricula'])
+                    ->name('matriculas-cuotas.store');
+                Route::patch('/matriculas-cuotas/{matricula}', [MatriculaCuotaController::class, 'updateMatricula'])
+                    ->name('matriculas-cuotas.update');
+                Route::post('/cuotas', [MatriculaCuotaController::class, 'storeCuota'])
+                    ->name('cuotas.store');
+                Route::patch('/cuotas/{cuota}', [MatriculaCuotaController::class, 'updateCuota'])
+                    ->name('cuotas.update');
+
+                Route::get('/habilitacion-academica', [HabilitacionAcademicaController::class, 'index'])
+                    ->name('habilitacion.index');
+                Route::patch('/habilitacion-academica/{habilitacion}', [HabilitacionAcademicaController::class, 'update'])
+                    ->name('habilitacion.update');
             });
 
         Route::prefix('gestion-academica')->group(function () {
@@ -243,7 +264,33 @@ Route::middleware('auth')->group(function () {
         if (auth()->user()->hasRole(['Super Administrador', 'Administrador', 'Docente'])) {
             return redirect()->route('dashboard');
         }
-        return Inertia::render('Estudiante/Evaluaciones');
+        $habilitacion = null;
+
+        if (
+            Schema::hasTable('postulantes')
+            && Schema::hasTable('habilitaciones_academicas')
+        ) {
+            $postulante = Postulante::query()
+                ->where('email_post', auth()->user()->email)
+                ->first();
+
+            if ($postulante) {
+                $habilitacion = HabilitacionAcademica::query()
+                    ->where('id_post', $postulante->id_post)
+                    ->latest('id_hab')
+                    ->first([
+                        'estado_hab',
+                        'motivo_hab',
+                        'habilitado_evaluaciones_hab',
+                        'habilitado_simulacros_hab',
+                        'habilitado_reportes_hab',
+                    ]);
+            }
+        }
+
+        return Inertia::render('Estudiante/Evaluaciones', [
+            'habilitacionAcademica' => $habilitacion,
+        ]);
     })->middleware('verified')->name('estudiante.evaluaciones');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -23,6 +23,7 @@ import {
     Trophy,
     Users,
     UserRoundCheck,
+    WalletCards,
     X,
 } from 'lucide-react';
 
@@ -93,6 +94,18 @@ const navigationGroups = [
                 icon: ClipboardList,
                 href: '/admin/institucional/inscripciones',
                 routeName: 'admin.institucional.inscripciones.*',
+            },
+            {
+                label: 'Matrículas y Cuotas',
+                icon: WalletCards,
+                href: '/admin/institucional/matriculas-cuotas',
+                routeName: 'admin.institucional.matriculas-cuotas.*',
+            },
+            {
+                label: 'Habilitación Académica',
+                icon: ShieldCheck,
+                href: '/admin/institucional/habilitacion-academica',
+                routeName: 'admin.institucional.habilitacion.*',
             },
             {
                 label: 'Calendario de Simulacros',
