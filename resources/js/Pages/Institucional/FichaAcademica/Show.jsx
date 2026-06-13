@@ -25,6 +25,7 @@ const tabs = [
     ['programa', 'Programa y grupo'],
     ['rendimiento', 'Rendimiento'],
     ['administracion', 'Estado administrativo'],
+    ['asistencia', 'Asistencia'],
     ['seguimiento', 'Seguimiento'],
 ];
 
@@ -37,6 +38,7 @@ export default function Show({
     recomendacion,
     tutorAsignado,
     administracion,
+    asistencia,
 }) {
     const [activeTab, setActiveTab] = useState('datos');
     const fullName = `${postulante.nombres_post} ${postulante.apellidos_post}`;
@@ -71,7 +73,7 @@ export default function Show({
 
             <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <MetricTile label="Promedio general" value={score(rendimiento?.promedio_general_rend)} note="Rendimiento preliminar sobre 100" icon={Award} tone="accent" />
-                <MetricTile label="Asistencia" value={`${score(rendimiento?.asistencia_porcentaje_rend)}%`} note="Participación en el ciclo" icon={CalendarCheck2} tone="success" />
+                <MetricTile label="Asistencia" value={`${score(asistencia?.porcentaje ?? rendimiento?.asistencia_porcentaje_rend)}%`} note="Participación en el ciclo" icon={CalendarCheck2} tone="success" />
                 <MetricTile label="Posición" value={posicion ? `#${posicion}` : '—'} note="Ranking del programa académico" icon={Target} tone="primary" />
                 <MetricTile label="Percentil aproximado" value={percentil !== null ? `${percentil}` : '—'} note="Ubicación relativa referencial" icon={BookOpenCheck} tone="info" />
             </div>
@@ -192,6 +194,67 @@ export default function Show({
                                     <p className="font-bold text-text-main">Sin registro administrativo</p>
                                     <p className="mt-1 text-sm text-text-muted">
                                         No existe una matrícula académica asociada a la inscripción vigente.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {activeTab === 'asistencia' && (
+                        <div>
+                            <h2 className="flex items-center gap-2 text-lg font-black text-text-main">
+                                <CalendarCheck2 className="h-5 w-5 text-brand-secondary" />
+                                Control de asistencia académica
+                            </h2>
+                            <p className="mt-1 text-sm text-text-muted">
+                                Variable complementaria para seguimiento académico.
+                            </p>
+                            {asistencia?.total > 0 ? (
+                                <>
+                                    <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                                        {[
+                                            ['Asistencia', `${Number(asistencia.porcentaje).toFixed(1)}%`],
+                                            ['Registros', asistencia.total],
+                                            ['Presentes', asistencia.presentes],
+                                            ['Ausentes', asistencia.ausentes],
+                                            ['Retrasos / justificados', `${asistencia.retrasos} / ${asistencia.justificados}`],
+                                        ].map(([label, value]) => (
+                                            <div key={label} className="rounded-2xl border border-brand-border bg-brand-card p-4">
+                                                <p className="text-xs font-bold text-text-muted">{label}</p>
+                                                <p className="mt-2 text-2xl font-black text-text-main">{value}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="mt-6">
+                                        <h3 className="text-sm font-black text-text-main">Últimas asistencias</h3>
+                                        <div className="mt-3 grid gap-3 md:grid-cols-2">
+                                            {asistencia.ultimas.map((registro) => (
+                                                <article key={registro.id_asist} className="rounded-2xl border border-brand-border bg-brand-bg p-4">
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div>
+                                                            <p className="text-sm font-bold text-text-main">
+                                                                {registro.grupo?.nombre_grupo || 'Grupo no disponible'}
+                                                            </p>
+                                                            <p className="mt-1 text-xs text-text-muted">
+                                                                {registro.fecha_asist
+                                                                    ? new Date(`${registro.fecha_asist.slice(0, 10)}T00:00:00`).toLocaleDateString('es-BO')
+                                                                    : 'Sin fecha'} · {registro.sesion_asist}
+                                                            </p>
+                                                        </div>
+                                                        <InstitutionalStatus status={registro.estado_asist} />
+                                                    </div>
+                                                    <p className="mt-3 text-xs leading-5 text-text-muted">
+                                                        {registro.observacion_asist || 'Sin observación registrada.'}
+                                                    </p>
+                                                </article>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="mt-5 rounded-2xl border border-dashed border-brand-border p-8 text-center">
+                                    <p className="font-bold text-text-main">Sin registros de asistencia</p>
+                                    <p className="mt-1 text-sm text-text-muted">
+                                        Aún no se consolidaron sesiones académicas para este postulante.
                                     </p>
                                 </div>
                             )}

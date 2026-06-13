@@ -20,6 +20,7 @@ import {
     BookOpenCheck,
     BrainCircuit,
     CalendarDays,
+    CalendarCheck2,
     FileQuestion,
     GraduationCap,
     Layers3,
@@ -29,6 +30,7 @@ import {
     Tags,
     Users,
     UserRoundCheck,
+    UserRoundX,
     Waypoints,
     Link2,
     WalletCards,
@@ -234,6 +236,26 @@ export default function Dashboard({
             label: 'Postulantes restringidos',
             value: gestionInstitucional.postulantesRestringidos ?? 0,
             icon: ShieldAlert,
+        },
+        {
+            label: 'Asistencia promedio',
+            value: `${Number(gestionInstitucional.asistenciaPromedio ?? 0).toFixed(1)}%`,
+            icon: CalendarCheck2,
+        },
+        {
+            label: 'Presentes del periodo',
+            value: gestionInstitucional.presentesPeriodo ?? 0,
+            icon: UserRoundCheck,
+        },
+        {
+            label: 'Ausencias registradas',
+            value: gestionInstitucional.ausenciasPeriodo ?? 0,
+            icon: UserRoundX,
+        },
+        {
+            label: 'Grupos con asistencia',
+            value: gestionInstitucional.gruposConAsistencia ?? 0,
+            icon: Layers3,
         },
     ];
 

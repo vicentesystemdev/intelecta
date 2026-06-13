@@ -70,6 +70,10 @@ class DashboardController extends Controller
             'cuotasVencidas' => 0,
             'postulantesHabilitados' => 0,
             'postulantesRestringidos' => 0,
+            'asistenciaPromedio' => 0,
+            'presentesPeriodo' => 0,
+            'ausenciasPeriodo' => 0,
+            'gruposConAsistencia' => 0,
         ];
 
         if (

@@ -6,6 +6,7 @@ import {
     BriefcaseBusiness,
     Building2,
     CalendarDays,
+    CalendarCheck2,
     ChartNoAxesCombined,
     ClipboardCheck,
     ClipboardList,
@@ -106,6 +107,12 @@ const navigationGroups = [
                 icon: ShieldCheck,
                 href: '/admin/institucional/habilitacion-academica',
                 routeName: 'admin.institucional.habilitacion.*',
+            },
+            {
+                label: 'Control de Asistencia',
+                icon: CalendarCheck2,
+                href: '/admin/institucional/asistencia',
+                routeName: 'admin.institucional.asistencia.*',
             },
             {
                 label: 'Calendario de Simulacros',

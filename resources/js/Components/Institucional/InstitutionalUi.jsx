@@ -39,6 +39,10 @@ const statusStyles = {
     vencida: 'border-brand-danger/25 bg-brand-danger/10 text-brand-danger',
     vencido: 'border-brand-danger/25 bg-brand-danger/10 text-brand-danger',
     restringido: 'border-brand-danger/25 bg-brand-danger/10 text-brand-danger',
+    presente: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
+    retraso: 'border-brand-warning/30 bg-brand-warning/10 text-brand-warning',
+    justificado: 'border-brand-info/25 bg-brand-info/10 text-brand-info',
+    ausente: 'border-brand-danger/25 bg-brand-danger/10 text-brand-danger',
     'Alto rendimiento':
         'border-brand-accent/35 bg-brand-accent/10 text-brand-primary dark:text-brand-accent',
     'Seguimiento regular':

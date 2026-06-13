@@ -2,6 +2,7 @@
 
 namespace App\Domains\Postulantes\Models;
 
+use App\Domains\Academico\Models\AsistenciaAcademica;
 use App\Domains\Academico\Models\InscripcionAcademica;
 use App\Domains\Academico\Models\HabilitacionAcademica;
 use App\Domains\Academico\Models\MatriculaAcademica;
@@ -84,5 +85,10 @@ class Postulante extends Model
     public function habilitacionesAcademicas(): HasMany
     {
         return $this->hasMany(HabilitacionAcademica::class, 'id_post', 'id_post');
+    }
+
+    public function asistenciasAcademicas(): HasMany
+    {
+        return $this->hasMany(AsistenciaAcademica::class, 'id_post', 'id_post');
     }
 }

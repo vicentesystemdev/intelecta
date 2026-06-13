@@ -42,6 +42,11 @@ class TutorAcademico extends Model
         return $this->hasMany(AsignacionTutor::class, 'id_tutor', 'id_tutor');
     }
 
+    public function asistencias(): HasMany
+    {
+        return $this->hasMany(AsistenciaAcademica::class, 'id_tutor', 'id_tutor');
+    }
+
     public function getNombreCompletoAttribute(): string
     {
         return trim("{$this->nombres_tutor} {$this->apellidos_tutor}");

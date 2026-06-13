@@ -90,4 +90,9 @@ class ProgramaAcademico extends Model
     {
         return $this->hasMany(MatriculaAcademica::class, 'id_prog', 'id_prog');
     }
+
+    public function asistencias(): HasMany
+    {
+        return $this->hasMany(AsistenciaAcademica::class, 'id_prog', 'id_prog');
+    }
 }

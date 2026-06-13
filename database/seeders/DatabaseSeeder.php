@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             AcademicoSeeder::class,
             TutoresAcademicosSeeder::class,
             MatriculasCuotasSeeder::class,
+            AsistenciasAcademicasSeeder::class,
         ]);
     }
 }

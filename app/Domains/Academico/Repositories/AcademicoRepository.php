@@ -7,6 +7,7 @@ use App\Domains\Academico\DTOs\InscripcionAcademicaData;
 use App\Domains\Academico\DTOs\ProgramaAcademicoData;
 use App\Domains\Academico\DTOs\SimulacroProgramadoData;
 use App\Domains\Academico\Models\AsignacionTutor;
+use App\Domains\Academico\Models\AsistenciaAcademica;
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Models\HabilitacionAcademica;
 use App\Domains\Academico\Models\InscripcionAcademica;
@@ -303,6 +304,7 @@ class AcademicoRepository
             ->first();
         $tutorAsignado = null;
         $administracion = null;
+        $asistencia = null;
 
         if (
             $inscripcion
@@ -372,6 +374,34 @@ class AcademicoRepository
             }
         }
 
+        if (Schema::hasTable('asistencias_academicas')) {
+            $registrosAsistencia = AsistenciaAcademica::query()
+                ->with([
+                    'grupo:id_grupo,nombre_grupo,codigo_grupo',
+                    'tutor:id_tutor,nombres_tutor,apellidos_tutor',
+                ])
+                ->where('id_post', $postulante->id_post)
+                ->latest('fecha_asist')
+                ->latest('id_asist')
+                ->get();
+            $totalAsistencia = $registrosAsistencia->count();
+            $asistenciasComputadas = $registrosAsistencia
+                ->whereIn('estado_asist', ['presente', 'retraso', 'justificado'])
+                ->count();
+
+            $asistencia = [
+                'porcentaje' => $totalAsistencia > 0
+                    ? round(($asistenciasComputadas / $totalAsistencia) * 100, 1)
+                    : 0,
+                'total' => $totalAsistencia,
+                'presentes' => $registrosAsistencia->where('estado_asist', 'presente')->count(),
+                'ausentes' => $registrosAsistencia->where('estado_asist', 'ausente')->count(),
+                'retrasos' => $registrosAsistencia->where('estado_asist', 'retraso')->count(),
+                'justificados' => $registrosAsistencia->where('estado_asist', 'justificado')->count(),
+                'ultimas' => $registrosAsistencia->take(8)->values(),
+            ];
+        }
+
         $position = null;
         $percentile = null;
         if ($rendimiento?->id_prog) {
@@ -398,11 +428,14 @@ class AcademicoRepository
             'recomendacion' => $this->recommendation($rendimiento?->nivel_riesgo_rend),
             'tutorAsignado' => $tutorAsignado,
             'administracion' => $administracion,
+            'asistencia' => $asistencia,
         ];
     }
 
     public function dashboardMetrics(): array
     {
+        $attendance = $this->attendanceMetrics();
+
         return [
             'programasActivos' => ProgramaAcademico::where('estado_prog', 'activo')->count(),
             'gruposActivos' => GrupoAcademico::where('estado_grupo', 'activo')->count(),
@@ -438,7 +471,36 @@ class AcademicoRepository
             'postulantesRestringidos' => Schema::hasTable('habilitaciones_academicas')
                 ? HabilitacionAcademica::where('estado_hab', 'restringido')->count()
                 : 0,
+            'asistenciaPromedio' => $attendance['promedio'],
+            'presentesPeriodo' => $attendance['presentes'],
+            'ausenciasPeriodo' => $attendance['ausentes'],
+            'gruposConAsistencia' => $attendance['grupos'],
             'seguimientoPrioritario' => RendimientoPostulante::where('nivel_riesgo_rend', 'Atención prioritaria')->count(),
+        ];
+    }
+
+    private function attendanceMetrics(): array
+    {
+        if (! Schema::hasTable('asistencias_academicas')) {
+            return ['promedio' => 0, 'presentes' => 0, 'ausentes' => 0, 'grupos' => 0];
+        }
+
+        $records = AsistenciaAcademica::query()
+            ->whereBetween('fecha_asist', [
+                now()->startOfMonth()->toDateString(),
+                now()->endOfMonth()->toDateString(),
+            ])
+            ->get(['id_grupo', 'estado_asist']);
+        $total = $records->count();
+        $attended = $records
+            ->whereIn('estado_asist', ['presente', 'retraso', 'justificado'])
+            ->count();
+
+        return [
+            'promedio' => $total > 0 ? round(($attended / $total) * 100, 1) : 0,
+            'presentes' => $records->where('estado_asist', 'presente')->count(),
+            'ausentes' => $records->where('estado_asist', 'ausente')->count(),
+            'grupos' => $records->pluck('id_grupo')->unique()->count(),
         ];
     }
 

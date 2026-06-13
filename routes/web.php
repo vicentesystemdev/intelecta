@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\AreaConocimientoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Institucional\AsignacionTutorController;
+use App\Http\Controllers\Institucional\AsistenciaAcademicaController;
 use App\Http\Controllers\Institucional\FichaAcademicaController;
 use App\Http\Controllers\Institucional\GrupoAcademicoController;
 use App\Http\Controllers\Institucional\HabilitacionAcademicaController;
@@ -179,6 +180,15 @@ Route::middleware('auth')->group(function () {
                     ->name('habilitacion.index');
                 Route::patch('/habilitacion-academica/{habilitacion}', [HabilitacionAcademicaController::class, 'update'])
                     ->name('habilitacion.update');
+
+                Route::get('/asistencia', [AsistenciaAcademicaController::class, 'index'])
+                    ->name('asistencia.index');
+                Route::post('/asistencia', [AsistenciaAcademicaController::class, 'store'])
+                    ->name('asistencia.store');
+                Route::post('/asistencia/grupo', [AsistenciaAcademicaController::class, 'storeGroup'])
+                    ->name('asistencia.store-grupo');
+                Route::patch('/asistencia/{asistencia}', [AsistenciaAcademicaController::class, 'update'])
+                    ->name('asistencia.update');
             });
 
         Route::prefix('gestion-academica')->group(function () {
