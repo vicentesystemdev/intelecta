@@ -62,6 +62,9 @@ class DashboardController extends Controller
             'proximosSimulacros' => 0,
             'promedioInstitucional' => 0,
             'seguimientoPrioritario' => 0,
+            'tutoresActivos' => 0,
+            'gruposConTutor' => 0,
+            'asignacionesActivas' => 0,
         ];
 
         if (

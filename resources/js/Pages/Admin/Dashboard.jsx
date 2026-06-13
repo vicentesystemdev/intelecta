@@ -27,6 +27,9 @@ import {
     ShieldCheck,
     Tags,
     Users,
+    UserRoundCheck,
+    Waypoints,
+    Link2,
 } from 'lucide-react';
 
 const matterStyles = {
@@ -188,6 +191,21 @@ export default function Dashboard({
             value: gestionInstitucional.seguimientoPrioritario ?? 0,
             icon: Users,
         },
+        {
+            label: 'Tutores activos',
+            value: gestionInstitucional.tutoresActivos ?? 0,
+            icon: UserRoundCheck,
+        },
+        {
+            label: 'Grupos con tutor',
+            value: gestionInstitucional.gruposConTutor ?? 0,
+            icon: Waypoints,
+        },
+        {
+            label: 'Asignaciones activas',
+            value: gestionInstitucional.asignacionesActivas ?? 0,
+            icon: Link2,
+        },
     ];
 
     return (
@@ -234,7 +252,7 @@ export default function Dashboard({
                     title="Operación académica"
                     description="Programas, grupos, inscripciones, simulacros y seguimiento institucional."
                 />
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {institutionalMetrics.map(({ label, value, icon: Icon }) => (
                         <Card
                             key={label}

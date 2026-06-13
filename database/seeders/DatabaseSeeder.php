@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             PreguntasCienciasSeeder::class,
             PlantillasEvaluacionSeeder::class,
             AcademicoSeeder::class,
+            TutoresAcademicosSeeder::class,
         ]);
     }
 }

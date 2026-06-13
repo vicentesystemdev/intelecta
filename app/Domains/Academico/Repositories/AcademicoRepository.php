@@ -6,11 +6,13 @@ use App\Domains\Academico\DTOs\GrupoAcademicoData;
 use App\Domains\Academico\DTOs\InscripcionAcademicaData;
 use App\Domains\Academico\DTOs\ProgramaAcademicoData;
 use App\Domains\Academico\DTOs\SimulacroProgramadoData;
+use App\Domains\Academico\Models\AsignacionTutor;
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Models\InscripcionAcademica;
 use App\Domains\Academico\Models\ProgramaAcademico;
 use App\Domains\Academico\Models\RendimientoPostulante;
 use App\Domains\Academico\Models\SimulacroProgramado;
+use App\Domains\Academico\Models\TutorAcademico;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
 use App\Domains\Postulantes\Models\Postulante;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -18,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Pagination\Paginator as PaginatorResolver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 
 class AcademicoRepository
 {
@@ -48,12 +51,18 @@ class AcademicoRepository
 
     public function paginateGrupos(array $filters, int $perPage = 12): LengthAwarePaginator
     {
-        return GrupoAcademico::query()
+        $query = GrupoAcademico::query()
             ->with('programa:id_prog,nombre_prog,codigo_prog')
             ->withCount([
                 'inscripciones as inscritos_count' => fn (Builder $query) => $query->where('estado_inscripcion', 'activo'),
                 'simulacros',
-            ])
+            ]);
+
+        if (Schema::hasTable('asignaciones_tutores')) {
+            $query->with('asignacionTutorActiva.tutor:id_tutor,nombres_tutor,apellidos_tutor,especialidad_tutor');
+        }
+
+        return $query
             ->when($filters['id_prog'] ?? null, fn (Builder $query, int|string $value) => $query->where('id_prog', $value))
             ->when($filters['turno_grupo'] ?? null, fn (Builder $query, string $value) => $query->where('turno_grupo', $value))
             ->when($filters['nivel_grupo'] ?? null, fn (Builder $query, string $value) => $query->where('nivel_grupo', $value))
@@ -290,6 +299,35 @@ class AcademicoRepository
         $inscripcion = $postulante->inscripcionesAcademicas
             ->sortByDesc('fecha_inscripcion')
             ->first();
+        $tutorAsignado = null;
+
+        if (
+            $inscripcion
+            && Schema::hasTable('asignaciones_tutores')
+            && Schema::hasTable('tutores_academicos')
+        ) {
+            $asignacion = AsignacionTutor::query()
+                ->with('tutor:id_tutor,nombres_tutor,apellidos_tutor,especialidad_tutor,celular_tutor,correo_tutor')
+                ->where('estado_asig', 'activo')
+                ->where(function (Builder $query) use ($inscripcion) {
+                    if ($inscripcion?->id_grupo) {
+                        $query->where('id_grupo', $inscripcion->id_grupo);
+                    }
+
+                    if ($inscripcion?->id_prog) {
+                        $method = $inscripcion?->id_grupo ? 'orWhere' : 'where';
+                        $query->{$method}(function (Builder $query) use ($inscripcion) {
+                            $query->where('id_prog', $inscripcion->id_prog)
+                                ->whereNull('id_grupo');
+                        });
+                    }
+                })
+                ->orderByRaw('CASE WHEN id_grupo IS NOT NULL THEN 0 ELSE 1 END')
+                ->latest('id_asig')
+                ->first();
+
+            $tutorAsignado = $asignacion?->tutor;
+        }
 
         $position = null;
         $percentile = null;
@@ -315,6 +353,7 @@ class AcademicoRepository
             'posicion' => $position,
             'percentil' => $percentile,
             'recomendacion' => $this->recommendation($rendimiento?->nivel_riesgo_rend),
+            'tutorAsignado' => $tutorAsignado,
         ];
     }
 
@@ -328,6 +367,18 @@ class AcademicoRepository
                 ->whereDate('fecha_sim', '>=', today())
                 ->count(),
             'promedioInstitucional' => round((float) RendimientoPostulante::avg('promedio_general_rend'), 2),
+            'tutoresActivos' => Schema::hasTable('tutores_academicos')
+                ? TutorAcademico::where('estado_tutor', 'activo')->count()
+                : 0,
+            'gruposConTutor' => Schema::hasTable('asignaciones_tutores')
+                ? AsignacionTutor::where('estado_asig', 'activo')
+                    ->whereNotNull('id_grupo')
+                    ->distinct('id_grupo')
+                    ->count('id_grupo')
+                : 0,
+            'asignacionesActivas' => Schema::hasTable('asignaciones_tutores')
+                ? AsignacionTutor::where('estado_asig', 'activo')->count()
+                : 0,
             'seguimientoPrioritario' => RendimientoPostulante::where('nivel_riesgo_rend', 'Atención prioritaria')->count(),
         ];
     }

@@ -4,12 +4,14 @@ use App\Http\Controllers\Admin\RolPermisoController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\AreaConocimientoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Institucional\AsignacionTutorController;
 use App\Http\Controllers\Institucional\FichaAcademicaController;
 use App\Http\Controllers\Institucional\GrupoAcademicoController;
 use App\Http\Controllers\Institucional\InscripcionAcademicaController;
 use App\Http\Controllers\Institucional\ProgramaAcademicoController;
 use App\Http\Controllers\Institucional\RankingAcademicoController;
 use App\Http\Controllers\Institucional\SimulacroProgramadoController;
+use App\Http\Controllers\Institucional\TutorAcademicoController;
 use App\Http\Controllers\PlantillaEvaluacionController;
 use App\Http\Controllers\PostulanteController;
 use App\Http\Controllers\PreguntaController;
@@ -140,6 +142,22 @@ Route::middleware('auth')->group(function () {
                     ->name('ranking.index');
                 Route::get('/ficha-academica/{postulante}', [FichaAcademicaController::class, 'show'])
                     ->name('ficha.postulante');
+
+                Route::get('/tutores', [TutorAcademicoController::class, 'index'])
+                    ->name('tutores.index');
+                Route::post('/tutores', [TutorAcademicoController::class, 'store'])
+                    ->name('tutores.store');
+                Route::get('/tutores/{tutor}', [TutorAcademicoController::class, 'show'])
+                    ->name('tutores.show');
+                Route::patch('/tutores/{tutor}', [TutorAcademicoController::class, 'update'])
+                    ->name('tutores.update');
+
+                Route::get('/asignacion-tutores', [AsignacionTutorController::class, 'index'])
+                    ->name('asignacion-tutores.index');
+                Route::post('/asignacion-tutores', [AsignacionTutorController::class, 'store'])
+                    ->name('asignacion-tutores.store');
+                Route::patch('/asignacion-tutores/{asignacion}', [AsignacionTutorController::class, 'update'])
+                    ->name('asignacion-tutores.update');
             });
 
         Route::prefix('gestion-academica')->group(function () {

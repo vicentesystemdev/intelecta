@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
@@ -70,5 +71,18 @@ class ProgramaAcademico extends Model
     public function rendimientos(): HasMany
     {
         return $this->hasMany(RendimientoPostulante::class, 'id_prog', 'id_prog');
+    }
+
+    public function asignacionesTutores(): HasMany
+    {
+        return $this->hasMany(AsignacionTutor::class, 'id_prog', 'id_prog');
+    }
+
+    public function asignacionTutorActiva(): HasOne
+    {
+        return $this->hasOne(AsignacionTutor::class, 'id_prog', 'id_prog')
+            ->whereNull('id_grupo')
+            ->where('estado_asig', 'activo')
+            ->latestOfMany('id_asig');
     }
 }

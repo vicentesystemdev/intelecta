@@ -28,6 +28,14 @@ const emptyGroup = {
     estado_grupo: 'activo',
 };
 
+const assignedTutorName = (grupo) => {
+    const tutor = grupo?.asignacion_tutor_activa?.tutor;
+
+    return tutor
+        ? `${tutor.nombres_tutor} ${tutor.apellidos_tutor}`.trim()
+        : grupo?.tutor_responsable_grupo || 'Sin tutor asignado';
+};
+
 export default function Index({ grupos, programas = [], filtros = {} }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
@@ -75,11 +83,12 @@ export default function Index({ grupos, programas = [], filtros = {} }) {
                 const occupied = Number(grupo.inscritos_count || 0);
                 const capacity = Number(grupo.capacidad_grupo || 0);
                 const percentage = capacity ? Math.min(100, Math.round((occupied / capacity) * 100)) : 0;
+                const tutorName = assignedTutorName(grupo);
                 return <article key={grupo.id_grupo} className={`${cardClass} p-5 sm:p-6`}>
                     <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-wider text-brand-secondary">{grupo.codigo_grupo || 'Grupo académico'}</p><h3 className="mt-2 break-words text-lg font-black text-text-main">{grupo.nombre_grupo}</h3><p className="mt-1 text-xs text-text-muted">{grupo.programa?.nombre_prog}</p></div><InstitutionalStatus status={grupo.estado_grupo} /></div>
                     <div className="mt-5 grid grid-cols-2 gap-3 text-xs"><div className="rounded-xl bg-brand-bg p-3"><p className="text-text-muted">Turno</p><p className="mt-1 font-bold text-text-main">{grupo.turno_grupo || 'Por definir'}</p></div><div className="rounded-xl bg-brand-bg p-3"><p className="text-text-muted">Aula</p><p className="mt-1 font-bold text-text-main">{grupo.aula_grupo || 'Por definir'}</p></div><div className="rounded-xl bg-brand-bg p-3"><p className="text-text-muted">Nivel</p><p className="mt-1 font-bold text-text-main">{grupo.nivel_grupo || 'General'}</p></div><div className="rounded-xl bg-brand-bg p-3"><p className="text-text-muted">Simulacros</p><p className="mt-1 font-bold text-text-main">{grupo.simulacros_count}</p></div></div>
                     <div className="mt-5"><div className="flex justify-between text-xs"><span className="font-bold text-text-main">Cupos ocupados</span><span className="text-text-muted">{occupied}/{capacity}</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-brand-border"><div className="h-full rounded-full bg-brand-secondary" style={{ width: `${percentage}%` }} /></div></div>
-                    <div className="mt-5 flex items-center justify-between border-t border-brand-border pt-4"><span className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><UserRoundCheck className="h-4 w-4 shrink-0" /><span className="truncate">{grupo.tutor_responsable_grupo || 'Tutor por asignar'}</span></span><div className="flex gap-1"><button className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30" onClick={() => setDetail(grupo)}><Eye className="h-4 w-4" /></button><button className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30" onClick={() => openForm(grupo)}><Pencil className="h-4 w-4" /></button></div></div>
+                    <div className="mt-5 flex items-center justify-between border-t border-brand-border pt-4"><span className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><UserRoundCheck className="h-4 w-4 shrink-0" /><span className="truncate">{tutorName}</span></span><div className="flex gap-1"><button className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30" onClick={() => setDetail(grupo)}><Eye className="h-4 w-4" /></button><button className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30" onClick={() => openForm(grupo)}><Pencil className="h-4 w-4" /></button></div></div>
                 </article>;
             })}</div> : <EmptyInstitutional title="No hay grupos disponibles" description="Registre un grupo/paralelo para comenzar la asignación de postulantes." />}
             <Pagination links={grupos.links} />
@@ -99,7 +108,7 @@ export default function Index({ grupos, programas = [], filtros = {} }) {
                 </form>
             </ModalInstitucional>
             <ModalInstitucional open={Boolean(detail)} onOpenChange={(open) => !open && setDetail(null)} title="Detalle del grupo/paralelo" description="Configuración operativa y ocupación actual.">
-                {detail && <div className="space-y-4"><div className="rounded-2xl bg-brand-primary p-5 text-white"><p className="text-xs font-bold text-brand-accent">{detail.codigo_grupo}</p><h3 className="mt-2 text-xl font-black">{detail.nombre_grupo}</h3><p className="mt-2 text-sm text-slate-300">{detail.programa?.nombre_prog}</p></div><div className="grid grid-cols-2 gap-3">{[['Turno', detail.turno_grupo], ['Aula', detail.aula_grupo], ['Nivel', detail.nivel_grupo], ['Capacidad', detail.capacidad_grupo], ['Inscritos', detail.inscritos_count], ['Tutor responsable', detail.tutor_responsable_grupo]].map(([label, value]) => <div key={label} className="rounded-xl border border-brand-border p-3"><p className="text-xs text-text-muted">{label}</p><p className="mt-1 font-bold text-text-main">{value || 'No registrado'}</p></div>)}</div></div>}
+                {detail && <div className="space-y-4"><div className="rounded-2xl bg-brand-primary p-5 text-white"><p className="text-xs font-bold text-brand-accent">{detail.codigo_grupo}</p><h3 className="mt-2 text-xl font-black">{detail.nombre_grupo}</h3><p className="mt-2 text-sm text-slate-300">{detail.programa?.nombre_prog}</p></div><div className="grid grid-cols-2 gap-3">{[['Turno', detail.turno_grupo], ['Aula', detail.aula_grupo], ['Nivel', detail.nivel_grupo], ['Capacidad', detail.capacidad_grupo], ['Inscritos', detail.inscritos_count], ['Tutor responsable', assignedTutorName(detail)]].map(([label, value]) => <div key={label} className="rounded-xl border border-brand-border p-3"><p className="text-xs text-text-muted">{label}</p><p className="mt-1 font-bold text-text-main">{value || 'No registrado'}</p></div>)}</div></div>}
             </ModalInstitucional>
         </AdminLayout>
     );

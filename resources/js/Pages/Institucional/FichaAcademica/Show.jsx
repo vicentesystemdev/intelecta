@@ -33,6 +33,7 @@ export default function Show({
     posicion,
     percentil,
     recomendacion,
+    tutorAsignado,
 }) {
     const [activeTab, setActiveTab] = useState('datos');
     const fullName = `${postulante.nombres_post} ${postulante.apellidos_post}`;
@@ -107,7 +108,15 @@ export default function Show({
                                 {detail('Código del programa', inscripcion?.programa?.codigo_prog)}
                                 {detail('Grupo/paralelo', inscripcion?.grupo?.nombre_grupo)}
                                 {detail('Código del grupo', inscripcion?.grupo?.codigo_grupo)}
-                                {detail('Tutor responsable', inscripcion?.grupo?.tutor_responsable_grupo)}
+                                {detail(
+                                    'Tutor responsable',
+                                    tutorAsignado?.nombre_completo ||
+                                        (tutorAsignado
+                                            ? `${tutorAsignado.nombres_tutor} ${tutorAsignado.apellidos_tutor}`.trim()
+                                            : null) ||
+                                        inscripcion?.grupo?.tutor_responsable_grupo ||
+                                        'Sin tutor asignado',
+                                )}
                                 {detail('Fecha de inscripción', inscripcion?.fecha_inscripcion ? new Date(`${inscripcion.fecha_inscripcion.slice(0, 10)}T00:00:00`).toLocaleDateString('es-BO') : null)}
                             </div>
                         </div>

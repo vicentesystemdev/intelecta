@@ -15,6 +15,7 @@ import {
     GraduationCap,
     LayoutDashboard,
     Layers3,
+    Link2,
     Settings,
     ShieldAlert,
     ShieldCheck,
@@ -47,12 +48,6 @@ const navigationGroups = [
                 routeName: 'postulantes.*',
             },
             {
-                label: 'Tutores Académicos',
-                icon: UserRoundCheck,
-                href: '/admin/gestion-academica/docentes',
-                routeName: 'admin.docentes',
-            },
-            {
                 label: 'Carreras',
                 icon: BriefcaseBusiness,
                 href: '/admin/gestion-academica/carreras',
@@ -80,6 +75,18 @@ const navigationGroups = [
                 icon: Layers3,
                 href: '/admin/institucional/grupos',
                 routeName: 'admin.institucional.grupos.*',
+            },
+            {
+                label: 'Tutores Académicos',
+                icon: UserRoundCheck,
+                href: '/admin/institucional/tutores',
+                routeName: 'admin.institucional.tutores.*',
+            },
+            {
+                label: 'Asignación de Tutores',
+                icon: Link2,
+                href: '/admin/institucional/asignacion-tutores',
+                routeName: 'admin.institucional.asignacion-tutores.*',
             },
             {
                 label: 'Inscripciones',
