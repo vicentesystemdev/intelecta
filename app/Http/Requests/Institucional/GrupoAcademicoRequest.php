@@ -46,6 +46,7 @@ class GrupoAcademicoRequest extends FormRequest
             'capacidad_grupo.required' => 'La capacidad del grupo es obligatoria.',
             'capacidad_grupo.integer' => 'La capacidad debe ser un número entero.',
             'capacidad_grupo.min' => 'La capacidad debe ser mayor a cero.',
+            'estado_grupo.required' => 'Seleccione el estado del grupo académico.',
             'estado_grupo.in' => 'Seleccione un estado válido para el grupo.',
         ];
     }

@@ -54,7 +54,7 @@ const navigationGroups = [
         label: 'GESTIÓN DE POSTULANTES',
         items: [
             { label: 'Postulantes', icon: GraduationCap, href: '/postulantes', routeName: 'postulantes.*' },
-            { label: 'Ficha Académica', icon: FileChartColumn, href: '/postulantes', routeName: 'admin.institucional.ficha.*' },
+            { label: 'Ficha Académica', icon: FileChartColumn, href: '/admin/institucional/ficha-academica', routeName: 'admin.institucional.ficha.*' },
             { label: 'Ranking Académico', icon: Trophy, href: '/admin/institucional/ranking', routeName: 'admin.institucional.ranking.*' },
         ],
     },

@@ -80,6 +80,7 @@ class StorePostulanteRequest extends FormRequest
             'id_car.exists' => 'La carrera seleccionada no pertenece a la universidad indicada.',
             'gestion_post.required' => 'La gestión es obligatoria.',
             'gestion_post.integer' => 'La gestión debe ser un año válido.',
+            'estado_post.required' => 'Seleccione el estado del postulante.',
             'estado_post.in' => 'Seleccione un estado válido para el postulante.',
         ];
     }

@@ -30,7 +30,12 @@ class CuotaAcademicaRequest extends FormRequest
             'concepto_cuota' => ['nullable', 'string', 'max:180'],
             'monto_cuota' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'fecha_vencimiento_cuota' => ['nullable', 'date'],
-            'fecha_pago_cuota' => ['nullable', 'date'],
+            'fecha_pago_cuota' => [
+                'nullable',
+                'required_if:estado_cuota,pagada',
+                'date',
+                'before_or_equal:today',
+            ],
             'metodo_pago_cuota' => ['nullable', 'string', 'max:120'],
             'estado_cuota' => ['required', Rule::in(['pendiente', 'pagada', 'vencida', 'becada', 'exenta'])],
             'observacion_cuota' => ['nullable', 'string', 'max:2000'],
@@ -50,6 +55,9 @@ class CuotaAcademicaRequest extends FormRequest
             'monto_cuota.min' => 'El monto de la cuota no puede ser negativo.',
             'fecha_vencimiento_cuota.date' => 'La fecha de vencimiento no tiene un formato válido.',
             'fecha_pago_cuota.date' => 'La fecha de pago no tiene un formato válido.',
+            'fecha_pago_cuota.required_if' => 'La fecha de pago es obligatoria cuando la cuota está pagada.',
+            'fecha_pago_cuota.before_or_equal' => 'La fecha de pago no puede ser posterior a la fecha actual.',
+            'estado_cuota.required' => 'Seleccione el estado de la cuota académica.',
             'estado_cuota.in' => 'Seleccione un estado válido para la cuota académica.',
         ];
     }

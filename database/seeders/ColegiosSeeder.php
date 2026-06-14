@@ -10,7 +10,7 @@ class ColegiosSeeder extends Seeder
     public function run(): void
     {
         $colegios = [
-            ['nombre_col' => 'Colegio San Antonio de Padua',          'tipo_col' => 'Privado',  'ubicacion_col' => 'La Paz',   'estado_col' => 'activo'],
+            ['nombre_col' => 'Unidad Educativa Integración Andina',   'tipo_col' => 'Privado',  'ubicacion_col' => 'La Paz',   'estado_col' => 'activo'],
             ['nombre_col' => 'Colegio Don Bosco',                      'tipo_col' => 'Convenio', 'ubicacion_col' => 'La Paz',   'estado_col' => 'activo'],
             ['nombre_col' => 'Colegio La Salle',                       'tipo_col' => 'Privado',  'ubicacion_col' => 'La Paz',   'estado_col' => 'activo'],
             ['nombre_col' => 'Colegio Nacional Ayacucho',              'tipo_col' => 'Público',  'ubicacion_col' => 'La Paz',   'estado_col' => 'activo'],

@@ -17,11 +17,18 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { ArrowRight, ClipboardList, Pencil, Plus, Search, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+const localToday = () => {
+    const date = new Date();
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 10);
+};
+
 const emptyEnrollment = {
     id_prog: '',
     id_grupo: '',
     id_post: '',
-    fecha_inscripcion: new Date().toISOString().slice(0, 10),
+    fecha_inscripcion: localToday(),
     estado_inscripcion: 'activo',
     observacion_inscripcion: '',
 };
@@ -397,6 +404,7 @@ export default function Index({
                     <Field
                         type="date"
                         label="Fecha de inscripción"
+                        max={localToday()}
                         value={form.data.fecha_inscripcion}
                         onChange={(event) =>
                             form.setData('fecha_inscripcion', event.target.value)

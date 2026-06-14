@@ -69,6 +69,15 @@ class AcademicoService
         return $this->repository->ficha($postulante);
     }
 
+    public function fichas(array $filters): array
+    {
+        return [
+            'fichas' => $this->repository->paginateFichas($filters),
+            'programas' => $this->repository->programasOptions(),
+            'grupos' => $this->repository->gruposOptions(),
+        ];
+    }
+
     public function dashboardMetrics(): array
     {
         return $this->repository->dashboardMetrics();

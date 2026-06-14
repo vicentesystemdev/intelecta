@@ -375,6 +375,7 @@ export default function Index({
                     <Field
                         type="date"
                         label="Fecha de finalización"
+                        min={form.data.fecha_inicio_hab || undefined}
                         value={form.data.fecha_fin_hab}
                         onChange={(event) =>
                             form.setData('fecha_fin_hab', event.target.value)

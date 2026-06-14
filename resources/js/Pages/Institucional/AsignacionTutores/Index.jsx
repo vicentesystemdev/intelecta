@@ -46,6 +46,13 @@ const formatDate = (value) =>
         ? new Date(`${String(value).slice(0, 10)}T00:00:00`).toLocaleDateString('es-BO')
         : 'Sin fecha definida';
 
+const localToday = () => {
+    const date = new Date();
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 10);
+};
+
 export default function Index({
     asignaciones,
     tutores = [],
@@ -399,6 +406,11 @@ export default function Index({
                     />
                     <Field
                         type="date"
+                        min={
+                            !modal.asignacion && form.data.estado_asig === 'activo'
+                                ? localToday()
+                                : undefined
+                        }
                         label="Fecha de inicio"
                         value={form.data.fecha_inicio_asig}
                         onChange={(event) =>

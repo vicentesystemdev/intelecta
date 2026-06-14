@@ -74,6 +74,7 @@ class StorePreguntaRequest extends FormRequest
             'puntaje_preg.required' => 'El puntaje de la pregunta es obligatorio.',
             'puntaje_preg.numeric' => 'El puntaje debe ser numérico.',
             'puntaje_preg.min' => 'El puntaje debe ser mayor a cero.',
+            'estado_preg.required' => 'Seleccione el estado de la pregunta.',
             'estado_preg.in' => 'Seleccione un estado válido para la pregunta.',
             'alternativas.*.texto_alt.required_with' => 'Complete el texto de todas las alternativas.',
             'alternativas.*.es_correcta_alt.required_with' => 'Indique cuál alternativa es correcta.',

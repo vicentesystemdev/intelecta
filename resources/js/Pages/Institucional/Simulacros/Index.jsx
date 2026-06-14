@@ -360,7 +360,7 @@ export default function Index({
                     />
                     <Field label="Modalidad" value={form.data.modalidad_sim} onChange={(e) => form.setData('modalidad_sim', e.target.value)} error={form.errors.modalidad_sim} />
                     <Field type="time" label="Hora de inicio" value={form.data.hora_inicio_sim} onChange={(e) => form.setData('hora_inicio_sim', e.target.value)} error={form.errors.hora_inicio_sim} />
-                    <Field type="time" label="Hora de finalización" value={form.data.hora_fin_sim} onChange={(e) => form.setData('hora_fin_sim', e.target.value)} error={form.errors.hora_fin_sim} />
+                    <Field type="time" min={form.data.hora_inicio_sim || undefined} label="Hora de finalización" value={form.data.hora_fin_sim} onChange={(e) => form.setData('hora_fin_sim', e.target.value)} error={form.errors.hora_fin_sim} />
                     <SelectField label="Estado" value={form.data.estado_sim} onChange={(e) => form.setData('estado_sim', e.target.value)} error={form.errors.estado_sim}>
                         <option value="programado">Programado</option>
                         <option value="en preparación">En preparación</option>

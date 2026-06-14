@@ -38,7 +38,7 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <>
-            <Head title="Iniciar Sesión - INTELECTA" />
+            <Head title="Iniciar sesión" />
 
             <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-brand-secondary selection:text-white dark:bg-slate-950 dark:text-slate-100">
                 {/* Columna Izquierda: Panel Visual Institucional */}

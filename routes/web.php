@@ -150,6 +150,8 @@ Route::middleware('auth')->group(function () {
 
                 Route::get('/ranking', [RankingAcademicoController::class, 'index'])
                     ->name('ranking.index');
+                Route::get('/ficha-academica', [FichaAcademicaController::class, 'index'])
+                    ->name('ficha.index');
                 Route::get('/ficha-academica/{postulante}', [FichaAcademicaController::class, 'show'])
                     ->name('ficha.postulante');
 
@@ -239,6 +241,15 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::prefix('evaluaciones')->group(function () {
+            Route::redirect('/areas', '/areas-conocimiento')
+                ->name('admin.evaluaciones.areas');
+            Route::redirect('/temas', '/temas')
+                ->name('admin.evaluaciones.temas');
+            Route::redirect('/preguntas', '/preguntas')
+                ->name('admin.evaluaciones.preguntas');
+            Route::redirect('/plantillas', '/plantillas-evaluacion')
+                ->name('admin.evaluaciones.plantillas');
+
             Route::get('/materias', function () {
                 $items = Materia::query()
                     ->with(['areas' => fn ($query) => $query->withCount('temas')])

@@ -14,7 +14,7 @@ class TemaRepository
     public function paginate(array $filters): LengthAwarePaginator
     {
         return Tema::query()
-            ->with('area:id_area,nombre_area')
+            ->with('area.materia:id_mat,nombre_mat,codigo_mat')
             ->withCount('preguntas')
             ->when(
                 $filters['id_area'] ?? null,
@@ -40,8 +40,9 @@ class TemaRepository
     public function areas(): Collection
     {
         return AreaConocimiento::query()
+            ->with('materia:id_mat,nombre_mat,codigo_mat')
             ->where('estado_area', 'activo')
             ->orderBy('nombre_area')
-            ->get(['id_area', 'nombre_area']);
+            ->get(['id_area', 'id_mat', 'nombre_area']);
     }
 }

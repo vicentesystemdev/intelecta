@@ -32,7 +32,7 @@ class InscripcionAcademicaRequest extends FormRequest
                     ->where(fn ($query) => $query->where('id_prog', $this->integer('id_prog')))
                     ->ignore($inscripcion?->id_insc, 'id_insc'),
             ],
-            'fecha_inscripcion' => ['nullable', 'date'],
+            'fecha_inscripcion' => ['nullable', 'date', 'before_or_equal:today'],
             'estado_inscripcion' => ['required', 'in:activo,inactivo'],
             'observacion_inscripcion' => ['nullable', 'string', 'max:2000'],
         ];
@@ -48,6 +48,8 @@ class InscripcionAcademicaRequest extends FormRequest
             'id_post.exists' => 'El postulante seleccionado no existe.',
             'id_post.unique' => 'El postulante ya está inscrito en este programa académico.',
             'fecha_inscripcion.date' => 'La fecha de inscripción no tiene un formato válido.',
+            'fecha_inscripcion.before_or_equal' => 'La fecha de inscripción no puede ser posterior a la fecha actual.',
+            'estado_inscripcion.required' => 'Seleccione el estado de la inscripción académica.',
             'estado_inscripcion.in' => 'Seleccione un estado válido para la inscripción.',
         ];
     }

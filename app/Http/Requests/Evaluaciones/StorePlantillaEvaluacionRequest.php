@@ -50,6 +50,7 @@ class StorePlantillaEvaluacionRequest extends FormRequest
             'duracion_minutos_plan.integer' => 'La duración debe expresarse en minutos enteros.',
             'duracion_minutos_plan.min' => 'La duración debe ser mayor a cero.',
             'dificultad_plan.in' => 'Seleccione una dificultad válida para la plantilla.',
+            'estado_plan.required' => 'Seleccione el estado de la plantilla de evaluación.',
             'estado_plan.in' => 'Seleccione un estado válido para la plantilla.',
             'preguntas.required' => 'Seleccione al menos una pregunta para la plantilla.',
             'preguntas.min' => 'Seleccione al menos una pregunta para la plantilla.',

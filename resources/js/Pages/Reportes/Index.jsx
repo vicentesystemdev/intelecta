@@ -245,7 +245,7 @@ export default function Index({
             subtitle="Cobertura institucional en ciencias exactas y razonamiento académico."
             wide
         >
-            <Head title="Reportes Académicos - INTELECTA" />
+            <Head title="Reportes Académicos" />
 
             <div className="space-y-8">
                 <section className="flex flex-col justify-between gap-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:flex-row md:items-center">

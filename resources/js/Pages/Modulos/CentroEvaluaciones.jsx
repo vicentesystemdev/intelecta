@@ -103,7 +103,7 @@ export default function CentroEvaluaciones() {
                                     </span>
                                     <div className="min-w-0 flex-1">
                                         <p className="text-xs font-bold text-text-main group-hover:text-brand-secondary transition-colors truncate">Portal del Postulante</p>
-                                        <p className="text-[10px] text-text-muted mt-0.5">Vista directa del estudiante</p>
+                                        <p className="text-[10px] text-text-muted mt-0.5">Vista directa del postulante</p>
                                     </div>
                                     <ArrowRight className="h-4 w-4 text-text-muted group-hover:translate-x-1 transition-transform" />
                                 </CardContent>

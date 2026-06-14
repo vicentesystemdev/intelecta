@@ -52,6 +52,7 @@ class TutorAcademicoRequest extends FormRequest
             'apellidos_tutor.required' => 'Los apellidos del tutor académico son obligatorios.',
             'ci_tutor.unique' => 'El C.I. ya está registrado para otro tutor académico.',
             'correo_tutor.email' => 'Ingrese un correo electrónico válido.',
+            'estado_tutor.required' => 'Seleccione el estado del tutor académico.',
             'estado_tutor.in' => 'Seleccione un estado válido para el tutor académico.',
         ];
     }

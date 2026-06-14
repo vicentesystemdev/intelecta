@@ -67,6 +67,13 @@ const formatDate = (value) =>
 const studentName = (postulante) =>
     `${postulante?.nombres_post || ''} ${postulante?.apellidos_post || ''}`.trim();
 
+const localToday = () => {
+    const date = new Date();
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 10);
+};
+
 export default function Index({
     matriculas,
     metricas = {},
@@ -515,6 +522,7 @@ export default function Index({
                     <Field
                         type="date"
                         label="Fecha de matrícula"
+                        max={localToday()}
                         value={matriculaForm.data.fecha_matricula_mat}
                         onChange={(event) =>
                             matriculaForm.setData(
@@ -674,6 +682,7 @@ export default function Index({
                     <Field
                         type="date"
                         label="Fecha de pago"
+                        max={localToday()}
                         value={cuotaForm.data.fecha_pago_cuota}
                         onChange={(event) =>
                             cuotaForm.setData('fecha_pago_cuota', event.target.value)

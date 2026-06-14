@@ -38,6 +38,13 @@ const emptyProgram = {
     estado_prog: 'activo',
 };
 
+const localToday = () => {
+    const date = new Date();
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 10);
+};
+
 export default function Index({ programas, universidades = [], modalidades = [], filtros = {} }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
@@ -181,7 +188,7 @@ export default function Index({ programas, universidades = [], modalidades = [],
                     <Field label="Universidad objetivo" value={form.data.universidad_objetivo_prog} onChange={(e) => form.setData('universidad_objetivo_prog', e.target.value)} error={form.errors.universidad_objetivo_prog} />
                     <Field label="Carrera o área" value={form.data.carrera_area_prog} onChange={(e) => form.setData('carrera_area_prog', e.target.value)} error={form.errors.carrera_area_prog} />
                     <Field label="Modalidad" value={form.data.modalidad_prog} onChange={(e) => form.setData('modalidad_prog', e.target.value)} error={form.errors.modalidad_prog} />
-                    <Field type="date" label="Fecha de inicio" value={form.data.fecha_inicio_prog} onChange={(e) => form.setData('fecha_inicio_prog', e.target.value)} error={form.errors.fecha_inicio_prog} />
+                    <Field type="date" min={formModal.programa ? undefined : localToday()} label="Fecha de inicio" value={form.data.fecha_inicio_prog} onChange={(e) => form.setData('fecha_inicio_prog', e.target.value)} error={form.errors.fecha_inicio_prog} />
                     <Field type="date" min={form.data.fecha_inicio_prog || undefined} label="Fecha de finalización" value={form.data.fecha_fin_prog} onChange={(e) => form.setData('fecha_fin_prog', e.target.value)} error={form.errors.fecha_fin_prog} />
                     <SelectField label="Estado" value={form.data.estado_prog} onChange={(e) => form.setData('estado_prog', e.target.value)} error={form.errors.estado_prog}><option value="activo">Activo</option><option value="inactivo">Inactivo</option></SelectField>
                     <TextareaField label="Descripción" value={form.data.descripcion_prog} onChange={(e) => form.setData('descripcion_prog', e.target.value)} error={form.errors.descripcion_prog} className="sm:col-span-2" />

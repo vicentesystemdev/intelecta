@@ -64,6 +64,7 @@ class SimulacroProgramadoRequest extends FormRequest
             'hora_inicio_sim.date_format' => 'La hora de inicio no tiene un formato válido.',
             'hora_fin_sim.date_format' => 'La hora de finalización no tiene un formato válido.',
             'hora_fin_sim.after' => 'La hora de finalización debe ser posterior a la hora de inicio.',
+            'estado_sim.required' => 'Seleccione el estado del simulacro programado.',
             'estado_sim.in' => 'Seleccione un estado válido para el simulacro.',
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Institucional;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class ProgramaAcademicoRequest extends FormRequest
@@ -28,7 +29,23 @@ class ProgramaAcademicoRequest extends FormRequest
             'universidad_objetivo_prog' => ['nullable', 'string', 'max:180'],
             'carrera_area_prog' => ['nullable', 'string', 'max:180'],
             'modalidad_prog' => ['nullable', 'string', 'max:100'],
-            'fecha_inicio_prog' => ['nullable', 'date'],
+            'fecha_inicio_prog' => [
+                'bail',
+                'nullable',
+                'date',
+                function (string $attribute, mixed $value, \Closure $fail) use ($programa): void {
+                    if (! $value) {
+                        return;
+                    }
+
+                    $existingDate = $programa?->fecha_inicio_prog?->format('Y-m-d');
+                    $isHistoricalDateUnchanged = $existingDate && $existingDate === $value;
+
+                    if (Carbon::parse($value)->startOfDay()->lt(today()) && ! $isHistoricalDateUnchanged) {
+                        $fail('La fecha de inicio de un programa nuevo no puede ser anterior a la fecha actual.');
+                    }
+                },
+            ],
             'fecha_fin_prog' => ['nullable', 'date', 'after_or_equal:fecha_inicio_prog'],
             'descripcion_prog' => ['nullable', 'string', 'max:3000'],
             'estado_prog' => ['required', 'in:activo,inactivo'],
@@ -58,6 +75,7 @@ class ProgramaAcademicoRequest extends FormRequest
             'fecha_inicio_prog.date' => 'La fecha de inicio no tiene un formato válido.',
             'fecha_fin_prog.date' => 'La fecha de finalización no tiene un formato válido.',
             'fecha_fin_prog.after_or_equal' => 'La fecha de finalización debe ser posterior o igual a la fecha de inicio.',
+            'estado_prog.required' => 'Seleccione el estado del programa académico.',
             'estado_prog.in' => 'Seleccione un estado válido para el programa académico.',
         ];
     }

@@ -42,7 +42,7 @@ const publicTemplates = [
     },
     {
         name: 'Simulacro Psicotécnico - ESFM / Normal Simón Bolívar',
-        detail: 'Lógica espacial, sucesiones conceptuales y aptitud docente.',
+        detail: 'Lógica espacial, sucesiones conceptuales y aptitud académica.',
         questions: 60,
         difficulty: 'Media',
         badge: 'ESFM - Normal'

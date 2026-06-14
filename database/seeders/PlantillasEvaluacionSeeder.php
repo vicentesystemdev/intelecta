@@ -49,7 +49,7 @@ class PlantillasEvaluacionSeeder extends Seeder
             // 4. Simulacro Psicotécnico – ESFM / Normal Simón Bolívar (10 × 10 = 100)
             [
                 'nombre_plan'           => 'Simulacro Psicotécnico - ESFM / Normal Simón Bolívar',
-                'descripcion_plan'      => 'Evaluación de razonamiento para procesos de admisión docente.',
+                'descripcion_plan'      => 'Evaluación de razonamiento para procesos de admisión universitaria.',
                 'objetivo_plan'         => 'Valorar patrones, operadores y comprensión de problemas.',
                 'duracion_minutos_plan' => 60,
                 'dificultad_plan'       => 'media',

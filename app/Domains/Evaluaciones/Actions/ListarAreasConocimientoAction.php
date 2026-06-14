@@ -8,8 +8,8 @@ class ListarAreasConocimientoAction
 {
     public function __construct(private readonly AreaConocimientoService $service) {}
 
-    public function execute()
+    public function execute(array $filters)
     {
-        return $this->service->list();
+        return $this->service->list($filters);
     }
 }

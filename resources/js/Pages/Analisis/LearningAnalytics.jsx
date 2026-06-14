@@ -205,7 +205,7 @@ const analyticalLayers = [
         title: 'Ingestión y captura de datos',
         subtitle: 'Módulo web de registro académico',
         description:
-            'Captura los datos generados por los postulantes durante evaluaciones y actividades académicas. Esta capa convierte la interacción del estudiante en variables estructuradas para análisis posterior.',
+            'Captura los datos generados por los postulantes durante evaluaciones y actividades académicas. Esta capa convierte la interacción del postulante en variables estructuradas para análisis posterior.',
         items: [
             'Calificaciones de simulacros',
             'Respuestas por pregunta',
@@ -492,7 +492,7 @@ export default function LearningAnalytics() {
                 </section>
 
                 <section>
-                    <SectionHeading eyebrow="Lectura institucional" title="Estado general del instituto" description="Interpretación preliminar para orientar decisiones docentes y acciones de nivelación." icon={Microscope} />
+                    <SectionHeading eyebrow="Lectura institucional" title="Estado general del instituto" description="Interpretación preliminar para orientar decisiones tutoriales y acciones de nivelación." icon={Microscope} />
                     <div className="grid gap-5 lg:grid-cols-3">
                         {institutionalStatus.map((item) => {
                             const Icon = item.icon;
@@ -613,7 +613,7 @@ export default function LearningAnalytics() {
                 </section>
 
                 <section>
-                    <SectionHeading eyebrow="Apoyo a la coordinación" title="Interpretación docente" description="Conclusiones automáticas simuladas para ilustrar cómo el módulo podría orientar intervenciones académicas." icon={Lightbulb} />
+                    <SectionHeading eyebrow="Apoyo a la coordinación" title="Interpretación tutorial" description="Conclusiones referenciales para ilustrar cómo el módulo podría orientar intervenciones académicas." icon={Lightbulb} />
                     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                         {teacherInsights.map((insight) => { const Icon = insight.icon; return (
                             <Card key={insight.title} className="bg-brand-card border border-brand-border rounded-2xl p-5 sm:p-6 shadow-sm"><CardContent className="p-0"><span className={`flex h-11 w-11 items-center justify-center rounded-xl border border-brand-border ${toneStyles[insight.tone].icon}`}><Icon className="h-5 w-5" /></span><h3 className="mt-5 text-sm font-bold leading-snug text-text-main">{insight.title}</h3><p className="mt-3 text-xs leading-5 text-text-muted">{insight.interpretation}</p><div className="mt-4 border-t border-brand-border pt-4"><p className="text-[10px] font-bold uppercase tracking-wider text-brand-secondary">Recomendación</p><p className="mt-1.5 text-xs leading-5 text-text-muted">{insight.recommendation}</p></div></CardContent></Card>
@@ -802,4 +802,3 @@ export default function LearningAnalytics() {
         </AdminLayout>
     );
 }
-

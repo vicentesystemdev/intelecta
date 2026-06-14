@@ -1,17 +1,30 @@
-import { AreaForm } from '@/Pages/Evaluaciones/Areas/Create';
 import AdminLayout from '@/Layouts/AdminLayout';
+import { AreaForm } from '@/Pages/Evaluaciones/Areas/Create';
 import { Head, useForm } from '@inertiajs/react';
 
-export default function Edit({ area }) {
-    const { data, setData, put, processing, errors } = useForm({
+export default function Edit({ area, materias = [] }) {
+    const form = useForm({
+        id_mat: area.id_mat || '',
         nombre_area: area.nombre_area,
         descripcion_area: area.descripcion_area || '',
         estado_area: area.estado_area,
     });
+
     return (
-        <AdminLayout title="Editar Área de Conocimiento" subtitle="Actualización de la estructura curricular institucional.">
+        <AdminLayout
+            title="Editar Área de Conocimiento"
+            subtitle="Actualización de la materia y estructura curricular institucional."
+        >
             <Head title={`Editar ${area.nombre_area}`} />
-            <AreaForm data={data} setData={setData} errors={errors} processing={processing} onSubmit={(e) => { e.preventDefault(); put(route('areas-conocimiento.update', area.id_area)); }} label="Guardar cambios" />
+            <AreaForm
+                {...form}
+                materias={materias}
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    form.put(route('areas-conocimiento.update', area.id_area));
+                }}
+                label="Guardar cambios"
+            />
         </AdminLayout>
     );
 }

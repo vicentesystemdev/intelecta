@@ -58,9 +58,9 @@ export default function Show({
         >
             <Head title={`Ficha académica - ${fullName}`} />
             <div className="mb-4">
-                <Link href={route('admin.institucional.ranking.index')} className={secondaryButtonClass}>
+                <Link href={route('admin.institucional.ficha.index')} className={secondaryButtonClass}>
                     <ArrowLeft className="h-4 w-4" />
-                    Volver al ranking
+                    Volver a fichas
                 </Link>
             </div>
             <InstitutionalBanner

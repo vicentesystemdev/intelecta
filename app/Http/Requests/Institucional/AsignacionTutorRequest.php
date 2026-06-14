@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Institucional;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
@@ -15,6 +16,8 @@ class AsignacionTutorRequest extends FormRequest
 
     public function rules(): array
     {
+        $asignacion = $this->route('asignacion');
+
         return [
             'id_tutor' => ['required', 'integer', 'exists:tutores_academicos,id_tutor'],
             'id_prog' => [
@@ -31,7 +34,24 @@ class AsignacionTutorRequest extends FormRequest
             ],
             'materia_referencia_asig' => ['nullable', 'string', 'max:160'],
             'rol_asig' => ['nullable', 'string', 'max:120'],
-            'fecha_inicio_asig' => ['nullable', 'date'],
+            'fecha_inicio_asig' => [
+                'bail',
+                'nullable',
+                'date',
+                function (string $attribute, mixed $value, \Closure $fail) use ($asignacion): void {
+                    if (
+                        ! $value
+                        || $asignacion
+                        || $this->input('estado_asig') !== 'activo'
+                    ) {
+                        return;
+                    }
+
+                    if (Carbon::parse($value)->startOfDay()->lt(today())) {
+                        $fail('La fecha de inicio de una asignación activa no puede ser anterior a la fecha actual.');
+                    }
+                },
+            ],
             'fecha_fin_asig' => ['nullable', 'date', 'after_or_equal:fecha_inicio_asig'],
             'estado_asig' => ['required', Rule::in(['activo', 'inactivo'])],
             'observacion_asig' => ['nullable', 'string', 'max:2000'],
@@ -71,6 +91,7 @@ class AsignacionTutorRequest extends FormRequest
             'fecha_inicio_asig.date' => 'La fecha de inicio no tiene un formato válido.',
             'fecha_fin_asig.date' => 'La fecha de finalización no tiene un formato válido.',
             'fecha_fin_asig.after_or_equal' => 'La fecha de finalización debe ser posterior o igual a la fecha de inicio.',
+            'estado_asig.required' => 'Seleccione el estado de la asignación tutorial.',
             'estado_asig.in' => 'Seleccione un estado válido para la asignación tutorial.',
         ];
     }

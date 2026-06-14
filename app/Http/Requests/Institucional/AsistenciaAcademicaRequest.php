@@ -61,6 +61,7 @@ class AsistenciaAcademicaRequest extends FormRequest
             'fecha_asist.date' => 'La fecha de asistencia no tiene un formato válido.',
             'fecha_asist.before_or_equal' => 'La asistencia no puede registrarse en una fecha futura.',
             'sesion_asist.required' => 'Indique la sesión académica.',
+            'estado_asist.required' => 'Seleccione el estado de asistencia del postulante.',
             'estado_asist.in' => 'Seleccione un estado válido de asistencia.',
         ];
     }

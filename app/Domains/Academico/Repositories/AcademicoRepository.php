@@ -285,6 +285,95 @@ class AcademicoRepository
         ];
     }
 
+    public function paginateFichas(array $filters, int $perPage = 12): LengthAwarePaginator
+    {
+        $paginator = Postulante::query()
+            ->with([
+                'colegio:id_col,nombre_col',
+                'carrera:id_car,id_uni,nombre_car',
+                'carrera.universidad:id_uni,nombre_uni,sigla_uni',
+                'inscripcionesAcademicas.programa:id_prog,nombre_prog,codigo_prog',
+                'inscripcionesAcademicas.grupo:id_grupo,nombre_grupo,codigo_grupo',
+                'rendimientosAcademicos:id_rend,id_post,id_prog,id_grupo,promedio_general_rend,nivel_riesgo_rend,created_at',
+            ])
+            ->when($filters['buscar'] ?? null, function (Builder $query, string $search) {
+                $pattern = '%'.mb_strtolower(trim($search)).'%';
+                $query->where(function (Builder $query) use ($pattern) {
+                    $query->whereRaw('LOWER(nombres_post) LIKE ?', [$pattern])
+                        ->orWhereRaw('LOWER(apellidos_post) LIKE ?', [$pattern])
+                        ->orWhereRaw("LOWER(CONCAT_WS(' ', nombres_post, apellidos_post)) LIKE ?", [$pattern])
+                        ->orWhereRaw("LOWER(COALESCE(ci_post, '')) LIKE ?", [$pattern])
+                        ->orWhereRaw("LOWER(COALESCE(email_post, '')) LIKE ?", [$pattern]);
+                });
+            })
+            ->when(
+                $filters['id_prog'] ?? null,
+                fn (Builder $query, int|string $value) => $query->whereHas(
+                    'inscripcionesAcademicas',
+                    fn (Builder $query) => $query->where('id_prog', $value),
+                ),
+            )
+            ->when(
+                $filters['id_grupo'] ?? null,
+                fn (Builder $query, int|string $value) => $query->whereHas(
+                    'inscripcionesAcademicas',
+                    fn (Builder $query) => $query->where('id_grupo', $value),
+                ),
+            )
+            ->when(
+                $filters['nivel_riesgo_rend'] ?? null,
+                fn (Builder $query, string $value) => $query->whereHas(
+                    'rendimientosAcademicos',
+                    fn (Builder $query) => $query->where('nivel_riesgo_rend', $value),
+                ),
+            )
+            ->orderBy('apellidos_post')
+            ->orderBy('nombres_post')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return $paginator->through(function (Postulante $postulante) use ($filters): array {
+            $inscripciones = $postulante->inscripcionesAcademicas;
+            if ($filters['id_grupo'] ?? null) {
+                $inscripciones = $inscripciones->where('id_grupo', $filters['id_grupo']);
+            } elseif ($filters['id_prog'] ?? null) {
+                $inscripciones = $inscripciones->where('id_prog', $filters['id_prog']);
+            }
+
+            $inscripcion = $inscripciones
+                ->sortByDesc(fn (InscripcionAcademica $item) => sprintf(
+                    '%s-%010d',
+                    $item->fecha_inscripcion?->format('Y-m-d') ?? '0000-00-00',
+                    $item->id_insc,
+                ))
+                ->first();
+            $rendimientos = $postulante->rendimientosAcademicos;
+            if ($filters['nivel_riesgo_rend'] ?? null) {
+                $rendimientos = $rendimientos->where(
+                    'nivel_riesgo_rend',
+                    $filters['nivel_riesgo_rend'],
+                );
+            }
+
+            $rendimiento = $rendimientos
+                ->sortByDesc('created_at')
+                ->first();
+
+            return [
+                'id_post' => $postulante->id_post,
+                'nombres_post' => $postulante->nombres_post,
+                'apellidos_post' => $postulante->apellidos_post,
+                'ci_post' => $postulante->ci_post,
+                'email_post' => $postulante->email_post,
+                'estado_post' => $postulante->estado_post,
+                'colegio' => $postulante->colegio,
+                'carrera' => $postulante->carrera,
+                'inscripcion' => $inscripcion,
+                'rendimiento' => $rendimiento,
+            ];
+        });
+    }
+
     public function ficha(Postulante $postulante): array
     {
         $postulante->load([

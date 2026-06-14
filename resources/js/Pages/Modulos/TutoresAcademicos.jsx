@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 const kpis = [
-    { title: 'Tutores referenciales', value: '18', detail: 'Cuerpo docente acreditado', icon: Users, tone: 'secondary' },
+    { title: 'Tutores referenciales', value: '18', detail: 'Equipo tutorial acreditado', icon: Users, tone: 'secondary' },
     { title: 'Materias cubiertas', value: '5', detail: 'Áreas clave preuniversitarias', icon: BookOpen, tone: 'info' },
     { title: 'Grupos asignables', value: '12', detail: 'Aulas de nivelación activa', icon: Layers, tone: 'accent' },
     { title: 'Seguimientos activos', value: '45', detail: 'Postulantes bajo mentoría', icon: ShieldCheck, tone: 'success' },
@@ -56,7 +56,7 @@ export default function TutoresAcademicos() {
                         </h2>
                         
                         <p className="max-w-3xl text-sm sm:text-base leading-relaxed text-slate-200">
-                            Cuerpo docente enfocado en el alto rendimiento preuniversitario. Coordina la asignación de carga horaria, seguimiento de grupos y la calibración psicométrica de reactivos.
+                            Equipo tutorial enfocado en el alto rendimiento preuniversitario. Coordina la asignación de carga horaria, seguimiento de grupos y la calibración psicométrica de reactivos.
                         </p>
                     </div>
                 </section>
@@ -223,7 +223,7 @@ export default function TutoresAcademicos() {
                 <div className="rounded-xl border border-brand-border bg-brand-card p-4 text-xs text-text-muted leading-relaxed">
                     <p className="font-semibold text-text-main">Nota de Gestión Académica:</p>
                     <p className="mt-1">
-                        Esta es una vista referencial de la plantilla docente del instituto. La asignación final de horas y la validación de roles en evaluaciones se consolida desde la coordinación académica en cada periodo preuniversitario.
+                        Esta es una vista referencial del equipo tutorial del instituto. La asignación final de horas y la validación de responsabilidades en evaluaciones se consolida desde la coordinación académica en cada periodo preuniversitario.
                     </p>
                 </div>
             </div>

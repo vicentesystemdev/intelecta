@@ -29,4 +29,9 @@ class UpdateTemaRequest extends FormRequest
             'estado_tem' => ['required', 'in:activo,inactivo'],
         ];
     }
+
+    public function messages(): array
+    {
+        return (new StoreTemaRequest())->messages();
+    }
 }

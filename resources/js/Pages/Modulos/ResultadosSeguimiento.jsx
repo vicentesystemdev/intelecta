@@ -7,7 +7,6 @@ import {
     TrendingUp, 
     Users, 
     AlertTriangle,
-    Search,
     GraduationCap,
     Sparkles,
     Briefcase,
@@ -96,21 +95,17 @@ export default function ResultadosSeguimiento() {
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
                                 <CardTitle className="text-base font-bold text-text-main">
-                                    Seguimiento de Rendimiento Estudiantil
+                                    Seguimiento del Rendimiento de Postulantes
                                 </CardTitle>
                                 <p className="text-xs text-text-muted mt-1">
                                     Calificaciones promedio y nivelación recomendada por postulante.
                                 </p>
                             </div>
                             
-                            <div className="relative max-w-xs w-full">
-                                <Search className="absolute left-3 top-3 h-4 w-4 text-text-muted" />
-                                <input 
-                                    type="text" 
-                                    placeholder="Buscar postulante..." 
-                                    className="w-full text-xs font-medium bg-brand-card border border-brand-border text-text-main rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition-all"
-                                    disabled
-                                />
+                            <div className="max-w-xl rounded-xl border border-brand-info/20 bg-brand-info/10 px-4 py-3">
+                                <p className="text-xs leading-5 text-text-muted">
+                                    Esta vista presenta una lectura referencial del seguimiento académico. La integración completa con evaluaciones aplicadas será consolidada en la etapa de resultados trazables.
+                                </p>
                             </div>
                         </div>
                     </CardHeader>
