@@ -133,6 +133,7 @@ class RolesAndUsersSeeder extends Seeder
             'areas.ver',
             'temas.ver',
             'preguntas.ver',
+            'preguntas.crear',
             'plantillas.ver',
             'resultados.ver',
             'reportes.ver',

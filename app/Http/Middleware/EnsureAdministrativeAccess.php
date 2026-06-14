@@ -21,7 +21,13 @@ class EnsureAdministrativeAccess
         }
 
         if ($user->hasAnyRole(['Estudiante', 'Postulante'])) {
-            return to_route('estudiante.evaluaciones');
+            if ($request->routeIs('dashboard')) {
+                return to_route('estudiante.evaluaciones');
+            }
+
+            throw new AuthorizationException(
+                'No cuentas con permisos para acceder a este módulo.',
+            );
         }
 
         return $next($request);
