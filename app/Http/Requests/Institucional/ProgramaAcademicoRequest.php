@@ -49,4 +49,16 @@ class ProgramaAcademicoRequest extends FormRequest
             'estado_prog' => 'estado',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'nombre_prog.required' => 'El nombre del programa académico es obligatorio.',
+            'codigo_prog.unique' => 'El código indicado ya pertenece a otro programa académico.',
+            'fecha_inicio_prog.date' => 'La fecha de inicio no tiene un formato válido.',
+            'fecha_fin_prog.date' => 'La fecha de finalización no tiene un formato válido.',
+            'fecha_fin_prog.after_or_equal' => 'La fecha de finalización debe ser posterior o igual a la fecha de inicio.',
+            'estado_prog.in' => 'Seleccione un estado válido para el programa académico.',
+        ];
+    }
 }

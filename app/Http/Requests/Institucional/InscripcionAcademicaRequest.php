@@ -37,4 +37,18 @@ class InscripcionAcademicaRequest extends FormRequest
             'observacion_inscripcion' => ['nullable', 'string', 'max:2000'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'id_prog.required' => 'Seleccione un programa académico.',
+            'id_prog.exists' => 'El programa académico seleccionado no existe.',
+            'id_grupo.exists' => 'El grupo seleccionado no pertenece al programa académico.',
+            'id_post.required' => 'Seleccione un postulante.',
+            'id_post.exists' => 'El postulante seleccionado no existe.',
+            'id_post.unique' => 'El postulante ya está inscrito en este programa académico.',
+            'fecha_inscripcion.date' => 'La fecha de inscripción no tiene un formato válido.',
+            'estado_inscripcion.in' => 'Seleccione un estado válido para la inscripción.',
+        ];
+    }
 }

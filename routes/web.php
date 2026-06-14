@@ -22,6 +22,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReporteAcademicoController;
 use App\Http\Controllers\TemaController;
 use App\Domains\Academico\Models\HabilitacionAcademica;
+use App\Domains\Academico\Models\RendimientoPostulante;
+use App\Domains\Evaluaciones\Models\Materia;
+use App\Domains\Institucional\Models\Carrera;
+use App\Domains\Institucional\Models\Colegio;
 use App\Domains\Postulantes\Models\Postulante;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -197,25 +201,68 @@ Route::middleware('auth')->group(function () {
             })->name('admin.docentes');
 
             Route::get('/carreras', function () {
-                return Inertia::render('Modulos/ModuloPlanificado', [
-                    'titulo' => 'Carreras',
-                    'descripcion' => 'Consulta institucional de carreras postuladas, universidades asociadas y nivel de exigencia matemática.',
-                    'moduloRelacionado' => 'Reportes Académicos',
-                    'proximaEvolucion' => 'Control de ponderación de puntajes mínimos exigidos y perfil de postulación académica.'
+                $items = Carrera::query()
+                    ->with('universidad:id_uni,nombre_uni,sigla_uni')
+                    ->withCount('postulantes')
+                    ->orderBy('nombre_car')
+                    ->get();
+
+                return Inertia::render('Catalogos/Index', [
+                    'tipo' => 'carreras',
+                    'items' => $items,
+                    'metricas' => [
+                        'total' => $items->count(),
+                        'activos' => $items->where('estado_car', 'activo')->count(),
+                        'vinculados' => $items->where('postulantes_count', '>', 0)->count(),
+                        'postulantes' => $items->sum('postulantes_count'),
+                    ],
                 ]);
             })->name('admin.carreras');
 
             Route::get('/colegios', function () {
-                return Inertia::render('Modulos/ModuloPlanificado', [
-                    'titulo' => 'Colegios',
-                    'descripcion' => 'Seguimiento de colegios de procedencia y origen académico de postulantes.',
-                    'moduloRelacionado' => 'Postulantes',
-                    'proximaEvolucion' => 'Estadísticas comparativas agregadas por colegios fiscales, privados y de convenio para análisis del instituto.'
+                $items = Colegio::query()
+                    ->withCount('postulantes')
+                    ->orderBy('nombre_col')
+                    ->get();
+
+                return Inertia::render('Catalogos/Index', [
+                    'tipo' => 'colegios',
+                    'items' => $items,
+                    'metricas' => [
+                        'total' => $items->count(),
+                        'activos' => $items->where('estado_col', 'activo')->count(),
+                        'vinculados' => $items->where('postulantes_count', '>', 0)->count(),
+                        'postulantes' => $items->sum('postulantes_count'),
+                    ],
                 ]);
             })->name('admin.colegios');
         });
 
         Route::prefix('evaluaciones')->group(function () {
+            Route::get('/materias', function () {
+                $items = Materia::query()
+                    ->with(['areas' => fn ($query) => $query->withCount('temas')])
+                    ->withCount('areas')
+                    ->orderBy('nombre_mat')
+                    ->get()
+                    ->map(function (Materia $materia) {
+                        $materia->setAttribute('temas_count', $materia->areas->sum('temas_count'));
+
+                        return $materia;
+                    });
+
+                return Inertia::render('Catalogos/Index', [
+                    'tipo' => 'materias',
+                    'items' => $items,
+                    'metricas' => [
+                        'total' => $items->count(),
+                        'activos' => $items->where('estado_mat', 'activo')->count(),
+                        'vinculados' => $items->where('areas_count', '>', 0)->count(),
+                        'postulantes' => $items->sum('temas_count'),
+                    ],
+                ]);
+            })->name('admin.evaluaciones.materias');
+
             Route::get('/', function () {
                 return Inertia::render('Modulos/CentroEvaluaciones');
             })->name('admin.evaluaciones.index');
@@ -231,11 +278,26 @@ Route::middleware('auth')->group(function () {
             })->name('admin.analisis.learning-analytics');
 
             Route::get('/riesgo-academico', function () {
-                return Inertia::render('Modulos/ModuloPlanificado', [
-                    'titulo' => 'Riesgo Académico',
-                    'descripcion' => 'Seguimiento preliminar de brechas lógico-matemáticas y priorización de refuerzo académico.',
-                    'moduloRelacionado' => 'Postulantes en Alerta',
-                    'proximaEvolucion' => 'Semáforo automático de detección de brechas académicas y sugerencia de tutorías dinámicas.'
+                $registros = RendimientoPostulante::query()
+                    ->with([
+                        'postulante:id_post,nombres_post,apellidos_post,id_car',
+                        'postulante.carrera:id_car,nombre_car',
+                        'programa:id_prog,nombre_prog',
+                        'grupo:id_grupo,nombre_grupo',
+                    ])
+                    ->orderByRaw("CASE nivel_riesgo_rend WHEN 'Atención prioritaria' THEN 0 WHEN 'Seguimiento regular' THEN 1 ELSE 2 END")
+                    ->orderBy('promedio_general_rend')
+                    ->take(24)
+                    ->get();
+
+                return Inertia::render('Analisis/RiesgoAcademico', [
+                    'registros' => $registros,
+                    'metricas' => [
+                        'total' => $registros->count(),
+                        'prioritarios' => $registros->where('nivel_riesgo_rend', 'Atención prioritaria')->count(),
+                        'seguimiento' => $registros->where('nivel_riesgo_rend', 'Seguimiento regular')->count(),
+                        'favorables' => $registros->where('nivel_riesgo_rend', 'Alto rendimiento')->count(),
+                    ],
                 ]);
             })->name('admin.analisis.riesgo-academico');
         });
@@ -259,12 +321,7 @@ Route::middleware('auth')->group(function () {
                 ->name('admin.sistema.roles-permisos.update');
 
             Route::get('/configuracion', function () {
-                return Inertia::render('Modulos/ModuloPlanificado', [
-                    'titulo' => 'Configuración',
-                    'descripcion' => 'Parámetros generales del sistema y preferencias académicas de operación.',
-                    'moduloRelacionado' => 'Sistema General',
-                    'proximaEvolucion' => 'Ajustes del temporizador global, ponderaciones de corrección y límites de intentos en exámenes.'
-                ]);
+                return Inertia::render('Sistema/Configuracion/Index');
             })->name('admin.sistema.configuracion');
         });
     });

@@ -64,4 +64,23 @@ class StorePostulanteRequest extends FormRequest
             'observaciones_post' => 'observaciones',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'nombres_post.required' => 'Los nombres del postulante son obligatorios.',
+            'apellidos_post.required' => 'Los apellidos del postulante son obligatorios.',
+            'ci_post.unique' => 'El C.I. ya está registrado para otro postulante.',
+            'email_post.email' => 'Ingrese un correo electrónico válido.',
+            'edad_post.integer' => 'La edad debe ser un número entero.',
+            'edad_post.min' => 'La edad mínima permitida es 14 años.',
+            'edad_post.max' => 'La edad máxima permitida es 80 años.',
+            'id_col.exists' => 'El colegio de procedencia seleccionado no existe.',
+            'id_uni.exists' => 'La universidad seleccionada no existe.',
+            'id_car.exists' => 'La carrera seleccionada no pertenece a la universidad indicada.',
+            'gestion_post.required' => 'La gestión es obligatoria.',
+            'gestion_post.integer' => 'La gestión debe ser un año válido.',
+            'estado_post.in' => 'Seleccione un estado válido para el postulante.',
+        ];
+    }
 }

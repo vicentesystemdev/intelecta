@@ -60,4 +60,9 @@ class UpdatePostulanteRequest extends FormRequest
     {
         return (new StorePostulanteRequest)->attributes();
     }
+
+    public function messages(): array
+    {
+        return (new StorePostulanteRequest)->messages();
+    }
 }

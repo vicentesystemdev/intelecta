@@ -42,4 +42,21 @@ class StorePlantillaEvaluacionRequest extends FormRequest
             },
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'nombre_plan.required' => 'El nombre de la plantilla de evaluación es obligatorio.',
+            'duracion_minutos_plan.integer' => 'La duración debe expresarse en minutos enteros.',
+            'duracion_minutos_plan.min' => 'La duración debe ser mayor a cero.',
+            'dificultad_plan.in' => 'Seleccione una dificultad válida para la plantilla.',
+            'estado_plan.in' => 'Seleccione un estado válido para la plantilla.',
+            'preguntas.required' => 'Seleccione al menos una pregunta para la plantilla.',
+            'preguntas.min' => 'Seleccione al menos una pregunta para la plantilla.',
+            'preguntas.*.id_preg.distinct' => 'Una pregunta no puede repetirse dentro de la plantilla.',
+            'preguntas.*.id_preg.exists' => 'Una de las preguntas seleccionadas ya no existe.',
+            'preguntas.*.puntaje_pp.numeric' => 'La ponderación de cada pregunta debe ser numérica.',
+            'preguntas.*.puntaje_pp.min' => 'La ponderación de cada pregunta debe ser mayor a cero.',
+        ];
+    }
 }

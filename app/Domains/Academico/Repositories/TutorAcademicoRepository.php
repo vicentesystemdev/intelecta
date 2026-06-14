@@ -14,7 +14,17 @@ class TutorAcademicoRepository
     public function paginate(array $filters, int $perPage = 12): LengthAwarePaginator
     {
         return TutorAcademico::query()
-            ->with('user:id,name,email')
+            ->with([
+                'user:id,name,email',
+                'asignaciones' => fn ($query) => $query
+                    ->where('estado_asig', 'activo')
+                    ->with([
+                        'programa:id_prog,nombre_prog,codigo_prog',
+                        'grupo:id_grupo,nombre_grupo,codigo_grupo',
+                    ])
+                    ->latest('fecha_inicio_asig')
+                    ->latest('id_asig'),
+            ])
             ->withCount([
                 'asignaciones as asignaciones_activas_count' => fn (Builder $query) => $query
                     ->where('estado_asig', 'activo'),

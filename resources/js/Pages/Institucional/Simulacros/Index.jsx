@@ -30,6 +30,12 @@ const emptySimulation = {
     observacion_sim: '',
 };
 
+const localToday = () => {
+    const date = new Date();
+    const offset = date.getTimezoneOffset();
+    return new Date(date.getTime() - offset * 60_000).toISOString().slice(0, 10);
+};
+
 export default function Index({
     simulacros,
     programas = [],
@@ -339,7 +345,19 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field type="date" label="Fecha" value={form.data.fecha_sim} onChange={(e) => form.setData('fecha_sim', e.target.value)} error={form.errors.fecha_sim} />
+                    <Field
+                        type="date"
+                        min={
+                            formModal.simulacro &&
+                            formModal.simulacro.fecha_sim?.slice(0, 10) < localToday()
+                                ? undefined
+                                : localToday()
+                        }
+                        label="Fecha"
+                        value={form.data.fecha_sim}
+                        onChange={(e) => form.setData('fecha_sim', e.target.value)}
+                        error={form.errors.fecha_sim}
+                    />
                     <Field label="Modalidad" value={form.data.modalidad_sim} onChange={(e) => form.setData('modalidad_sim', e.target.value)} error={form.errors.modalidad_sim} />
                     <Field type="time" label="Hora de inicio" value={form.data.hora_inicio_sim} onChange={(e) => form.setData('hora_inicio_sim', e.target.value)} error={form.errors.hora_inicio_sim} />
                     <Field type="time" label="Hora de finalización" value={form.data.hora_fin_sim} onChange={(e) => form.setData('hora_fin_sim', e.target.value)} error={form.errors.hora_fin_sim} />

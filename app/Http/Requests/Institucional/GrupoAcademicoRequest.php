@@ -35,4 +35,18 @@ class GrupoAcademicoRequest extends FormRequest
             'estado_grupo' => ['required', 'in:activo,inactivo'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'id_prog.required' => 'Seleccione un programa académico.',
+            'id_prog.exists' => 'El programa académico seleccionado no existe.',
+            'nombre_grupo.required' => 'El nombre del grupo o paralelo es obligatorio.',
+            'codigo_grupo.unique' => 'El código ya está registrado en este programa académico.',
+            'capacidad_grupo.required' => 'La capacidad del grupo es obligatoria.',
+            'capacidad_grupo.integer' => 'La capacidad debe ser un número entero.',
+            'capacidad_grupo.min' => 'La capacidad debe ser mayor a cero.',
+            'estado_grupo.in' => 'Seleccione un estado válido para el grupo.',
+        ];
+    }
 }

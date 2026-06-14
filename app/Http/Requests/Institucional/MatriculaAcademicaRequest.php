@@ -38,4 +38,19 @@ class MatriculaAcademicaRequest extends FormRequest
             'observacion_mat' => ['nullable', 'string', 'max:2000'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'id_insc.required' => 'Seleccione una inscripción académica.',
+            'id_insc.exists' => 'La inscripción académica seleccionada no existe.',
+            'id_insc.unique' => 'La inscripción ya tiene una matrícula académica registrada.',
+            'codigo_mat.unique' => 'El código de matrícula ya está registrado.',
+            'fecha_matricula_mat.date' => 'La fecha de matrícula no tiene un formato válido.',
+            'monto_matricula_mat.required' => 'El monto de matrícula es obligatorio.',
+            'monto_matricula_mat.numeric' => 'El monto de matrícula debe ser numérico.',
+            'monto_matricula_mat.min' => 'El monto de matrícula no puede ser negativo.',
+            'estado_matricula_mat.in' => 'Seleccione un estado válido para la matrícula.',
+        ];
+    }
 }

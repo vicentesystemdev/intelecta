@@ -408,6 +408,7 @@ export default function Index({
                     />
                     <Field
                         type="date"
+                        min={form.data.fecha_inicio_asig || undefined}
                         label="Fecha de finalización"
                         value={form.data.fecha_fin_asig}
                         onChange={(event) =>

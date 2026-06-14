@@ -135,7 +135,7 @@ export function Field({ label, error, className = '', ...props }) {
     return (
         <label className={`block ${className}`}>
             <span className="mb-1.5 block text-xs font-bold text-text-main">{label}</span>
-            <input className={inputClass} {...props} />
+            <input className={`${inputClass} ${error ? 'border-brand-danger focus:border-brand-danger focus:ring-brand-danger/15' : ''}`} {...props} />
             {error && <span className="mt-1 block text-xs text-brand-danger">{error}</span>}
         </label>
     );
@@ -145,7 +145,7 @@ export function SelectField({ label, error, children, className = '', ...props }
     return (
         <label className={`block ${className}`}>
             <span className="mb-1.5 block text-xs font-bold text-text-main">{label}</span>
-            <select className={inputClass} {...props}>
+            <select className={`${inputClass} ${error ? 'border-brand-danger focus:border-brand-danger focus:ring-brand-danger/15' : ''}`} {...props}>
                 {children}
             </select>
             {error && <span className="mt-1 block text-xs text-brand-danger">{error}</span>}
@@ -158,7 +158,11 @@ export function TextareaField({ label, error, className = '', ...props }) {
         <label className={`block ${className}`}>
             <span className="mb-1.5 block text-xs font-bold text-text-main">{label}</span>
             <textarea
-                className="min-h-24 w-full rounded-xl border border-brand-border bg-brand-card px-3 py-2.5 text-sm text-text-main outline-none transition focus:border-brand-secondary focus:ring-2 focus:ring-brand-secondary/15"
+                className={`min-h-24 w-full rounded-xl border bg-brand-card px-3 py-2.5 text-sm text-text-main outline-none transition focus:ring-2 ${
+                    error
+                        ? 'border-brand-danger focus:border-brand-danger focus:ring-brand-danger/15'
+                        : 'border-brand-border focus:border-brand-secondary focus:ring-brand-secondary/15'
+                }`}
                 {...props}
             />
             {error && <span className="mt-1 block text-xs text-brand-danger">{error}</span>}

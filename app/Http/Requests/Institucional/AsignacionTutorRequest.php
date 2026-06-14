@@ -60,4 +60,18 @@ class AsignacionTutorRequest extends FormRequest
             },
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'id_tutor.required' => 'Seleccione un tutor académico.',
+            'id_tutor.exists' => 'El tutor académico seleccionado no existe.',
+            'id_prog.required_without' => 'Seleccione un programa académico o un grupo.',
+            'id_grupo.required_without' => 'Seleccione un grupo o un programa académico.',
+            'fecha_inicio_asig.date' => 'La fecha de inicio no tiene un formato válido.',
+            'fecha_fin_asig.date' => 'La fecha de finalización no tiene un formato válido.',
+            'fecha_fin_asig.after_or_equal' => 'La fecha de finalización debe ser posterior o igual a la fecha de inicio.',
+            'estado_asig.in' => 'Seleccione un estado válido para la asignación tutorial.',
+        ];
+    }
 }

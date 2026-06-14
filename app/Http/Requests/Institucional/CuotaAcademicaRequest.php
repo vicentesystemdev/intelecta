@@ -36,4 +36,21 @@ class CuotaAcademicaRequest extends FormRequest
             'observacion_cuota' => ['nullable', 'string', 'max:2000'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'id_mat.required' => 'Seleccione una matrícula académica.',
+            'id_mat.exists' => 'La matrícula académica seleccionada no existe.',
+            'nro_cuota.integer' => 'El número de cuota debe ser un número entero.',
+            'nro_cuota.min' => 'El número de cuota debe ser mayor a cero.',
+            'nro_cuota.unique' => 'Este número de cuota ya está registrado para la matrícula.',
+            'monto_cuota.required' => 'El monto de la cuota es obligatorio.',
+            'monto_cuota.numeric' => 'El monto de la cuota debe ser numérico.',
+            'monto_cuota.min' => 'El monto de la cuota no puede ser negativo.',
+            'fecha_vencimiento_cuota.date' => 'La fecha de vencimiento no tiene un formato válido.',
+            'fecha_pago_cuota.date' => 'La fecha de pago no tiene un formato válido.',
+            'estado_cuota.in' => 'Seleccione un estado válido para la cuota académica.',
+        ];
+    }
 }

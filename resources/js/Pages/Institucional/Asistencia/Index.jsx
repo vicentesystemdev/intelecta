@@ -53,6 +53,12 @@ const emptyAttendance = {
     observacion_asist: '',
 };
 
+const localToday = () => {
+    const date = new Date();
+    const offset = date.getTimezoneOffset();
+    return new Date(date.getTime() - offset * 60_000).toISOString().slice(0, 10);
+};
+
 const formatDate = (value) =>
     value
         ? new Date(`${String(value).slice(0, 10)}T00:00:00`).toLocaleDateString(
@@ -326,6 +332,7 @@ export default function Index({
                 </select>
                 <input
                     type="date"
+                    max={localToday()}
                     className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
                     value={filters.fecha_asist}
                     onChange={(event) =>
@@ -401,7 +408,19 @@ export default function Index({
                     )}
                 </div>
 
-                {listaGrupo.length > 0 ? (
+                                {(groupForm.errors.id_grupo ||
+                                    groupForm.errors.fecha_asist ||
+                                    groupForm.errors.sesion_asist ||
+                                    groupForm.errors.registros) && (
+                                    <div className="mb-4 rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-3 text-sm font-medium text-brand-danger">
+                                        {groupForm.errors.id_grupo ||
+                                            groupForm.errors.fecha_asist ||
+                                            groupForm.errors.sesion_asist ||
+                                            groupForm.errors.registros}
+                                    </div>
+                                )}
+
+                                {listaGrupo.length > 0 ? (
                     <form onSubmit={submitGroup} className="mt-5">
                         <div className="grid gap-3">
                             {listaGrupo.map((item) => {
@@ -694,6 +713,7 @@ export default function Index({
                     </SelectField>
                     <Field
                         type="date"
+                        max={localToday()}
                         label="Fecha"
                         value={individual.data.fecha_asist}
                         onChange={(event) =>

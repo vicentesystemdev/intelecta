@@ -13,11 +13,14 @@ import {
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import Pagination from '@/Components/Pagination';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import {
     AtSign,
+    BookOpenCheck,
+    CalendarDays,
     Eye,
     GraduationCap,
+    Layers3,
     Link2,
     Pencil,
     Phone,
@@ -54,6 +57,7 @@ export default function Index({
         estado_tutor: filtros.estado_tutor || '',
     });
     const [modal, setModal] = useState({ open: false, tutor: null });
+    const [detail, setDetail] = useState(null);
     const form = useForm(emptyTutor);
 
     const openForm = (tutor = null) => {
@@ -203,16 +207,14 @@ export default function Index({
                                     {tutor.asignaciones_activas_count} asignaciones activas
                                 </span>
                                 <div className="flex gap-1">
-                                    <Link
-                                        href={route(
-                                            'admin.institucional.tutores.show',
-                                            tutor.id_tutor,
-                                        )}
+                                    <button
+                                        type="button"
+                                        onClick={() => setDetail(tutor)}
                                         className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30"
                                         aria-label={`Ver a ${tutor.nombre_completo}`}
                                     >
                                         <Eye className="h-4 w-4" />
-                                    </Link>
+                                    </button>
                                     <button
                                         className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30"
                                         onClick={() => openForm(tutor)}
@@ -351,6 +353,99 @@ export default function Index({
                         </button>
                     </div>
                 </form>
+            </ModalInstitucional>
+
+            <ModalInstitucional
+                open={Boolean(detail)}
+                onOpenChange={(open) => !open && setDetail(null)}
+                title="Detalle del Tutor Académico"
+                description="Perfil profesional y responsabilidades activas de acompañamiento institucional."
+                size="xl"
+            >
+                {detail && (
+                    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.8fr)]">
+                        <section className="space-y-5">
+                            <div className="rounded-2xl bg-gradient-to-br from-brand-primary to-brand-secondary p-5 text-white">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p className="text-xs font-bold uppercase tracking-wider text-brand-accent">
+                                            {detail.especialidad_tutor || 'Acompañamiento académico'}
+                                        </p>
+                                        <h3 className="mt-2 text-xl font-black">{detail.nombre_completo}</h3>
+                                    </div>
+                                    <InstitutionalStatus status={detail.estado_tutor} />
+                                </div>
+                                <p className="mt-3 text-sm leading-6 text-slate-200">
+                                    {detail.formacion_tutor || 'Formación profesional pendiente de registro.'}
+                                </p>
+                            </div>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                {[
+                                    ['C.I.', detail.ci_tutor],
+                                    ['Celular', detail.celular_tutor],
+                                    ['Correo de contacto', detail.correo_tutor],
+                                    ['Usuario asociado', detail.user?.email],
+                                ].map(([label, value]) => (
+                                    <div key={label} className="rounded-xl border border-brand-border bg-brand-card p-4">
+                                        <p className="text-xs text-text-muted">{label}</p>
+                                        <p className="mt-1 break-words text-sm font-bold text-text-main">{value || 'No registrado'}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="rounded-2xl border border-brand-border p-5">
+                                <p className="text-xs font-bold uppercase tracking-wider text-text-muted">Experiencia académica</p>
+                                <p className="mt-3 whitespace-pre-line text-sm leading-6 text-text-main">
+                                    {detail.experiencia_tutor || 'Experiencia pendiente de registro.'}
+                                </p>
+                            </div>
+                            {detail.observacion_tutor && (
+                                <div className="rounded-2xl border border-brand-info/25 bg-brand-info/10 p-5">
+                                    <p className="text-xs font-bold uppercase tracking-wider text-brand-info">Observación institucional</p>
+                                    <p className="mt-3 text-sm leading-6 text-text-main">{detail.observacion_tutor}</p>
+                                </div>
+                            )}
+                        </section>
+                        <section className="rounded-2xl border border-brand-border bg-brand-bg p-5">
+                            <h3 className="text-base font-black text-text-main">Asignaciones activas</h3>
+                            <p className="mt-1 text-xs leading-5 text-text-muted">Programas y grupos vinculados al tutor académico.</p>
+                            <div className="mt-4 space-y-3">
+                                {(detail.asignaciones || []).map((assignment) => (
+                                    <article key={assignment.id_asig} className="rounded-2xl border border-brand-border bg-brand-card p-4">
+                                        <div className="flex items-start gap-3">
+                                            {assignment.grupo ? (
+                                                <Layers3 className="mt-0.5 h-4 w-4 shrink-0 text-brand-secondary" />
+                                            ) : (
+                                                <BookOpenCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-secondary" />
+                                            )}
+                                            <div className="min-w-0">
+                                                <p className="break-words text-sm font-black text-text-main">
+                                                    {assignment.grupo?.nombre_grupo || assignment.programa?.nombre_prog || 'Asignación institucional'}
+                                                </p>
+                                                <p className="mt-1 text-xs leading-5 text-text-muted">
+                                                    {assignment.grupo ? assignment.programa?.nombre_prog : 'Cobertura por programa'}
+                                                </p>
+                                                <p className="mt-2 flex items-center gap-1.5 text-xs text-text-muted">
+                                                    <CalendarDays className="h-3.5 w-3.5" />
+                                                    {assignment.fecha_inicio_asig
+                                                        ? new Date(`${assignment.fecha_inicio_asig.slice(0, 10)}T00:00:00`).toLocaleDateString('es-BO')
+                                                        : 'Sin fecha de inicio'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </article>
+                                ))}
+                                {!detail.asignaciones?.length && (
+                                    <div className="rounded-2xl border border-dashed border-brand-border p-6 text-center text-sm text-text-muted">
+                                        Sin asignaciones activas.
+                                    </div>
+                                )}
+                            </div>
+                            <button type="button" className={`${secondaryButtonClass} mt-5 w-full`} onClick={() => setDetail(null)}>
+                                Cerrar detalle
+                            </button>
+                        </section>
+                    </div>
+                )}
             </ModalInstitucional>
         </AdminLayout>
     );

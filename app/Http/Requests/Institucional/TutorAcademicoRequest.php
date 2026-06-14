@@ -42,4 +42,17 @@ class TutorAcademicoRequest extends FormRequest
             'observacion_tutor' => ['nullable', 'string', 'max:2000'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'user_id.exists' => 'El usuario seleccionado no existe.',
+            'user_id.unique' => 'El usuario seleccionado ya está vinculado con otro tutor académico.',
+            'nombres_tutor.required' => 'Los nombres del tutor académico son obligatorios.',
+            'apellidos_tutor.required' => 'Los apellidos del tutor académico son obligatorios.',
+            'ci_tutor.unique' => 'El C.I. ya está registrado para otro tutor académico.',
+            'correo_tutor.email' => 'Ingrese un correo electrónico válido.',
+            'estado_tutor.in' => 'Seleccione un estado válido para el tutor académico.',
+        ];
+    }
 }
