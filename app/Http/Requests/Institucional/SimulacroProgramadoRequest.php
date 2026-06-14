@@ -10,7 +10,11 @@ class SimulacroProgramadoRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        $permission = $this->isMethod('post')
+            ? 'simulacros.crear'
+            : 'simulacros.editar';
+
+        return $this->user()?->can($permission) ?? false;
     }
 
     public function rules(): array

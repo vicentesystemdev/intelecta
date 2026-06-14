@@ -33,48 +33,48 @@ const navigationGroups = [
     {
         label: 'INICIO',
         items: [
-            { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', routeName: 'dashboard' },
+            { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', routeName: 'dashboard', permission: 'dashboard.ver' },
         ],
     },
     {
         label: 'GESTIÓN INSTITUCIONAL',
         items: [
-            { label: 'Programas Académicos', icon: BookOpenCheck, href: '/admin/institucional/programas', routeName: 'admin.institucional.programas.*' },
-            { label: 'Grupos y Paralelos', icon: Layers3, href: '/admin/institucional/grupos', routeName: 'admin.institucional.grupos.*' },
-            { label: 'Tutores Académicos', icon: UserRoundCheck, href: '/admin/institucional/tutores', routeName: 'admin.institucional.tutores.*' },
-            { label: 'Asignación de Tutores', icon: Link2, href: '/admin/institucional/asignacion-tutores', routeName: 'admin.institucional.asignacion-tutores.*' },
-            { label: 'Inscripciones Académicas', icon: ClipboardList, href: '/admin/institucional/inscripciones', routeName: 'admin.institucional.inscripciones.*' },
-            { label: 'Matrículas y Cuotas', icon: WalletCards, href: '/admin/institucional/matriculas-cuotas', routeName: 'admin.institucional.matriculas-cuotas.*' },
-            { label: 'Habilitación Académica', icon: ShieldCheck, href: '/admin/institucional/habilitacion-academica', routeName: 'admin.institucional.habilitacion.*' },
-            { label: 'Control de Asistencia', icon: CalendarCheck2, href: '/admin/institucional/asistencia', routeName: 'admin.institucional.asistencia.*' },
-            { label: 'Calendario de Simulacros', icon: CalendarDays, href: '/admin/institucional/simulacros', routeName: 'admin.institucional.simulacros.*' },
+            { label: 'Programas Académicos', icon: BookOpenCheck, href: '/admin/institucional/programas', routeName: 'admin.institucional.programas.*', permission: 'programas.ver' },
+            { label: 'Grupos y Paralelos', icon: Layers3, href: '/admin/institucional/grupos', routeName: 'admin.institucional.grupos.*', permission: 'grupos.ver' },
+            { label: 'Tutores Académicos', icon: UserRoundCheck, href: '/admin/institucional/tutores', routeName: 'admin.institucional.tutores.*', permission: 'tutores.ver' },
+            { label: 'Asignación de Tutores', icon: Link2, href: '/admin/institucional/asignacion-tutores', routeName: 'admin.institucional.asignacion-tutores.*', permission: 'asignaciones-tutores.ver' },
+            { label: 'Inscripciones Académicas', icon: ClipboardList, href: '/admin/institucional/inscripciones', routeName: 'admin.institucional.inscripciones.*', permission: 'inscripciones.ver' },
+            { label: 'Matrículas y Cuotas', icon: WalletCards, href: '/admin/institucional/matriculas-cuotas', routeName: 'admin.institucional.matriculas-cuotas.*', permission: 'matriculas-cuotas.ver' },
+            { label: 'Habilitación Académica', icon: ShieldCheck, href: '/admin/institucional/habilitacion-academica', routeName: 'admin.institucional.habilitacion.*', permission: 'habilitacion-academica.ver' },
+            { label: 'Control de Asistencia', icon: CalendarCheck2, href: '/admin/institucional/asistencia', routeName: 'admin.institucional.asistencia.*', permission: 'asistencia.ver' },
+            { label: 'Calendario de Simulacros', icon: CalendarDays, href: '/admin/institucional/simulacros', routeName: 'admin.institucional.simulacros.*', permission: 'simulacros.ver' },
         ],
     },
     {
         label: 'GESTIÓN DE POSTULANTES',
         items: [
-            { label: 'Postulantes', icon: GraduationCap, href: '/postulantes', routeName: 'postulantes.*' },
-            { label: 'Ficha Académica', icon: FileChartColumn, href: '/admin/institucional/ficha-academica', routeName: 'admin.institucional.ficha.*' },
-            { label: 'Ranking Académico', icon: Trophy, href: '/admin/institucional/ranking', routeName: 'admin.institucional.ranking.*' },
+            { label: 'Postulantes', icon: GraduationCap, href: '/postulantes', routeName: 'postulantes.*', permission: 'postulantes.ver' },
+            { label: 'Ficha Académica', icon: FileChartColumn, href: '/admin/institucional/ficha-academica', routeName: 'admin.institucional.ficha.*', permission: 'ficha-academica.ver' },
+            { label: 'Ranking Académico', icon: Trophy, href: '/admin/institucional/ranking', routeName: 'admin.institucional.ranking.*', permission: 'ranking.ver' },
         ],
     },
     {
         label: 'GESTIÓN EVALUATIVA',
         items: [
-            { label: 'Materias', icon: BookOpenCheck, href: '/admin/evaluaciones/materias', routeName: 'admin.evaluaciones.materias' },
-            { label: 'Áreas de Conocimiento', icon: Layers3, href: '/areas-conocimiento', routeName: 'areas-conocimiento.*' },
-            { label: 'Temas Académicos', icon: Tags, href: '/temas', routeName: 'temas.*' },
-            { label: 'Banco de Preguntas', icon: FileQuestion, href: '/preguntas', routeName: 'preguntas.*' },
-            { label: 'Plantillas de Evaluación', icon: BookCopy, href: '/plantillas-evaluacion', routeName: 'plantillas-evaluacion.*' },
-            { label: 'Resultados Académicos', icon: ListChecks, href: '/admin/evaluaciones/resultados', routeName: 'admin.evaluaciones.resultados' },
+            { label: 'Materias', icon: BookOpenCheck, href: '/admin/evaluaciones/materias', routeName: 'admin.evaluaciones.materias', permission: 'materias.ver' },
+            { label: 'Áreas de Conocimiento', icon: Layers3, href: '/areas-conocimiento', routeName: 'areas-conocimiento.*', permission: 'areas.ver' },
+            { label: 'Temas Académicos', icon: Tags, href: '/temas', routeName: 'temas.*', permission: 'temas.ver' },
+            { label: 'Banco de Preguntas', icon: FileQuestion, href: '/preguntas', routeName: 'preguntas.*', permission: 'preguntas.ver' },
+            { label: 'Plantillas de Evaluación', icon: BookCopy, href: '/plantillas-evaluacion', routeName: 'plantillas-evaluacion.*', permission: 'plantillas.ver' },
+            { label: 'Resultados Académicos', icon: ListChecks, href: '/admin/evaluaciones/resultados', routeName: 'admin.evaluaciones.resultados', permission: 'resultados.ver' },
         ],
     },
     {
         label: 'REPORTES Y ANÁLISIS',
         items: [
-            { label: 'Reportes Académicos', icon: BarChart3, href: '/reportes-academicos', routeName: 'reportes-academicos.index' },
-            { label: 'Indicadores de Desempeño', icon: FileChartColumn, href: '/admin/analisis/riesgo-academico', routeName: 'admin.analisis.riesgo-academico' },
-            { label: 'Learning Analytics', icon: ChartNoAxesCombined, href: '/admin/analisis/learning-analytics', routeName: 'admin.analisis.learning-analytics' },
+            { label: 'Reportes Académicos', icon: BarChart3, href: '/reportes-academicos', routeName: 'reportes-academicos.index', permission: 'reportes.ver' },
+            { label: 'Indicadores de Desempeño', icon: FileChartColumn, href: '/admin/analisis/riesgo-academico', routeName: 'admin.analisis.riesgo-academico', permission: 'indicadores.ver' },
+            { label: 'Learning Analytics', icon: ChartNoAxesCombined, href: '/admin/analisis/learning-analytics', routeName: 'admin.analisis.learning-analytics', permission: 'learning_analytics.ver' },
         ],
     },
     {
@@ -82,7 +82,7 @@ const navigationGroups = [
         items: [
             { label: 'Usuarios', icon: Users, href: '/admin/sistema/usuarios', routeName: 'admin.sistema.usuarios', permission: 'usuarios.ver' },
             { label: 'Roles y Permisos', icon: ShieldCheck, href: '/admin/sistema/roles-permisos', routeName: 'admin.sistema.roles-permisos', permission: 'roles.ver' },
-            { label: 'Configuración', icon: Settings, href: '/admin/sistema/configuracion', routeName: 'admin.sistema.configuracion' },
+            { label: 'Configuración', icon: Settings, href: '/admin/sistema/configuracion', routeName: 'admin.sistema.configuracion', permission: 'configuracion.ver' },
         ],
     },
 ];
@@ -91,10 +91,26 @@ const groupIsActive = (group) =>
     group.items.some(({ routeName }) => routeName && route().current(routeName));
 
 export default function AppSidebar({ open = false, onClose = () => {} }) {
-    const permissions = usePage().props.auth.permissions || [];
+    const auth = usePage().props.auth || {};
+    const permissions = auth.permissions || [];
+    const isSuperAdministrator = (auth.roles || []).includes(
+        'Super Administrador',
+    );
+    const visibleGroups = navigationGroups
+        .map((group) => ({
+            ...group,
+            items: group.items.filter(
+                ({ permission }) =>
+                    isSuperAdministrator ||
+                    !permission ||
+                    permissions.includes(permission),
+            ),
+        }))
+        .filter((group) => group.items.length > 0);
+
     const [expanded, setExpanded] = useState(() =>
         Object.fromEntries(
-            navigationGroups.map((group) => [
+            visibleGroups.map((group) => [
                 group.label,
                 group.label === 'INICIO' || groupIsActive(group),
             ]),
@@ -142,10 +158,7 @@ export default function AppSidebar({ open = false, onClose = () => {} }) {
                 </div>
 
                 <nav className="flex-1 space-y-2 overflow-y-auto px-4 py-5 sidebar-scrollbar">
-                    {navigationGroups.map((group) => {
-                        const visibleItems = group.items.filter(
-                            ({ permission }) => !permission || permissions.includes(permission),
-                        );
+                    {visibleGroups.map((group) => {
                         const active = groupIsActive(group);
                         const isOpen = expanded[group.label] || active;
 
@@ -169,7 +182,7 @@ export default function AppSidebar({ open = false, onClose = () => {} }) {
                                 >
                                     <div className="overflow-hidden">
                                         <div className="space-y-1 pb-2 pt-1">
-                                            {visibleItems.map(({ label, icon: Icon, href, routeName }) => {
+                                            {group.items.map(({ label, icon: Icon, href, routeName }) => {
                                                 const itemActive = routeName ? route().current(routeName) : false;
                                                 return (
                                                     <Link

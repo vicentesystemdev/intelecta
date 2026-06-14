@@ -11,7 +11,11 @@ class AsignacionTutorRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        $permission = $this->isMethod('post')
+            ? 'asignaciones-tutores.crear'
+            : 'asignaciones-tutores.editar';
+
+        return $this->user()?->can($permission) ?? false;
     }
 
     public function rules(): array

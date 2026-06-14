@@ -17,18 +17,33 @@ import {
 import { useMemo, useState } from 'react';
 
 const groupLabels = {
+    'asignaciones-tutores': 'Asignación de tutores',
+    asistencia: 'Control de asistencia',
     areas: 'Áreas de conocimiento',
+    configuracion: 'Configuración',
     dashboard: 'Panel principal',
     docentes: 'Docentes',
     evaluaciones: 'Evaluaciones',
+    'ficha-academica': 'Ficha académica',
     general: 'General',
+    grupos: 'Grupos y paralelos',
+    'habilitacion-academica': 'Habilitación académica',
+    indicadores: 'Indicadores de desempeño',
+    inscripciones: 'Inscripciones académicas',
     learning_analytics: 'Learning Analytics',
+    materias: 'Materias',
+    'matriculas-cuotas': 'Matrículas y cuotas',
     plantillas: 'Plantillas',
     postulantes: 'Postulantes',
     preguntas: 'Banco de Preguntas',
+    programas: 'Programas académicos',
+    ranking: 'Ranking académico',
     reportes: 'Reportes Académicos',
+    resultados: 'Resultados académicos',
     roles: 'Roles y Permisos',
+    simulacros: 'Calendario de simulacros',
     temas: 'Temas',
+    tutores: 'Tutores académicos',
     usuarios: 'Usuarios',
 };
 

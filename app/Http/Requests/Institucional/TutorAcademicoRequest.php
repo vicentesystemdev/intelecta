@@ -9,7 +9,11 @@ class TutorAcademicoRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        $permission = $this->isMethod('post')
+            ? 'tutores.crear'
+            : 'tutores.editar';
+
+        return $this->user()?->can($permission) ?? false;
     }
 
     public function rules(): array

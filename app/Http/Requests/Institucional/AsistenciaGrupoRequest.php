@@ -12,7 +12,7 @@ class AsistenciaGrupoRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return $this->user()?->can('asistencia.crear') ?? false;
     }
 
     protected function prepareForValidation(): void

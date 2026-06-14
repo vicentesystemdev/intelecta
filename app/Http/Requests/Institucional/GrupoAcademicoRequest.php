@@ -9,7 +9,11 @@ class GrupoAcademicoRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        $permission = $this->isMethod('post')
+            ? 'grupos.crear'
+            : 'grupos.editar';
+
+        return $this->user()?->can($permission) ?? false;
     }
 
     public function rules(): array

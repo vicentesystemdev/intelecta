@@ -9,7 +9,11 @@ class CuotaAcademicaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        $permission = $this->isMethod('post')
+            ? 'matriculas-cuotas.crear'
+            : 'matriculas-cuotas.editar';
+
+        return $this->user()?->can($permission) ?? false;
     }
 
     public function rules(): array

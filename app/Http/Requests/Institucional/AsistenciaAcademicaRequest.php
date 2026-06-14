@@ -12,7 +12,11 @@ class AsistenciaAcademicaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        $permission = $this->isMethod('post')
+            ? 'asistencia.crear'
+            : 'asistencia.editar';
+
+        return $this->user()?->can($permission) ?? false;
     }
 
     protected function prepareForValidation(): void

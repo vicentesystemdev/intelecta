@@ -46,11 +46,14 @@ Route::get('/evaluaciones-postulante', function () {
 })->name('evaluaciones-postulante');
 
 Route::get('/dashboard', DashboardController::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'administrative', 'permission:dashboard.ver'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::prefix('areas-conocimiento')->name('areas-conocimiento.')->group(function () {
+    Route::prefix('areas-conocimiento')
+        ->middleware(['verified', 'administrative'])
+        ->name('areas-conocimiento.')
+        ->group(function () {
         Route::get('/', [AreaConocimientoController::class, 'index'])->middleware('permission:areas.ver')->name('index');
         Route::get('/crear', [AreaConocimientoController::class, 'create'])->middleware('permission:areas.crear')->name('create');
         Route::post('/', [AreaConocimientoController::class, 'store'])->middleware('permission:areas.crear')->name('store');
@@ -58,7 +61,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/{area}', [AreaConocimientoController::class, 'update'])->middleware('permission:areas.editar')->name('update');
     });
 
-    Route::prefix('temas')->name('temas.')->group(function () {
+    Route::prefix('temas')
+        ->middleware(['verified', 'administrative'])
+        ->name('temas.')
+        ->group(function () {
         Route::get('/', [TemaController::class, 'index'])->middleware('permission:temas.ver')->name('index');
         Route::get('/crear', [TemaController::class, 'create'])->middleware('permission:temas.crear')->name('create');
         Route::post('/', [TemaController::class, 'store'])->middleware('permission:temas.crear')->name('store');
@@ -66,7 +72,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/{tema}', [TemaController::class, 'update'])->middleware('permission:temas.editar')->name('update');
     });
 
-    Route::prefix('preguntas')->name('preguntas.')->group(function () {
+    Route::prefix('preguntas')
+        ->middleware(['verified', 'administrative'])
+        ->name('preguntas.')
+        ->group(function () {
         Route::get('/', [PreguntaController::class, 'index'])->middleware('permission:preguntas.ver')->name('index');
         Route::get('/crear', [PreguntaController::class, 'create'])->middleware('permission:preguntas.crear')->name('create');
         Route::post('/', [PreguntaController::class, 'store'])->middleware('permission:preguntas.crear')->name('store');
@@ -76,7 +85,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{pregunta}/estado', [PreguntaController::class, 'cambiarEstado'])->middleware('permission:preguntas.eliminar')->name('cambiar-estado');
     });
 
-    Route::prefix('plantillas-evaluacion')->name('plantillas-evaluacion.')->group(function () {
+    Route::prefix('plantillas-evaluacion')
+        ->middleware(['verified', 'administrative'])
+        ->name('plantillas-evaluacion.')
+        ->group(function () {
         Route::get('/', [PlantillaEvaluacionController::class, 'index'])->middleware('permission:plantillas.ver')->name('index');
         Route::get('/crear', [PlantillaEvaluacionController::class, 'create'])->middleware('permission:plantillas.crear')->name('create');
         Route::post('/', [PlantillaEvaluacionController::class, 'store'])->middleware('permission:plantillas.crear')->name('store');
@@ -86,7 +98,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{plantilla}/estado', [PlantillaEvaluacionController::class, 'cambiarEstado'])->middleware('permission:plantillas.eliminar')->name('cambiar-estado');
     });
 
-    Route::prefix('postulantes')->name('postulantes.')->group(function () {
+    Route::prefix('postulantes')
+        ->middleware(['verified', 'administrative'])
+        ->name('postulantes.')
+        ->group(function () {
         Route::get('/', [PostulanteController::class, 'index'])
             ->middleware('permission:postulantes.ver')
             ->name('index');
@@ -111,96 +126,130 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/reportes-academicos', [ReporteAcademicoController::class, 'index'])
-        ->middleware('permission:reportes.ver')
+        ->middleware(['verified', 'administrative', 'permission:reportes.ver'])
         ->name('reportes-academicos.index');
 
     // Rutas planificadas del panel administrativo
-    Route::prefix('admin')->group(function () {
+    Route::prefix('admin')
+        ->middleware(['verified', 'administrative'])
+        ->group(function () {
         Route::prefix('institucional')
-            ->middleware('verified')
             ->name('admin.institucional.')
             ->group(function () {
                 Route::get('/programas', [ProgramaAcademicoController::class, 'index'])
+                    ->middleware('permission:programas.ver')
                     ->name('programas.index');
                 Route::post('/programas', [ProgramaAcademicoController::class, 'store'])
+                    ->middleware('permission:programas.crear')
                     ->name('programas.store');
                 Route::put('/programas/{programa}', [ProgramaAcademicoController::class, 'update'])
+                    ->middleware('permission:programas.editar')
                     ->name('programas.update');
 
                 Route::get('/grupos', [GrupoAcademicoController::class, 'index'])
+                    ->middleware('permission:grupos.ver')
                     ->name('grupos.index');
                 Route::post('/grupos', [GrupoAcademicoController::class, 'store'])
+                    ->middleware('permission:grupos.crear')
                     ->name('grupos.store');
                 Route::put('/grupos/{grupo}', [GrupoAcademicoController::class, 'update'])
+                    ->middleware('permission:grupos.editar')
                     ->name('grupos.update');
 
                 Route::get('/inscripciones', [InscripcionAcademicaController::class, 'index'])
+                    ->middleware('permission:inscripciones.ver')
                     ->name('inscripciones.index');
                 Route::post('/inscripciones', [InscripcionAcademicaController::class, 'store'])
+                    ->middleware('permission:inscripciones.crear')
                     ->name('inscripciones.store');
                 Route::patch('/inscripciones/{inscripcion}', [InscripcionAcademicaController::class, 'update'])
+                    ->middleware('permission:inscripciones.editar')
                     ->name('inscripciones.update');
 
                 Route::get('/simulacros', [SimulacroProgramadoController::class, 'index'])
+                    ->middleware('permission:simulacros.ver')
                     ->name('simulacros.index');
                 Route::post('/simulacros', [SimulacroProgramadoController::class, 'store'])
+                    ->middleware('permission:simulacros.crear')
                     ->name('simulacros.store');
                 Route::put('/simulacros/{simulacro}', [SimulacroProgramadoController::class, 'update'])
+                    ->middleware('permission:simulacros.editar')
                     ->name('simulacros.update');
 
                 Route::get('/ranking', [RankingAcademicoController::class, 'index'])
+                    ->middleware('permission:ranking.ver')
                     ->name('ranking.index');
                 Route::get('/ficha-academica', [FichaAcademicaController::class, 'index'])
+                    ->middleware('permission:ficha-academica.ver')
                     ->name('ficha.index');
                 Route::get('/ficha-academica/{postulante}', [FichaAcademicaController::class, 'show'])
+                    ->middleware('permission:ficha-academica.ver')
                     ->name('ficha.postulante');
 
                 Route::get('/tutores', [TutorAcademicoController::class, 'index'])
+                    ->middleware('permission:tutores.ver')
                     ->name('tutores.index');
                 Route::post('/tutores', [TutorAcademicoController::class, 'store'])
+                    ->middleware('permission:tutores.crear')
                     ->name('tutores.store');
                 Route::get('/tutores/{tutor}', [TutorAcademicoController::class, 'show'])
+                    ->middleware('permission:tutores.ver')
                     ->name('tutores.show');
                 Route::patch('/tutores/{tutor}', [TutorAcademicoController::class, 'update'])
+                    ->middleware('permission:tutores.editar')
                     ->name('tutores.update');
 
                 Route::get('/asignacion-tutores', [AsignacionTutorController::class, 'index'])
+                    ->middleware('permission:asignaciones-tutores.ver')
                     ->name('asignacion-tutores.index');
                 Route::post('/asignacion-tutores', [AsignacionTutorController::class, 'store'])
+                    ->middleware('permission:asignaciones-tutores.crear')
                     ->name('asignacion-tutores.store');
                 Route::patch('/asignacion-tutores/{asignacion}', [AsignacionTutorController::class, 'update'])
+                    ->middleware('permission:asignaciones-tutores.editar')
                     ->name('asignacion-tutores.update');
 
                 Route::get('/matriculas-cuotas', [MatriculaCuotaController::class, 'index'])
+                    ->middleware('permission:matriculas-cuotas.ver')
                     ->name('matriculas-cuotas.index');
                 Route::post('/matriculas-cuotas', [MatriculaCuotaController::class, 'storeMatricula'])
+                    ->middleware('permission:matriculas-cuotas.crear')
                     ->name('matriculas-cuotas.store');
                 Route::patch('/matriculas-cuotas/{matricula}', [MatriculaCuotaController::class, 'updateMatricula'])
+                    ->middleware('permission:matriculas-cuotas.editar')
                     ->name('matriculas-cuotas.update');
                 Route::post('/cuotas', [MatriculaCuotaController::class, 'storeCuota'])
+                    ->middleware('permission:matriculas-cuotas.crear')
                     ->name('cuotas.store');
                 Route::patch('/cuotas/{cuota}', [MatriculaCuotaController::class, 'updateCuota'])
+                    ->middleware('permission:matriculas-cuotas.editar')
                     ->name('cuotas.update');
 
                 Route::get('/habilitacion-academica', [HabilitacionAcademicaController::class, 'index'])
+                    ->middleware('permission:habilitacion-academica.ver')
                     ->name('habilitacion.index');
                 Route::patch('/habilitacion-academica/{habilitacion}', [HabilitacionAcademicaController::class, 'update'])
+                    ->middleware('permission:habilitacion-academica.editar')
                     ->name('habilitacion.update');
 
                 Route::get('/asistencia', [AsistenciaAcademicaController::class, 'index'])
+                    ->middleware('permission:asistencia.ver')
                     ->name('asistencia.index');
                 Route::post('/asistencia', [AsistenciaAcademicaController::class, 'store'])
+                    ->middleware('permission:asistencia.crear')
                     ->name('asistencia.store');
                 Route::post('/asistencia/grupo', [AsistenciaAcademicaController::class, 'storeGroup'])
+                    ->middleware('permission:asistencia.crear')
                     ->name('asistencia.store-grupo');
                 Route::patch('/asistencia/{asistencia}', [AsistenciaAcademicaController::class, 'update'])
+                    ->middleware('permission:asistencia.editar')
                     ->name('asistencia.update');
             });
 
         Route::prefix('gestion-academica')->group(function () {
             Route::get('/docentes', function () {
                 return Inertia::render('Modulos/TutoresAcademicos');
-            })->name('admin.docentes');
+            })->middleware('permission:tutores.ver')->name('admin.docentes');
 
             Route::get('/carreras', function () {
                 $items = Carrera::query()
@@ -219,7 +268,7 @@ Route::middleware('auth')->group(function () {
                         'postulantes' => $items->sum('postulantes_count'),
                     ],
                 ]);
-            })->name('admin.carreras');
+            })->middleware('permission:postulantes.ver')->name('admin.carreras');
 
             Route::get('/colegios', function () {
                 $items = Colegio::query()
@@ -237,17 +286,21 @@ Route::middleware('auth')->group(function () {
                         'postulantes' => $items->sum('postulantes_count'),
                     ],
                 ]);
-            })->name('admin.colegios');
+            })->middleware('permission:postulantes.ver')->name('admin.colegios');
         });
 
         Route::prefix('evaluaciones')->group(function () {
             Route::redirect('/areas', '/areas-conocimiento')
+                ->middleware('permission:areas.ver')
                 ->name('admin.evaluaciones.areas');
             Route::redirect('/temas', '/temas')
+                ->middleware('permission:temas.ver')
                 ->name('admin.evaluaciones.temas');
             Route::redirect('/preguntas', '/preguntas')
+                ->middleware('permission:preguntas.ver')
                 ->name('admin.evaluaciones.preguntas');
             Route::redirect('/plantillas', '/plantillas-evaluacion')
+                ->middleware('permission:plantillas.ver')
                 ->name('admin.evaluaciones.plantillas');
 
             Route::get('/materias', function () {
@@ -272,21 +325,21 @@ Route::middleware('auth')->group(function () {
                         'postulantes' => $items->sum('temas_count'),
                     ],
                 ]);
-            })->name('admin.evaluaciones.materias');
+            })->middleware('permission:materias.ver')->name('admin.evaluaciones.materias');
 
             Route::get('/', function () {
                 return Inertia::render('Modulos/CentroEvaluaciones');
-            })->name('admin.evaluaciones.index');
+            })->middleware('permission:evaluaciones.ver')->name('admin.evaluaciones.index');
 
             Route::get('/resultados', function () {
                 return Inertia::render('Modulos/ResultadosSeguimiento');
-            })->name('admin.evaluaciones.resultados');
+            })->middleware('permission:resultados.ver')->name('admin.evaluaciones.resultados');
         });
 
         Route::prefix('analisis')->group(function () {
             Route::get('/learning-analytics', function () {
                 return Inertia::render('Analisis/LearningAnalytics');
-            })->name('admin.analisis.learning-analytics');
+            })->middleware('permission:learning_analytics.ver')->name('admin.analisis.learning-analytics');
 
             Route::get('/riesgo-academico', function () {
                 $registros = RendimientoPostulante::query()
@@ -310,7 +363,7 @@ Route::middleware('auth')->group(function () {
                         'favorables' => $registros->where('nivel_riesgo_rend', 'Alto rendimiento')->count(),
                     ],
                 ]);
-            })->name('admin.analisis.riesgo-academico');
+            })->middleware('permission:indicadores.ver')->name('admin.analisis.riesgo-academico');
         });
 
         Route::prefix('sistema')->group(function () {
@@ -333,7 +386,7 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/configuracion', function () {
                 return Inertia::render('Sistema/Configuracion/Index');
-            })->name('admin.sistema.configuracion');
+            })->middleware('permission:configuracion.ver')->name('admin.sistema.configuracion');
         });
     });
 

@@ -10,7 +10,11 @@ class ProgramaAcademicoRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        $permission = $this->isMethod('post')
+            ? 'programas.crear'
+            : 'programas.editar';
+
+        return $this->user()?->can($permission) ?? false;
     }
 
     public function rules(): array

@@ -23,9 +23,17 @@ class DashboardController extends Controller
         AcademicoService $academico,
     ): Response|RedirectResponse
     {
-        if (auth()->user()->hasRole('Estudiante')) {
-            return redirect('/');
+        $user = request()->user();
+
+        if ($user->hasAnyRole(['Estudiante', 'Postulante'])) {
+            return to_route('estudiante.evaluaciones');
         }
+
+        abort_unless(
+            $user->getRoleNames()->isNotEmpty() && $user->can('dashboard.ver'),
+            403,
+            'No cuentas con permisos para acceder a este módulo.',
+        );
 
         $plantillasRecientes = PlantillaEvaluacion::query()
             ->withCount('preguntas')

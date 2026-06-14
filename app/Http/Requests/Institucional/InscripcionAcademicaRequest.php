@@ -9,7 +9,11 @@ class InscripcionAcademicaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        $permission = $this->isMethod('post')
+            ? 'inscripciones.crear'
+            : 'inscripciones.editar';
+
+        return $this->user()?->can($permission) ?? false;
     }
 
     public function rules(): array

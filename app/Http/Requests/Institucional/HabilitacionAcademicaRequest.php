@@ -9,7 +9,7 @@ class HabilitacionAcademicaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return $this->user()?->can('habilitacion-academica.editar') ?? false;
     }
 
     public function rules(): array
