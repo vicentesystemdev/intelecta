@@ -3,9 +3,11 @@
 namespace App\Domains\Academico\Models;
 
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
+use App\Domains\Resultados\Models\EvaluacionAplicada;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
@@ -46,5 +48,10 @@ class SimulacroProgramado extends Model
     public function plantilla(): BelongsTo
     {
         return $this->belongsTo(PlantillaEvaluacion::class, 'id_plantilla', 'id_plan');
+    }
+
+    public function evaluacionesAplicadas(): HasMany
+    {
+        return $this->hasMany(EvaluacionAplicada::class, 'id_sim', 'id_sim');
     }
 }

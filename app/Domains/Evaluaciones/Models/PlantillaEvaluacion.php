@@ -2,9 +2,11 @@
 
 namespace App\Domains\Evaluaciones\Models;
 
+use App\Domains\Resultados\Models\EvaluacionAplicada;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
@@ -33,5 +35,10 @@ class PlantillaEvaluacion extends Model
         )->withPivot(['orden_pp', 'puntaje_pp'])
             ->withTimestamps()
             ->orderByPivot('orden_pp');
+    }
+
+    public function evaluacionesAplicadas(): HasMany
+    {
+        return $this->hasMany(EvaluacionAplicada::class, 'id_plantilla', 'id_plan');
     }
 }

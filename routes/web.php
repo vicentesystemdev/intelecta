@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\RolPermisoController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\AreaConocimientoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EvaluacionAplicadaController;
 use App\Http\Controllers\Institucional\AsignacionTutorController;
 use App\Http\Controllers\Institucional\AsistenciaAcademicaController;
 use App\Http\Controllers\Institucional\FichaAcademicaController;
@@ -20,8 +21,8 @@ use App\Http\Controllers\PostulanteController;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReporteAcademicoController;
+use App\Http\Controllers\ResultadoAcademicoController;
 use App\Http\Controllers\TemaController;
-use App\Domains\Academico\Models\HabilitacionAcademica;
 use App\Domains\Academico\Models\RendimientoPostulante;
 use App\Domains\Evaluaciones\Models\Materia;
 use App\Domains\Institucional\Models\Carrera;
@@ -29,7 +30,6 @@ use App\Domains\Institucional\Models\Colegio;
 use App\Domains\Postulantes\Models\Postulante;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -331,9 +331,9 @@ Route::middleware('auth')->group(function () {
                 return Inertia::render('Modulos/CentroEvaluaciones');
             })->middleware('permission:evaluaciones.ver')->name('admin.evaluaciones.index');
 
-            Route::get('/resultados', function () {
-                return Inertia::render('Modulos/ResultadosSeguimiento');
-            })->middleware('permission:resultados.ver')->name('admin.evaluaciones.resultados');
+            Route::get('/resultados', [ResultadoAcademicoController::class, 'index'])
+                ->middleware('permission:resultados.ver')
+                ->name('admin.evaluaciones.resultados');
         });
 
         Route::prefix('analisis')->group(function () {
@@ -390,39 +390,21 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    // Ruta de evaluaciones del estudiante
-    Route::get('/estudiante/evaluaciones', function () {
-        if (auth()->user()->hasRole(['Super Administrador', 'Administrador', 'Docente'])) {
-            return redirect()->route('dashboard');
-        }
-        $habilitacion = null;
-
-        if (
-            Schema::hasTable('postulantes')
-            && Schema::hasTable('habilitaciones_academicas')
-        ) {
-            $postulante = Postulante::query()
-                ->where('email_post', auth()->user()->email)
-                ->first();
-
-            if ($postulante) {
-                $habilitacion = HabilitacionAcademica::query()
-                    ->where('id_post', $postulante->id_post)
-                    ->latest('id_hab')
-                    ->first([
-                        'estado_hab',
-                        'motivo_hab',
-                        'habilitado_evaluaciones_hab',
-                        'habilitado_simulacros_hab',
-                        'habilitado_reportes_hab',
-                    ]);
-            }
-        }
-
-        return Inertia::render('Estudiante/Evaluaciones', [
-            'habilitacionAcademica' => $habilitacion,
-        ]);
-    })->middleware('verified')->name('estudiante.evaluaciones');
+    Route::get('/estudiante/evaluaciones', [EvaluacionAplicadaController::class, 'index'])
+        ->middleware('verified')
+        ->name('estudiante.evaluaciones');
+    Route::post(
+        '/estudiante/evaluaciones/{plantilla}/iniciar',
+        [EvaluacionAplicadaController::class, 'iniciar'],
+    )
+        ->middleware('verified')
+        ->name('estudiante.evaluaciones.iniciar');
+    Route::post(
+        '/estudiante/evaluaciones/{evaluacion}/enviar',
+        [EvaluacionAplicadaController::class, 'enviar'],
+    )
+        ->middleware('verified')
+        ->name('estudiante.evaluaciones.enviar');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -12,6 +12,7 @@ import {
     Award,
     BookOpenCheck,
     CalendarCheck2,
+    ClipboardCheck,
     GraduationCap,
     School,
     Target,
@@ -24,6 +25,7 @@ const tabs = [
     ['datos', 'Datos académicos'],
     ['programa', 'Programa y grupo'],
     ['rendimiento', 'Rendimiento'],
+    ['evaluaciones', 'Evaluaciones aplicadas'],
     ['administracion', 'Estado administrativo'],
     ['asistencia', 'Asistencia'],
     ['seguimiento', 'Seguimiento'],
@@ -39,6 +41,7 @@ export default function Show({
     tutorAsignado,
     administracion,
     asistencia,
+    evaluacionesAplicadas = [],
 }) {
     const [activeTab, setActiveTab] = useState('datos');
     const fullName = `${postulante.nombres_post} ${postulante.apellidos_post}`;
@@ -136,6 +139,63 @@ export default function Show({
                                     return <div key={label} className="rounded-2xl border border-brand-border p-5"><p className="text-xs font-bold text-text-muted">{label}</p><p className="mt-3 text-3xl font-black text-text-main">{score(value)}</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-brand-border"><div className={`h-full rounded-full ${color}`} style={{ width: `${Math.min(100, numeric)}%` }} /></div></div>;
                                 })}
                             </div>
+                        </div>
+                    )}
+                    {activeTab === 'evaluaciones' && (
+                        <div>
+                            <h2 className="flex items-center gap-2 text-lg font-black text-text-main">
+                                <ClipboardCheck className="h-5 w-5 text-brand-secondary" />
+                                Evaluaciones aplicadas
+                            </h2>
+                            <p className="mt-1 text-sm text-text-muted">
+                                Historial trazable de aplicaciones y puntajes calculados.
+                            </p>
+                            {evaluacionesAplicadas.length ? (
+                                <div className="mt-5 grid gap-3">
+                                    {evaluacionesAplicadas.map((evaluacion) => (
+                                        <article
+                                            key={evaluacion.id_eval_apl}
+                                            className="grid gap-4 rounded-2xl border border-brand-border bg-brand-bg p-4 md:grid-cols-[1fr_130px_130px_140px]"
+                                        >
+                                            <div>
+                                                <p className="break-words text-sm font-black leading-snug text-text-main">
+                                                    {evaluacion.plantilla?.nombre_plan || 'Plantilla no disponible'}
+                                                </p>
+                                                <p className="mt-1 text-xs text-text-muted">
+                                                    {evaluacion.codigo_eval_apl || 'Sin código de aplicación'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">Puntaje</p>
+                                                <p className="mt-1 text-sm font-black text-text-main">
+                                                    {Number(evaluacion.puntaje_total_eval_apl || 0).toFixed(2)} / {Number(evaluacion.puntaje_maximo_eval_apl || 0).toFixed(2)}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">Porcentaje</p>
+                                                <p className="mt-1 text-lg font-black text-brand-primary dark:text-slate-100">
+                                                    {Number(evaluacion.porcentaje_eval_apl || 0).toFixed(1)}%
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">Finalización</p>
+                                                <p className="mt-1 text-xs font-semibold leading-5 text-text-main">
+                                                    {evaluacion.fecha_fin_eval_apl
+                                                        ? new Date(evaluacion.fecha_fin_eval_apl).toLocaleString('es-BO', { dateStyle: 'medium', timeStyle: 'short' })
+                                                        : 'En progreso'}
+                                                </p>
+                                            </div>
+                                        </article>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="mt-5 rounded-2xl border border-dashed border-brand-border p-8 text-center">
+                                    <p className="font-bold text-text-main">Sin evaluaciones aplicadas registradas.</p>
+                                    <p className="mt-1 text-sm text-text-muted">
+                                        El historial se mostrará cuando el postulante finalice una evaluación desde su portal.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
                     {activeTab === 'administracion' && (

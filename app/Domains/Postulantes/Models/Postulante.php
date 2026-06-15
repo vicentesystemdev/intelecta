@@ -10,6 +10,7 @@ use App\Domains\Academico\Models\RendimientoPostulante;
 use App\Domains\Institucional\Models\Carrera;
 use App\Domains\Institucional\Models\Colegio;
 use App\Domains\Institucional\Models\Universidad;
+use App\Domains\Resultados\Models\EvaluacionAplicada;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -90,5 +91,10 @@ class Postulante extends Model
     public function asistenciasAcademicas(): HasMany
     {
         return $this->hasMany(AsistenciaAcademica::class, 'id_post', 'id_post');
+    }
+
+    public function evaluacionesAplicadas(): HasMany
+    {
+        return $this->hasMany(EvaluacionAplicada::class, 'id_post', 'id_post');
     }
 }

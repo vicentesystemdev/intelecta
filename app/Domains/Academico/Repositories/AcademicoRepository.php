@@ -18,6 +18,7 @@ use App\Domains\Academico\Models\SimulacroProgramado;
 use App\Domains\Academico\Models\TutorAcademico;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
 use App\Domains\Postulantes\Models\Postulante;
+use App\Domains\Resultados\Models\EvaluacionAplicada;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
@@ -394,6 +395,7 @@ class AcademicoRepository
         $tutorAsignado = null;
         $administracion = null;
         $asistencia = null;
+        $evaluacionesAplicadas = collect();
 
         if (
             $inscripcion
@@ -491,6 +493,16 @@ class AcademicoRepository
             ];
         }
 
+        if (Schema::hasTable('evaluaciones_aplicadas')) {
+            $evaluacionesAplicadas = EvaluacionAplicada::query()
+                ->with('plantilla:id_plan,nombre_plan')
+                ->where('id_post', $postulante->id_post)
+                ->latest('fecha_fin_eval_apl')
+                ->latest('id_eval_apl')
+                ->limit(12)
+                ->get();
+        }
+
         $position = null;
         $percentile = null;
         if ($rendimiento?->id_prog) {
@@ -518,6 +530,7 @@ class AcademicoRepository
             'tutorAsignado' => $tutorAsignado,
             'administracion' => $administracion,
             'asistencia' => $asistencia,
+            'evaluacionesAplicadas' => $evaluacionesAplicadas,
         ];
     }
 

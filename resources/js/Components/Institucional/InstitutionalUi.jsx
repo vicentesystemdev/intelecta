@@ -18,6 +18,7 @@ const statusStyles = {
     activo: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
     activa: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
     aplicado: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
+    finalizada: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
     aprobado: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
     habilitado: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
     pagada: 'border-brand-success/25 bg-brand-success/10 text-brand-success',
@@ -33,6 +34,7 @@ const statusStyles = {
         'border-brand-warning/25 bg-brand-warning/10 text-brand-warning',
     cerrado: 'border-brand-border bg-brand-border/30 text-text-muted',
     pendiente: 'border-brand-warning/30 bg-brand-warning/10 text-brand-warning',
+    en_progreso: 'border-brand-warning/30 bg-brand-warning/10 text-brand-warning',
     observada: 'border-brand-warning/30 bg-brand-warning/10 text-brand-warning',
     observado: 'border-brand-warning/30 bg-brand-warning/10 text-brand-warning',
     temporal: 'border-brand-info/25 bg-brand-info/10 text-brand-info',
@@ -43,6 +45,7 @@ const statusStyles = {
     retraso: 'border-brand-warning/30 bg-brand-warning/10 text-brand-warning',
     justificado: 'border-brand-info/25 bg-brand-info/10 text-brand-info',
     ausente: 'border-brand-danger/25 bg-brand-danger/10 text-brand-danger',
+    anulada: 'border-brand-danger/25 bg-brand-danger/10 text-brand-danger',
     'Alto rendimiento':
         'border-brand-accent/35 bg-brand-accent/10 text-brand-primary dark:text-brand-accent',
     'Seguimiento regular':
@@ -57,7 +60,7 @@ export function InstitutionalStatus({ status }) {
             variant="outline"
             className={`whitespace-nowrap ${statusStyles[status] || statusStyles.inactivo}`}
         >
-            {status || 'Sin estado'}
+            {status ? String(status).replaceAll('_', ' ') : 'Sin estado'}
         </Badge>
     );
 }

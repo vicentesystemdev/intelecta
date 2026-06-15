@@ -1,246 +1,368 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import Pagination from '@/Components/Pagination';
+import {
+    EmptyInstitutional,
+    InstitutionalBanner,
+    InstitutionalStatus,
+    MetricTile,
+    cardClass,
+    primaryButtonClass,
+} from '@/Components/Institucional/InstitutionalUi';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-import { 
-    FileChartColumn, 
-    TrendingUp, 
-    Users, 
-    AlertTriangle,
-    GraduationCap,
-    Sparkles,
-    Briefcase,
-    Lightbulb,
-    FileText
+import { Head, router } from '@inertiajs/react';
+import {
+    CheckCircle2,
+    ClipboardCheck,
+    Clock3,
+    FileChartColumn,
+    TrendingUp,
 } from 'lucide-react';
+import { useState } from 'react';
 
-const kpis = [
-    { title: 'Resultados referenciales', value: '742', detail: 'Registros evaluativos locales', icon: FileText, tone: 'secondary' },
-    { title: 'Promedio general', value: '68.4 / 100', detail: 'Desempeño medio de cohorte', icon: TrendingUp, tone: 'info' },
-    { title: 'Postulantes en seguimiento', value: '39', detail: 'Casos asignados a tutorías', icon: Users, tone: 'accent' },
-    { title: 'Materias críticas', value: '1', detail: 'Matemática con mayor brecha', icon: AlertTriangle, tone: 'danger' },
-];
+const formatDate = (value) =>
+    value
+        ? new Date(value).toLocaleString('es-BO', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+          })
+        : 'Sin fecha';
 
-const applicantsFollowUp = [
-    { id: 1, name: 'Camila Quispe Mamani', career: 'Ingeniería Civil (UMSA)', average: 58, criticalSubject: 'Matemática', status: 'Atención prioritaria', recommendation: 'Asignar nivelación de álgebra básica y seguimiento semanal.' },
-    { id: 2, name: 'Diego Choque Condori', career: 'Ingeniería de Sistemas (EMI)', average: 62, criticalSubject: 'Física', status: 'Atención prioritaria', recommendation: 'Reforzar resolución gráfica de problemas físicos.' },
-    { id: 3, name: 'Valeria Flores Apaza', career: 'Economía (UCB)', average: 65, criticalSubject: 'Matemática', status: 'Seguimiento regular', recommendation: 'Secuencia corta de funciones y análisis gráfico.' },
-    { id: 4, name: 'Luis Fernando Huanca', career: 'Ingeniería de Sistemas (UMSA)', average: 67, criticalSubject: 'Química', status: 'Seguimiento regular', recommendation: 'Programar práctica en relaciones molares.' },
-    { id: 5, name: 'Andrea Nina Callisaya', career: 'Ingeniería Comercial (UNIFRANZ)', average: 69, criticalSubject: 'Matemática', status: 'Seguimiento regular', recommendation: 'Reforzar identidades básicas bajo tiempo controlado.' },
-    { id: 6, name: 'Mateo Quispe Flores', career: 'Medicina (UMSA)', average: 85, criticalSubject: 'Ninguna', status: 'Alto rendimiento', recommendation: 'Promover al grupo de simulacros avanzados.' },
-];
+const formatDuration = (seconds) => {
+    if (seconds === null || seconds === undefined) return 'No registrado';
+    const minutes = Math.floor(Number(seconds) / 60);
+    const rest = Number(seconds) % 60;
+    return `${minutes} min ${rest} s`;
+};
 
-export default function ResultadosSeguimiento() {
+export default function ResultadosSeguimiento({
+    resultados,
+    plantillas = [],
+    filtros = {},
+    metricas = {},
+    estructuraResultadosDisponible = false,
+}) {
+    const [filters, setFilters] = useState({
+        buscar: filtros.buscar || '',
+        id_plantilla: filtros.id_plantilla || '',
+        estado_eval_apl: filtros.estado_eval_apl || '',
+        fecha_desde: filtros.fecha_desde || '',
+        fecha_hasta: filtros.fecha_hasta || '',
+    });
+
+    const submit = (event) => {
+        event.preventDefault();
+        router.get(route('admin.evaluaciones.resultados'), filters, {
+            preserveState: true,
+            replace: true,
+        });
+    };
+
+    const metrics = [
+        [
+            'Evaluaciones aplicadas',
+            metricas.total || 0,
+            'Registros trazables',
+            ClipboardCheck,
+            'primary',
+        ],
+        [
+            'Evaluaciones finalizadas',
+            metricas.finalizadas || 0,
+            'Resultados calculados',
+            CheckCircle2,
+            'success',
+        ],
+        [
+            'En progreso',
+            metricas.enProgreso || 0,
+            'Aplicaciones abiertas',
+            Clock3,
+            'info',
+        ],
+        [
+            'Promedio general',
+            `${Number(metricas.promedio || 0).toFixed(1)}%`,
+            'Sobre resultados finalizados',
+            TrendingUp,
+            'accent',
+        ],
+    ];
+
     return (
         <AdminLayout
-            title="Resultados y Seguimiento"
-            subtitle="Lectura académica preliminar y priorización del seguimiento de rendimiento preuniversitario."
+            title="Resultados Académicos"
+            subtitle="Trazabilidad de evaluaciones aplicadas, respuestas registradas y puntajes calculados."
             wide
         >
-            <Head title="Resultados y Seguimiento" />
+            <Head title="Resultados Académicos" />
 
-            <div className="space-y-8">
-                {/* Banner principal */}
-                <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary via-brand-primary to-brand-secondary p-8 text-white shadow-xl shadow-brand-primary/20">
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:24px_24px]" />
-                    <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-accent/15 blur-3xl" />
-                    
-                    <div className="relative z-10 space-y-4">
-                        <div className="inline-flex items-center gap-2 rounded-full bg-brand-accent/10 px-3 py-1 text-xs font-semibold text-brand-accent ring-1 ring-brand-accent/25">
-                            <Sparkles className="h-3.5 w-3.5" />
-                            Elite Prep Institute
-                        </div>
-                        
-                        <h2 className="text-3xl font-black tracking-tight sm:text-4xl text-white">
-                            Resultados y Seguimiento
-                        </h2>
-                        
-                        <p className="max-w-3xl text-sm sm:text-base leading-relaxed text-slate-200">
-                            Analice la dispersión de calificaciones, identifique materias críticas y priorice las tutorías académicas. Utilice los filtros integrados para enfocar los planes de nivelación.
-                        </p>
-                    </div>
-                </section>
+            <InstitutionalBanner
+                eyebrow="Seguimiento académico"
+                title="Resultados Académicos Trazables"
+                description="Consulta institucional de aplicaciones evaluativas finalizadas y en progreso, vinculadas a postulantes y plantillas reales."
+                icon={FileChartColumn}
+            />
 
-                {/* Grid de KPIs */}
-                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                    {kpis.map((kpi, idx) => {
-                        const Icon = kpi.icon;
-                        const toneClasses = {
-                            secondary: 'bg-brand-secondary/10 text-brand-secondary border-brand-secondary/20',
-                            info: 'bg-brand-info/10 text-brand-info border-brand-info/20',
-                            accent: 'bg-brand-accent/10 text-brand-accent border-brand-accent/20',
-                            danger: 'bg-brand-danger/10 text-brand-danger border-brand-danger/20',
-                        }[kpi.tone];
-
-                        return (
-                            <Card key={idx} className="bg-brand-card border border-brand-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-black/20 transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
-                                <CardContent className="p-0 flex items-center justify-between">
-                                    <div className="space-y-1">
-                                        <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">{kpi.title}</p>
-                                        <p className="text-3xl font-extrabold text-text-main">{kpi.value}</p>
-                                        <p className="text-[11px] text-text-muted">{kpi.detail}</p>
-                                    </div>
-                                    <span className={`flex h-12 w-12 items-center justify-center rounded-xl border ${toneClasses}`}>
-                                        <Icon className="h-6 w-6" />
-                                    </span>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
-                </div>
-
-                {/* Tabla de Postulantes en Seguimiento */}
-                <Card className="bg-brand-card border border-brand-border rounded-2xl shadow-sm dark:shadow-black/20 overflow-hidden">
-                    <CardHeader className="border-b border-brand-border p-5 sm:p-6 bg-brand-primary/[0.01]">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div>
-                                <CardTitle className="text-base font-bold text-text-main">
-                                    Seguimiento del Rendimiento de Postulantes
-                                </CardTitle>
-                                <p className="text-xs text-text-muted mt-1">
-                                    Calificaciones promedio y nivelación recomendada por postulante.
-                                </p>
-                            </div>
-                            
-                            <div className="max-w-xl rounded-xl border border-brand-info/20 bg-brand-info/10 px-4 py-3">
-                                <p className="text-xs leading-5 text-text-muted">
-                                    Esta vista presenta una lectura referencial del seguimiento académico. La integración completa con evaluaciones aplicadas será consolidada en la etapa de resultados trazables.
-                                </p>
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                        {/* Tabla Desktop */}
-                        <div className="hidden md:block overflow-x-auto">
-                            <table className="w-full table-fixed">
-                                <thead>
-                                    <tr>
-                                        <th className="bg-brand-primary/5 dark:bg-brand-card border-b border-brand-border text-left text-[10px] font-extrabold text-text-muted uppercase tracking-wider p-4 w-[22%]">Postulante</th>
-                                        <th className="bg-brand-primary/5 dark:bg-brand-card border-b border-brand-border text-left text-[10px] font-extrabold text-text-muted uppercase tracking-wider p-4 w-[20%]">Carrera Objetivo</th>
-                                        <th className="bg-brand-primary/5 dark:bg-brand-card border-b border-brand-border text-left text-[10px] font-extrabold text-text-muted uppercase tracking-wider p-4 w-[12%]">Promedio</th>
-                                        <th className="bg-brand-primary/5 dark:bg-brand-card border-b border-brand-border text-left text-[10px] font-extrabold text-text-muted uppercase tracking-wider p-4 w-[14%]">Materia Crítica</th>
-                                        <th className="bg-brand-primary/5 dark:bg-brand-card border-b border-brand-border text-left text-[10px] font-extrabold text-text-muted uppercase tracking-wider p-4 w-[16%]">Estado Alerta</th>
-                                        <th className="bg-brand-primary/5 dark:bg-brand-card border-b border-brand-border text-left text-[10px] font-extrabold text-text-muted uppercase tracking-wider p-4 w-[16%]">Recomendación</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {applicantsFollowUp.map((applicant) => {
-                                        const statusClasses = {
-                                            'Alto rendimiento': 'bg-brand-success/10 text-brand-success border border-brand-success/20',
-                                            'Seguimiento regular': 'bg-brand-warning/10 text-brand-warning border border-brand-warning/20',
-                                            'Atención prioritaria': 'bg-brand-danger/10 text-brand-danger border border-brand-danger/20',
-                                        }[applicant.status];
-
-                                        const progressClasses = applicant.average >= 80 
-                                            ? 'text-brand-success' 
-                                            : applicant.average >= 60 
-                                                ? 'text-brand-warning' 
-                                                : 'text-brand-danger';
-
-                                        return (
-                                            <tr key={applicant.id} className="bg-brand-card border-b border-brand-border/60 hover:bg-brand-primary/[0.02] dark:hover:bg-brand-border/20 transition-colors">
-                                                <td className="p-4 text-xs font-semibold text-text-main whitespace-normal break-words leading-snug">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-primary/5 text-2xs font-black text-text-muted border border-brand-border">
-                                                            {applicant.name.split(' ').slice(0, 2).map(n => n[0]).join('')}
-                                                        </span>
-                                                        {applicant.name}
-                                                    </div>
-                                                </td>
-                                                <td className="p-4 text-xs font-medium text-text-muted whitespace-normal break-words leading-snug">
-                                                    {applicant.career}
-                                                </td>
-                                                <td className="p-4 text-xs font-extrabold leading-none">
-                                                    <span className={progressClasses}>
-                                                        {applicant.average}%
-                                                    </span>
-                                                </td>
-                                                <td className="p-4 text-xs font-semibold text-text-main">
-                                                    {applicant.criticalSubject === 'Ninguna' ? (
-                                                        <span className="text-text-muted font-normal">—</span>
-                                                    ) : (
-                                                        <span className="text-brand-danger">{applicant.criticalSubject}</span>
-                                                    )}
-                                                </td>
-                                                <td className="p-4 text-xs font-medium text-text-main">
-                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-2xs font-semibold ${statusClasses}`}>
-                                                        {applicant.status}
-                                                    </span>
-                                                </td>
-                                                <td className="p-4 text-xs font-medium text-text-muted whitespace-normal break-words leading-snug">
-                                                    {applicant.recommendation}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* Tarjetas Mobile */}
-                        <div className="block md:hidden divide-y divide-brand-border">
-                            {applicantsFollowUp.map((applicant) => {
-                                const statusClasses = {
-                                    'Alto rendimiento': 'bg-brand-success/10 text-brand-success border border-brand-success/20',
-                                    'Seguimiento regular': 'bg-brand-warning/10 text-brand-warning border border-brand-warning/20',
-                                    'Atención prioritaria': 'bg-brand-danger/10 text-brand-danger border border-brand-danger/20',
-                                }[applicant.status];
-
-                                return (
-                                    <div key={applicant.id} className="p-5 space-y-4 bg-brand-card">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2.5">
-                                                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary/5 text-2xs font-black text-text-muted border border-brand-border">
-                                                    {applicant.name.split(' ').slice(0, 2).map(n => n[0]).join('')}
-                                                </span>
-                                                <div>
-                                                    <h4 className="text-xs font-bold text-text-main">{applicant.name}</h4>
-                                                    <p className="text-[10px] text-text-muted">{applicant.career}</p>
-                                                </div>
-                                            </div>
-                                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusClasses}`}>
-                                                {applicant.status}
-                                            </span>
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-brand-border/40">
-                                            <div>
-                                                <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Promedio</p>
-                                                <p className="font-extrabold text-text-main mt-0.5">{applicant.average}%</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Materia Crítica</p>
-                                                <p className="font-semibold text-brand-danger mt-0.5">{applicant.criticalSubject}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="rounded-xl border border-brand-border bg-brand-primary/[0.01] p-3 text-xs leading-relaxed">
-                                            <div className="flex items-start gap-1.5">
-                                                <Lightbulb className="h-4 w-4 text-brand-secondary shrink-0 mt-0.5" />
-                                                <div>
-                                                    <strong className="text-text-main font-semibold">Recomendación: </strong>
-                                                    <span className="text-text-muted">{applicant.recommendation}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Mensaje institucional de interpretación académica */}
-                <div className="rounded-xl border border-brand-border bg-brand-card p-5 text-xs text-text-muted leading-relaxed">
-                    <p className="font-bold text-text-main uppercase tracking-wider flex items-center gap-1.5">
-                        <Sparkles className="h-4 w-4 text-brand-accent" />
-                        Mensaje institucional de interpretación académica:
-                    </p>
-                    <p className="mt-2 text-text-muted">
-                        Esta vista consolida una lectura referencial del seguimiento académico, tomando como base la estructura evaluativa del sistema. Los resultados deben interpretarse como apoyo a la coordinación académica y no como predicción definitiva.
-                    </p>
-                </div>
+            <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {metrics.map(([label, value, note, icon, tone]) => (
+                    <MetricTile
+                        key={label}
+                        label={label}
+                        value={value}
+                        note={note}
+                        icon={icon}
+                        tone={tone}
+                    />
+                ))}
             </div>
+
+            {!estructuraResultadosDisponible && (
+                <div className="mb-5 rounded-2xl border border-brand-info/25 bg-brand-info/10 p-5 text-sm text-text-muted">
+                    La estructura de evaluaciones aplicadas todavía no está
+                    habilitada en la base de datos. Ejecute las migraciones para
+                    iniciar el registro trazable.
+                </div>
+            )}
+
+            <form
+                onSubmit={submit}
+                className={`${cardClass} mb-5 grid gap-3 p-4 lg:grid-cols-[1.4fr_1fr_180px_160px_160px_auto]`}
+            >
+                <input
+                    value={filters.buscar}
+                    onChange={(event) =>
+                        setFilters({ ...filters, buscar: event.target.value })
+                    }
+                    placeholder="Postulante o C.I."
+                    className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
+                />
+                <select
+                    value={filters.id_plantilla}
+                    onChange={(event) =>
+                        setFilters({
+                            ...filters,
+                            id_plantilla: event.target.value,
+                        })
+                    }
+                    className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
+                >
+                    <option value="">Todas las plantillas</option>
+                    {plantillas.map((plantilla) => (
+                        <option
+                            key={plantilla.id_plan}
+                            value={plantilla.id_plan}
+                        >
+                            {plantilla.nombre_plan}
+                        </option>
+                    ))}
+                </select>
+                <select
+                    value={filters.estado_eval_apl}
+                    onChange={(event) =>
+                        setFilters({
+                            ...filters,
+                            estado_eval_apl: event.target.value,
+                        })
+                    }
+                    className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
+                >
+                    <option value="">Todos los estados</option>
+                    <option value="finalizada">Finalizada</option>
+                    <option value="en_progreso">En progreso</option>
+                    <option value="anulada">Anulada</option>
+                </select>
+                <input
+                    type="date"
+                    value={filters.fecha_desde}
+                    onChange={(event) =>
+                        setFilters({
+                            ...filters,
+                            fecha_desde: event.target.value,
+                        })
+                    }
+                    className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
+                />
+                <input
+                    type="date"
+                    min={filters.fecha_desde || undefined}
+                    value={filters.fecha_hasta}
+                    onChange={(event) =>
+                        setFilters({
+                            ...filters,
+                            fecha_hasta: event.target.value,
+                        })
+                    }
+                    className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
+                />
+                <button className={primaryButtonClass}>Aplicar</button>
+            </form>
+
+            {resultados.data.length ? (
+                <>
+                    <div className="hidden overflow-hidden rounded-2xl border border-brand-border bg-brand-card shadow-sm xl:block">
+                        <table className="w-full table-fixed">
+                            <thead className="border-b border-brand-border bg-brand-bg">
+                                <tr>
+                                    {[
+                                        ['Postulante', 'w-[20%]'],
+                                        ['Plantilla', 'w-[25%]'],
+                                        ['Resultado', 'w-[12%]'],
+                                        ['Respuestas', 'w-[10%]'],
+                                        ['Finalización', 'w-[15%]'],
+                                        ['Tiempo', 'w-[10%]'],
+                                        ['Estado', 'w-[8%]'],
+                                    ].map(([label, width]) => (
+                                        <th
+                                            key={label}
+                                            className={`${width} px-4 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-text-muted`}
+                                        >
+                                            {label}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-brand-border">
+                                {resultados.data.map((item) => (
+                                    <tr
+                                        key={item.id_eval_apl}
+                                        className="hover:bg-brand-bg/70"
+                                    >
+                                        <td className="px-4 py-4 align-top">
+                                            <p className="break-words text-sm font-bold leading-snug text-text-main">
+                                                {item.postulante?.nombres_post}{' '}
+                                                {item.postulante?.apellidos_post}
+                                            </p>
+                                            <p className="mt-1 text-xs text-text-muted">
+                                                C.I.{' '}
+                                                {item.postulante?.ci_post ||
+                                                    'No registrado'}
+                                            </p>
+                                        </td>
+                                        <td className="px-4 py-4 align-top">
+                                            <p className="break-words text-xs font-semibold leading-5 text-text-main">
+                                                {item.plantilla?.nombre_plan}
+                                            </p>
+                                            <p className="mt-1 text-[10px] text-text-muted">
+                                                {item.codigo_eval_apl}
+                                            </p>
+                                        </td>
+                                        <td className="px-4 py-4 align-top">
+                                            <p className="text-xl font-black text-brand-primary dark:text-slate-100">
+                                                {Number(
+                                                    item.porcentaje_eval_apl,
+                                                ).toFixed(1)}
+                                                %
+                                            </p>
+                                            <p className="mt-1 text-xs text-text-muted">
+                                                {Number(
+                                                    item.puntaje_total_eval_apl,
+                                                ).toFixed(2)}{' '}
+                                                /{' '}
+                                                {Number(
+                                                    item.puntaje_maximo_eval_apl,
+                                                ).toFixed(2)}
+                                            </p>
+                                        </td>
+                                        <td className="px-4 py-4 align-top text-xs font-semibold text-text-main">
+                                            {
+                                                item.respuestas_correctas_count
+                                            }{' '}
+                                            / {item.respuestas_count}
+                                        </td>
+                                        <td className="px-4 py-4 align-top text-xs leading-5 text-text-muted">
+                                            {formatDate(
+                                                item.fecha_fin_eval_apl,
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-4 align-top text-xs text-text-muted">
+                                            {formatDuration(
+                                                item.tiempo_total_segundos_eval_apl,
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-4 align-top">
+                                            <InstitutionalStatus
+                                                status={
+                                                    item.estado_eval_apl
+                                                }
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="grid gap-4 xl:hidden">
+                        {resultados.data.map((item) => (
+                            <article
+                                key={item.id_eval_apl}
+                                className={`${cardClass} p-5`}
+                            >
+                                <div className="flex items-start justify-between gap-4">
+                                    <div>
+                                        <h3 className="font-black text-text-main">
+                                            {item.postulante?.nombres_post}{' '}
+                                            {item.postulante?.apellidos_post}
+                                        </h3>
+                                        <p className="mt-1 text-xs leading-5 text-text-muted">
+                                            {item.plantilla?.nombre_plan}
+                                        </p>
+                                    </div>
+                                    <p className="text-2xl font-black text-brand-primary dark:text-slate-100">
+                                        {Number(
+                                            item.porcentaje_eval_apl,
+                                        ).toFixed(1)}
+                                        %
+                                    </p>
+                                </div>
+                                <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-brand-bg p-4 text-xs">
+                                    <div>
+                                        <p className="text-text-muted">
+                                            Puntaje
+                                        </p>
+                                        <p className="mt-1 font-black text-text-main">
+                                            {Number(
+                                                item.puntaje_total_eval_apl,
+                                            ).toFixed(2)}{' '}
+                                            /{' '}
+                                            {Number(
+                                                item.puntaje_maximo_eval_apl,
+                                            ).toFixed(2)}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-text-muted">
+                                            Respuestas
+                                        </p>
+                                        <p className="mt-1 font-black text-text-main">
+                                            {
+                                                item.respuestas_correctas_count
+                                            }{' '}
+                                            / {item.respuestas_count}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex items-center justify-between gap-3">
+                                    <p className="text-xs text-text-muted">
+                                        {formatDate(
+                                            item.fecha_fin_eval_apl,
+                                        )}
+                                    </p>
+                                    <InstitutionalStatus
+                                        status={item.estado_eval_apl}
+                                    />
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                </>
+            ) : (
+                <EmptyInstitutional
+                    title="Sin evaluaciones aplicadas registradas"
+                    description="Los resultados aparecerán cuando un postulante finalice una evaluación desde su portal académico."
+                />
+            )}
+
+            <Pagination links={resultados.links} />
         </AdminLayout>
     );
 }

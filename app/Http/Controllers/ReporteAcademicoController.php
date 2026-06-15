@@ -12,8 +12,10 @@ use App\Domains\Evaluaciones\Models\AreaConocimiento;
 use App\Domains\Evaluaciones\Models\Materia;
 use App\Domains\Evaluaciones\Models\Tema;
 use App\Domains\Reportes\Services\CoberturaCurricularService;
+use App\Domains\Resultados\Models\EvaluacionAplicada;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -32,6 +34,22 @@ class ReporteAcademicoController extends Controller
         $totalMaterias = Materia::count();
         $totalAreas = AreaConocimiento::count();
         $totalTemas = Tema::count();
+        $totalEvaluacionesAplicadas = 0;
+        $promedioEvaluacionesAplicadas = 0;
+
+        if (Schema::hasTable('evaluaciones_aplicadas')) {
+            $totalEvaluacionesAplicadas = EvaluacionAplicada::where(
+                'estado_eval_apl',
+                'finalizada',
+            )->count();
+            $promedioEvaluacionesAplicadas = round(
+                (float) EvaluacionAplicada::where(
+                    'estado_eval_apl',
+                    'finalizada',
+                )->avg('porcentaje_eval_apl'),
+                2,
+            );
+        }
 
         // 2. Distribución: Postulantes por universidad
         $postulantesPorUniversidad = Postulante::join('carreras', 'postulantes.id_car', '=', 'carreras.id_car')
@@ -103,8 +121,21 @@ class ReporteAcademicoController extends Controller
             });
 
         // 9. Reporte individual por postulante
-        $postulantesList = Postulante::with(['colegio', 'carrera.universidad'])
-            ->get()
+        $postulantesQuery = Postulante::with(['colegio', 'carrera.universidad']);
+
+        if (Schema::hasTable('evaluaciones_aplicadas')) {
+            $postulantesQuery
+                ->withCount([
+                    'evaluacionesAplicadas as evaluaciones_finalizadas_count' => fn ($query) => $query
+                        ->where('estado_eval_apl', 'finalizada'),
+                ])
+                ->withAvg([
+                    'evaluacionesAplicadas as promedio_evaluaciones' => fn ($query) => $query
+                        ->where('estado_eval_apl', 'finalizada'),
+                ], 'porcentaje_eval_apl');
+        }
+
+        $postulantesList = $postulantesQuery->get()
             ->map(function ($postulante) {
                 $carrera = $postulante->carrera;
                 $universidad = $carrera ? $carrera->universidad : null;
@@ -129,7 +160,17 @@ class ReporteAcademicoController extends Controller
                     'exigencia' => $exigencia,
                     'estado' => $postulante->estado_post ?? 'Activo',
                     'perfil' => $perfil,
-                    'lectura_materias' => 'La estructura está preparada para generar análisis por materia cuando se registren evaluaciones aplicadas.',
+                    'evaluaciones_finalizadas' => (int) ($postulante->evaluaciones_finalizadas_count ?? 0),
+                    'promedio_evaluaciones' => $postulante->promedio_evaluaciones !== null
+                        ? round((float) $postulante->promedio_evaluaciones, 2)
+                        : null,
+                    'lectura_materias' => ($postulante->evaluaciones_finalizadas_count ?? 0) > 0
+                        ? sprintf(
+                            '%d evaluación(es) aplicada(s) con promedio general de %.2f%%.',
+                            $postulante->evaluaciones_finalizadas_count,
+                            $postulante->promedio_evaluaciones,
+                        )
+                        : 'Sin evaluaciones aplicadas registradas.',
                 ];
             });
 
@@ -145,6 +186,8 @@ class ReporteAcademicoController extends Controller
                 'totalMaterias' => $totalMaterias,
                 'totalAreas' => $totalAreas,
                 'totalTemas' => $totalTemas,
+                'totalEvaluacionesAplicadas' => $totalEvaluacionesAplicadas,
+                'promedioEvaluacionesAplicadas' => $promedioEvaluacionesAplicadas,
             ],
             'postulantesPorUniversidad' => $postulantesPorUniversidad,
             'postulantesPorCarrera' => $postulantesPorCarrera,

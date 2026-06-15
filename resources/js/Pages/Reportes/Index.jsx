@@ -18,6 +18,7 @@ import {
     BookCopy,
     BrainCircuit,
     Building2,
+    CheckCircle2,
     ChevronDown,
     ChevronUp,
     FileQuestion,
@@ -172,6 +173,20 @@ export default function Index({
             detail: 'Opciones postuladas',
             icon: BarChart3,
             color: 'text-slate-500',
+        },
+        {
+            title: 'Evaluaciones aplicadas',
+            value: metricas.totalEvaluacionesAplicadas ?? 0,
+            detail: 'Resultados finalizados',
+            icon: CheckCircle2,
+            color: 'text-brand-success',
+        },
+        {
+            title: 'Promedio evaluativo',
+            value: `${Number(metricas.promedioEvaluacionesAplicadas ?? 0).toFixed(1)}%`,
+            detail: 'Puntaje trazable general',
+            icon: Activity,
+            color: 'text-brand-info',
         },
     ];
 

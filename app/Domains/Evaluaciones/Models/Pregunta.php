@@ -2,6 +2,7 @@
 
 namespace App\Domains\Evaluaciones\Models;
 
+use App\Domains\Resultados\Models\RespuestaEvaluacion;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -56,5 +57,10 @@ class Pregunta extends Model
             'id_preg',
             'id_plan',
         )->withPivot(['orden_pp', 'puntaje_pp'])->withTimestamps();
+    }
+
+    public function respuestasEvaluacion(): HasMany
+    {
+        return $this->hasMany(RespuestaEvaluacion::class, 'id_preg', 'id_preg');
     }
 }

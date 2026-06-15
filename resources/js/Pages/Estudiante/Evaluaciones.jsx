@@ -1,549 +1,598 @@
-import React, { useState, useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
-import { 
-    Clock, 
-    BookOpen, 
-    CheckCircle2, 
-    AlertTriangle, 
-    ArrowRight, 
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, router, usePage } from '@inertiajs/react';
+import {
+    AlertTriangle,
+    ArrowRight,
     Award,
-    RefreshCw,
+    BookOpenCheck,
+    CheckCircle2,
+    Clock,
     GraduationCap,
-    HelpCircle,
-    ChevronRight,
-    TrendingUp,
-    Atom,
-    FlaskConical,
-    Calculator,
-    BrainCircuit,
-    Layers3
+    History,
+    RefreshCw,
 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
-const examQuestions = [
-    {
-        id: 1,
-        area: 'Aritmética',
-        question: 'Un estudiante del instituto preuniversitario resolvió el 60% de los reactivos de aritmética el lunes, y el martes resolvió el 30% del resto. Si aún le quedan 28 preguntas por resolver, ¿cuál era la cantidad original de preguntas de aritmética?',
-        options: [
-            { key: 'A', text: '80 preguntas' },
-            { key: 'B', text: '100 preguntas' },
-            { key: 'C', text: '120 preguntas' },
-            { key: 'D', text: '90 preguntas' }
-        ],
-        correct: 'B',
-        feedbackSuccess: '¡Correcto! El lunes resuelve el 60% (queda 40%). El martes el 30% del 40%, es decir, 12%. El total resuelto es 72%, dejando un 28% equivalente a las 28 preguntas restantes. Total original = 100.',
-        feedbackFail: 'Reforzar porcentajes y proporciones. Recuerda calcular la fracción del resto restante.'
-    },
-    {
-        id: 2,
-        area: 'Álgebra',
-        question: 'Resuelva el siguiente sistema de ecuaciones lineales: \n3x - y = 7 \nx + 2y = 7 \nCalcule el valor del producto xy.',
-        options: [
-            { key: 'A', text: '4' },
-            { key: 'B', text: '5' },
-            { key: 'C', text: '6' },
-            { key: 'D', text: '8' }
-        ],
-        correct: 'C',
-        feedbackSuccess: '¡Correcto! Multiplicando la primera ecuación por 2: 6x - 2y = 14. Sumando a la segunda: 7x = 21 => x = 3. Sustituyendo, y = 2. Por tanto, xy = 3 * 2 = 6.',
-        feedbackFail: 'Practicar despeje de variables y métodos de resolución de sistemas lineales (reducción, sustitución).'
-    },
-    {
-        id: 3,
-        area: 'Razonamiento Lógico',
-        question: 'Encuentre el término que continúa de manera lógica en la siguiente sucesión numérica: \n4,  9,  19,  39,  79,  ...',
-        options: [
-            { key: 'A', text: '149' },
-            { key: 'B', text: '159' },
-            { key: 'C', text: '169' },
-            { key: 'D', text: '119' }
-        ],
-        correct: 'B',
-        feedbackSuccess: '¡Correcto! La regla de formación es multiplicar el término por 2 y sumarle 1: (4*2)+1 = 9, (9*2)+1 = 19, (19*2)+1 = 39, (39*2)+1 = 79. El siguiente término es (79*2)+1 = 159.',
-        feedbackFail: 'Trabajar sucesiones y patrones numéricos. Analiza las diferencias sucesivas entre términos.'
-    }
-];
+const formatTime = (seconds) => {
+    const safeSeconds = Math.max(0, seconds);
+    const minutes = Math.floor(safeSeconds / 60);
+    const remaining = safeSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remaining).padStart(2, '0')}`;
+};
 
-const evaluationTypes = [
-    {
-        id: 'diagnostico',
-        name: 'Diagnóstico General',
-        description: 'Lectura inicial de Matemática, ciencias exactas y razonamiento académico.',
-        icon: BrainCircuit,
-    },
-    {
-        id: 'matematica',
-        name: 'Matemática',
-        description: 'Aritmética, álgebra, geometría, estadística y resolución cuantitativa.',
-        icon: Calculator,
-    },
-    {
-        id: 'fisica',
-        name: 'Física',
-        description: 'Magnitudes, movimiento, fuerzas, energía y electricidad básica.',
-        icon: Atom,
-    },
-    {
-        id: 'quimica',
-        name: 'Química',
-        description: 'Materia, estructura atómica, reacciones y estequiometría.',
-        icon: FlaskConical,
-    },
-    {
-        id: 'mixta',
-        name: 'Mixta Ingeniería',
-        description: 'Cobertura integrada de Matemática, Física y Química.',
-        icon: Layers3,
-    },
-];
+const formatDate = (value) =>
+    value
+        ? new Date(value).toLocaleString('es-BO', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+          })
+        : 'Sin fecha';
 
-export default function StudentEvaluaciones({ habilitacionAcademica = null }) {
-    // Etapas: 1 (Inicio), 2 (Resolución), 3 (Resultado preliminar)
-    const [step, setStep] = useState(1);
+export default function Evaluaciones({
+    postulanteVinculado = false,
+    habilitacionAcademica = null,
+    estructuraResultadosDisponible = false,
+    plantillas = [],
+    evaluacionActiva = null,
+    resultado = null,
+    historial = [],
+}) {
+    const { errors, flash } = usePage().props;
+    const [selectedTemplate, setSelectedTemplate] = useState(
+        evaluacionActiva?.plantilla?.id_plan || plantillas[0]?.id_plan || '',
+    );
     const [answers, setAnswers] = useState({});
-    const [secondsLeft, setSecondsLeft] = useState(900); // 15 minutos
-    const [isActive, setIsActive] = useState(false);
-    const [selectedEvaluation, setSelectedEvaluation] = useState(evaluationTypes[0]);
+    const [processing, setProcessing] = useState(false);
+    const durationSeconds =
+        Number(evaluacionActiva?.plantilla?.duracion_minutos_plan || 60) * 60;
+    const [secondsLeft, setSecondsLeft] = useState(
+        evaluacionActiva?.segundos_restantes ?? durationSeconds,
+    );
     const accessRestricted =
         habilitacionAcademica?.habilitado_evaluaciones_hab === false;
-    
-    // Temporizador
-    useEffect(() => {
-        let interval = null;
-        if (isActive && secondsLeft > 0) {
-            interval = setInterval(() => {
-                setSecondsLeft((prev) => prev - 1);
-            }, 1000);
-        } else if (secondsLeft === 0) {
-            handleSubmit();
-        }
-        return () => clearInterval(interval);
-    }, [isActive, secondsLeft]);
-
-    const formatTime = (secs) => {
-        const minutes = Math.floor(secs / 60);
-        const remainingSeconds = secs % 60;
-        return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-    };
-
-    const scrollToTop = () => {
-        window.requestAnimationFrame(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    };
-
-    const handleStart = () => {
-        if (accessRestricted) return;
-
-        setStep(2);
-        setAnswers({});
-        setSecondsLeft(900);
-        setIsActive(true);
-        scrollToTop();
-    };
-
-    const handleSelectOption = (questionId, optionKey) => {
-        setAnswers(prev => ({
-            ...prev,
-            [questionId]: optionKey
-        }));
-    };
-
-    const handleSubmit = () => {
-        setIsActive(false);
-        setStep(3);
-        scrollToTop();
-    };
-
-    const handleReset = () => {
-        setStep(1);
-        setAnswers({});
-        setSecondsLeft(900);
-        scrollToTop();
-    };
-
-    // Calcular estadísticas de resultados
-    const totalQuestions = examQuestions.length;
+    const selected = useMemo(
+        () =>
+            plantillas.find(
+                (plantilla) =>
+                    String(plantilla.id_plan) === String(selectedTemplate),
+            ) || plantillas[0],
+        [plantillas, selectedTemplate],
+    );
     const answeredCount = Object.keys(answers).length;
-    let correctCount = 0;
-    
-    examQuestions.forEach(q => {
-        if (answers[q.id] === q.correct) {
-            correctCount++;
-        }
-    });
+    const totalQuestions = evaluacionActiva?.preguntas?.length || 0;
 
-    const score = Math.round((correctCount / totalQuestions) * 100);
+    useEffect(() => {
+        if (!evaluacionActiva) return;
+
+        setAnswers({});
+        setSelectedTemplate(evaluacionActiva.plantilla.id_plan);
+        setSecondsLeft(
+            evaluacionActiva.segundos_restantes ?? durationSeconds,
+        );
+    }, [evaluacionActiva?.id_eval_apl]);
+
+    useEffect(() => {
+        if (!evaluacionActiva || resultado || secondsLeft <= 0) {
+            return undefined;
+        }
+
+        const timer = window.setInterval(
+            () => setSecondsLeft((current) => Math.max(0, current - 1)),
+            1000,
+        );
+
+        return () => window.clearInterval(timer);
+    }, [evaluacionActiva, resultado, secondsLeft]);
+
+    const start = () => {
+        if (
+            !selected ||
+            accessRestricted ||
+            !postulanteVinculado ||
+            !estructuraResultadosDisponible
+        ) {
+            return;
+        }
+
+        router.post(
+            route('estudiante.evaluaciones.iniciar', selected.id_plan),
+            { tipo_eval_apl: selected.dificultad_plan },
+            {
+                preserveScroll: true,
+                onStart: () => setProcessing(true),
+                onFinish: () => setProcessing(false),
+            },
+        );
+    };
+
+    const submit = () => {
+        if (!evaluacionActiva || processing) {
+            return;
+        }
+
+        const responses = evaluacionActiva.preguntas
+            .filter((question) => answers[question.id_preg])
+            .map((question) => ({
+                id_preg: question.id_preg,
+                id_alt: answers[question.id_preg],
+            }));
+
+        router.post(
+            route(
+                'estudiante.evaluaciones.enviar',
+                evaluacionActiva.id_eval_apl,
+            ),
+            {
+                respuestas: responses,
+                tiempo_total_segundos: Math.max(
+                    0,
+                    durationSeconds - secondsLeft,
+                ),
+            },
+            {
+                preserveScroll: true,
+                onStart: () => setProcessing(true),
+                onFinish: () => setProcessing(false),
+            },
+        );
+    };
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="flex items-center gap-2 text-xl font-bold leading-tight text-slate-800 dark:text-slate-100">
-                    <GraduationCap className="h-6 w-6 text-brand-primary" />
+                <h2 className="flex items-center gap-2 text-xl font-bold text-text-main">
+                    <GraduationCap className="h-6 w-6 text-brand-secondary" />
                     Centro de Evaluaciones Académicas
                 </h2>
             }
         >
-            <Head title="Evaluaciones de Postulante" />
+            <Head title="Evaluaciones del Postulante" />
 
-            <div className="py-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+                {(errors?.postulante ||
+                    errors?.habilitacion ||
+                    errors?.plantilla ||
+                    errors?.evaluacion ||
+                    errors?.respuestas) && (
+                    <div className="rounded-2xl border border-brand-danger/20 bg-brand-danger/10 p-4 text-sm text-brand-danger">
+                        {errors.postulante ||
+                            errors.habilitacion ||
+                            errors.plantilla ||
+                            errors.evaluacion ||
+                            errors.respuestas}
+                    </div>
+                )}
+
+                {flash?.success && (
+                    <div className="rounded-2xl border border-brand-success/20 bg-brand-success/10 p-4 text-sm font-semibold text-brand-success">
+                        {flash.success}
+                    </div>
+                )}
+
                 {accessRestricted && (
-                    <div className="mb-6 flex items-start gap-3 rounded-2xl border border-brand-danger/20 bg-brand-danger/10 p-5 text-brand-danger">
+                    <div className="flex items-start gap-3 rounded-2xl border border-brand-danger/20 bg-brand-danger/10 p-5 text-brand-danger">
                         <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
                         <div>
                             <p className="text-sm font-bold">
                                 Habilitación académica temporalmente restringida
                             </p>
                             <p className="mt-1 text-xs leading-5">
-                                Tu acceso a evaluaciones se encuentra temporalmente restringido. Consulta con administración académica para regularizar tu habilitación.
+                                Tu acceso a evaluaciones se encuentra temporalmente
+                                restringido. Consulta con administración académica
+                                para regularizar tu habilitación.
                             </p>
-                            {habilitacionAcademica?.motivo_hab && (
-                                <p className="mt-2 text-xs font-semibold">
-                                    Referencia: {habilitacionAcademica.motivo_hab}
-                                </p>
-                            )}
                         </div>
                     </div>
                 )}
-                
-                {/* ETAPA 1: INICIO */}
-                {step === 1 && (
-                    <div className="space-y-6">
-                        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary via-brand-primary to-brand-secondary p-8 text-white shadow-xl">
-                            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:20px_20px]" />
-                            <div className="relative z-10 space-y-4">
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-brand-accent border border-white/10">
-                                    <Clock className="h-3.5 w-3.5" />
-                                    Evaluación Activa
+
+                {!postulanteVinculado && (
+                    <div className="rounded-2xl border border-brand-warning/25 bg-brand-warning/10 p-5">
+                        <p className="font-bold text-text-main">
+                            Cuenta pendiente de vinculación académica
+                        </p>
+                        <p className="mt-1 text-sm text-text-muted">
+                            No se encontró un postulante con el correo de esta
+                            cuenta. Administración debe verificar la vinculación
+                            antes de iniciar una evaluación.
+                        </p>
+                    </div>
+                )}
+
+                {!estructuraResultadosDisponible && (
+                    <div className="rounded-2xl border border-brand-info/25 bg-brand-info/10 p-5">
+                        <p className="font-bold text-text-main">
+                            Estructura de resultados pendiente de habilitación
+                        </p>
+                        <p className="mt-1 text-sm text-text-muted">
+                            Las migraciones de evaluaciones aplicadas deben
+                            ejecutarse antes de registrar respuestas.
+                        </p>
+                    </div>
+                )}
+
+                {!evaluacionActiva && !resultado && (
+                    <>
+                        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary via-brand-primary to-brand-secondary p-7 text-white shadow-xl sm:p-9">
+                            <div className="relative z-10 max-w-3xl">
+                                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-brand-accent">
+                                    <BookOpenCheck className="h-4 w-4" />
+                                    Evaluaciones institucionales
                                 </span>
-                                <h1 className="text-2xl sm:text-3xl font-black">
-                                    {selectedEvaluation.name}
+                                <h1 className="mt-4 text-3xl font-black">
+                                    Evaluaciones con resultados trazables
                                 </h1>
-                                <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
-                                    {selectedEvaluation.description} Selecciona el instrumento académico y realiza el recorrido guiado para obtener recomendaciones de nivelación.
+                                <p className="mt-3 text-sm leading-6 text-slate-200">
+                                    Cada respuesta será registrada y calificada con
+                                    la ponderación definida en la plantilla
+                                    académica.
                                 </p>
                             </div>
                         </section>
 
                         <section>
-                            <div className="mb-3">
-                                <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Evaluaciones disponibles</h2>
-                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Elige el enfoque académico que deseas revisar.</p>
-                            </div>
-                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                                {evaluationTypes.map((evaluation) => {
-                                    const Icon = evaluation.icon;
-                                    const selected = selectedEvaluation.id === evaluation.id;
-
+                            <h2 className="text-lg font-black text-text-main">
+                                Instrumentos disponibles
+                            </h2>
+                            <p className="mt-1 text-sm text-text-muted">
+                                Selecciona una plantilla para iniciar una aplicación
+                                académica.
+                            </p>
+                            <div className="mt-4 grid gap-4 md:grid-cols-2">
+                                {plantillas.map((plantilla) => {
+                                    const isSelected =
+                                        String(selected?.id_plan) ===
+                                        String(plantilla.id_plan);
                                     return (
                                         <button
-                                            key={evaluation.id}
+                                            key={plantilla.id_plan}
                                             type="button"
-                                            onClick={() => setSelectedEvaluation(evaluation)}
-                                            className={`rounded-2xl border p-4 text-left transition group ${
-                                                selected
-                                                    ? 'border-brand-secondary bg-brand-secondary/5 shadow-md'
-                                                    : 'bg-brand-card border border-brand-border hover:border-brand-secondary/40 hover:bg-brand-secondary/5'
+                                            onClick={() =>
+                                                setSelectedTemplate(
+                                                    plantilla.id_plan,
+                                                )
+                                            }
+                                            className={`rounded-2xl border p-5 text-left transition ${
+                                                isSelected
+                                                    ? 'border-brand-secondary bg-brand-secondary/10 shadow-md'
+                                                    : 'border-brand-border bg-brand-card hover:border-brand-secondary/40'
                                             }`}
                                         >
-                                            <span className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl transition ${
-                                                selected
-                                                    ? 'bg-brand-secondary text-white'
-                                                    : 'bg-brand-primary/5 text-text-muted group-hover:text-brand-secondary'
-                                            }`}>
-                                                <Icon className="h-5 w-5" />
-                                            </span>
-                                            <span className="block text-sm font-bold text-text-main">{evaluation.name}</span>
-                                            <span className="mt-1 block text-[11px] leading-4 text-text-muted">{evaluation.description}</span>
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <h3 className="font-black leading-snug text-text-main">
+                                                        {plantilla.nombre_plan}
+                                                    </h3>
+                                                    <p className="mt-2 text-xs leading-5 text-text-muted">
+                                                        {plantilla.descripcion_plan ||
+                                                            'Instrumento académico institucional.'}
+                                                    </p>
+                                                </div>
+                                                <span className="rounded-xl bg-brand-primary/10 px-3 py-2 text-xs font-black text-brand-primary dark:text-slate-100">
+                                                    {
+                                                        plantilla.preguntas_count
+                                                    }{' '}
+                                                    preguntas
+                                                </span>
+                                            </div>
+                                            <div className="mt-4 flex flex-wrap gap-2">
+                                                {plantilla.materias.map(
+                                                    (materia) => (
+                                                        <span
+                                                            key={materia}
+                                                            className="rounded-full border border-brand-border bg-brand-bg px-2.5 py-1 text-[10px] font-bold text-text-muted"
+                                                        >
+                                                            {materia}
+                                                        </span>
+                                                    ),
+                                                )}
+                                            </div>
+                                            <p className="mt-4 text-xs font-semibold text-text-muted">
+                                                {plantilla.duracion_minutos_plan ||
+                                                    60}{' '}
+                                                minutos ·{' '}
+                                                {Number(
+                                                    plantilla.puntaje_maximo,
+                                                ).toFixed(2)}{' '}
+                                                puntos
+                                            </p>
                                         </button>
                                     );
                                 })}
                             </div>
                         </section>
 
-                        <div className="grid gap-6 md:grid-cols-3">
-                            <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                                        Duración Sugerida
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-2xl font-black text-slate-900">15 Minutos</p>
-                                    <p className="text-xs text-slate-500 mt-1">Con control de tiempo activo</p>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                                        Estructura
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-2xl font-black text-slate-900">3 Reactivos</p>
-                                    <p className="text-xs text-slate-500 mt-1">Nivel académico preuniversitario</p>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80">
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                                        Áreas de Medición
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-base font-black text-slate-800">{selectedEvaluation.name}</p>
-                                    <p className="text-xs text-slate-500 mt-1">Recorrido académico preliminar</p>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 p-8 text-center space-y-4">
-                            <div className="max-w-md mx-auto space-y-2">
-                                <h3 className="text-lg font-bold text-slate-900">¿Preparado para iniciar?</h3>
-                                <p className="text-xs text-slate-500">
-                                    Una vez que presiones el botón de inicio, se activará el conteo de tiempo y se mostrarán las preguntas. Asegúrate de estar en un ambiente tranquilo.
+                        <Card className="border-brand-border bg-brand-card">
+                            <CardContent className="flex flex-col items-center p-6 text-center sm:p-8">
+                                <h3 className="text-lg font-black text-text-main">
+                                    {selected?.nombre_plan ||
+                                        'Sin plantilla disponible'}
+                                </h3>
+                                <p className="mt-2 max-w-xl text-sm leading-6 text-text-muted">
+                                    Al iniciar se abrirá un registro de evaluación
+                                    aplicado asociado a tu ficha académica.
                                 </p>
-                            </div>
-                            <button
-                                onClick={handleStart}
-                                disabled={accessRestricted}
-                                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-secondary hover:bg-brand-secondary/90 text-white font-semibold text-sm px-8 py-3.5 shadow-lg shadow-brand-secondary/10 transition disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                {accessRestricted
-                                    ? 'Acceso temporalmente restringido'
-                                    : 'Iniciar evaluación guiada'}
-                                <ArrowRight className="h-4 w-4" />
-                            </button>
+                                <button
+                                    type="button"
+                                    onClick={start}
+                                    disabled={
+                                        processing ||
+                                        accessRestricted ||
+                                        !postulanteVinculado ||
+                                        !estructuraResultadosDisponible ||
+                                        !selected
+                                    }
+                                    className="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand-secondary px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-secondary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    Iniciar evaluación
+                                    <ArrowRight className="h-4 w-4" />
+                                </button>
+                            </CardContent>
                         </Card>
-                    </div>
+                    </>
                 )}
 
-                {/* ETAPA 2: RESOLUCIÓN */}
-                {step === 2 && (
-                    <div className="space-y-6">
-                        {/* Cabecera del examen */}
-                        <div className="sticky top-20 z-40 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 sm:flex-row sm:p-6">
-                            <div className="flex items-center gap-3">
-                                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-primary/10 text-brand-primary font-bold">
-                                    E2
-                                </span>
+                {evaluacionActiva && !resultado && (
+                    <>
+                        <div className="sticky top-4 z-20 rounded-2xl border border-brand-border bg-brand-card/95 p-4 shadow-lg backdrop-blur sm:p-5">
+                            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                                 <div>
-                                    <h2 className="text-sm font-bold text-slate-900">{selectedEvaluation.name}</h2>
-                                    <p className="text-xs text-slate-400">Responde de manera guiada cada reactivo.</p>
+                                    <p className="text-sm font-black text-text-main">
+                                        {evaluacionActiva.plantilla.nombre_plan}
+                                    </p>
+                                    <p className="mt-1 text-xs text-text-muted">
+                                        {answeredCount} de {totalQuestions}{' '}
+                                        respuestas registradas
+                                    </p>
                                 </div>
-                            </div>
-
-                            <div className="flex items-center gap-6">
-                                <div className="text-right">
-                                    <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Progreso</p>
-                                    <p className="text-xs font-bold text-slate-700">{answeredCount} de {totalQuestions} respondidos</p>
-                                </div>
-                                <div className="flex items-center gap-2 bg-rose-50 px-3.5 py-2 rounded-xl text-rose-600 font-black tracking-wider text-sm ring-1 ring-rose-600/10">
-                                    <Clock className="h-4 w-4 animate-pulse" />
+                                <span className="inline-flex items-center gap-2 rounded-xl bg-brand-warning/10 px-4 py-2 font-black text-brand-warning">
+                                    <Clock className="h-4 w-4" />
                                     {formatTime(secondsLeft)}
-                                </div>
+                                </span>
                             </div>
+                            <Progress
+                                value={
+                                    totalQuestions
+                                        ? (answeredCount / totalQuestions) * 100
+                                        : 0
+                                }
+                                className="mt-4 h-2"
+                            />
                         </div>
 
-                        {/* Barra de progreso visual */}
-                        <Progress 
-                            value={(answeredCount / totalQuestions) * 100} 
-                            className="h-2 bg-brand-border [&_[data-slot=progress-indicator]]:bg-brand-secondary"
-                        />
-
-                        {/* Cuestionario de preguntas */}
-                        <div className="space-y-6">
-                            {examQuestions.map((q, idx) => (
-                                <Card key={q.id} className="border-0 bg-white shadow-sm ring-1 ring-slate-200/85 overflow-hidden">
-                                    <div className="border-l-4 border-brand-secondary h-full">
-                                        <CardHeader className="pb-3">
-                                            <div className="flex justify-between items-center text-xs">
-                                                <span className="font-semibold text-brand-secondary uppercase tracking-widest">{q.area}</span>
-                                                <span className="text-slate-400 font-semibold">Pregunta {idx + 1} de {totalQuestions}</span>
-                                            </div>
-                                            <CardTitle className="text-slate-900 text-base font-bold leading-relaxed whitespace-pre-line mt-2">
-                                                {q.question}
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="space-y-3 pt-2">
-                                            <div className="grid gap-2">
-                                                {q.options.map((option) => {
-                                                    const isSelected = answers[q.id] === option.key;
-                                                    return (
-                                                        <button
-                                                            key={option.key}
-                                                            type="button"
-                                                            onClick={() => handleSelectOption(q.id, option.key)}
-                                                            className={`flex items-center gap-3 w-full text-left rounded-xl p-3.5 text-sm transition font-medium ring-1 ${
-                                                                isSelected 
-                                                                    ? 'bg-brand-secondary/5 ring-brand-secondary text-brand-secondary' 
-                                                                    : 'bg-slate-50/50 hover:bg-slate-50 ring-slate-200/60 text-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-slate-800'
+                        <div className="space-y-5">
+                            {evaluacionActiva.preguntas.map((pregunta, index) => (
+                                <Card
+                                    key={pregunta.id_preg}
+                                    className="overflow-hidden border-brand-border bg-brand-card"
+                                >
+                                    <CardHeader>
+                                        <div className="flex flex-wrap justify-between gap-2 text-xs">
+                                            <span className="font-bold uppercase tracking-wider text-brand-secondary">
+                                                {pregunta.materia} ·{' '}
+                                                {pregunta.area}
+                                            </span>
+                                            <span className="text-text-muted">
+                                                Pregunta {index + 1} de{' '}
+                                                {totalQuestions} ·{' '}
+                                                {Number(
+                                                    pregunta.puntaje,
+                                                ).toFixed(2)}{' '}
+                                                pts
+                                            </span>
+                                        </div>
+                                        <CardTitle className="mt-3 whitespace-pre-line text-base leading-7 text-text-main">
+                                            {pregunta.enunciado_preg}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="grid gap-3">
+                                        {pregunta.alternativas.map(
+                                            (alternativa) => {
+                                                const checked =
+                                                    answers[
+                                                        pregunta.id_preg
+                                                    ] === alternativa.id_alt;
+                                                return (
+                                                    <button
+                                                        key={
+                                                            alternativa.id_alt
+                                                        }
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setAnswers(
+                                                                (current) => ({
+                                                                    ...current,
+                                                                    [pregunta.id_preg]:
+                                                                        alternativa.id_alt,
+                                                                }),
+                                                            )
+                                                        }
+                                                        className={`flex items-start gap-3 rounded-xl border p-4 text-left text-sm transition ${
+                                                            checked
+                                                                ? 'border-brand-secondary bg-brand-secondary/10 text-brand-secondary'
+                                                                : 'border-brand-border bg-brand-bg text-text-main hover:border-brand-secondary/40'
+                                                        }`}
+                                                    >
+                                                        <span
+                                                            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-black ${
+                                                                checked
+                                                                    ? 'bg-brand-secondary text-white'
+                                                                    : 'bg-brand-card text-text-muted'
                                                             }`}
                                                         >
-                                                            <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-black transition ${
-                                                                isSelected 
-                                                                    ? 'bg-brand-secondary text-white shadow-md' 
-                                                                    : 'border border-slate-200 bg-white text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'
-                                                            }`}>
-                                                                {option.key}
-                                                            </span>
-                                                            <span>{option.text}</span>
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </CardContent>
-                                    </div>
+                                                            {
+                                                                alternativa.letra_alt
+                                                            }
+                                                        </span>
+                                                        <span className="leading-6">
+                                                            {
+                                                                alternativa.texto_alt
+                                                            }
+                                                        </span>
+                                                    </button>
+                                                );
+                                            },
+                                        )}
+                                    </CardContent>
                                 </Card>
                             ))}
                         </div>
 
-                        {/* Botón de envío */}
-                        <div className="flex justify-end pt-4">
+                        <div className="flex justify-end">
                             <button
                                 type="button"
-                                onClick={handleSubmit}
-                                disabled={answeredCount < totalQuestions}
-                                className={`inline-flex items-center justify-center gap-2 rounded-2xl font-bold text-sm px-8 py-3.5 shadow-lg transition ${
-                                    answeredCount === totalQuestions
-                                        ? 'bg-brand-secondary hover:bg-brand-secondary/90 text-white shadow-brand-secondary/10'
-                                        : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
-                                }`}
+                                onClick={submit}
+                                disabled={
+                                    processing ||
+                                    answeredCount < totalQuestions
+                                }
+                                className="inline-flex items-center gap-2 rounded-xl bg-brand-secondary px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-secondary/90 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                Enviar respuestas y calificar
+                                Finalizar y calificar
                                 <ArrowRight className="h-4 w-4" />
                             </button>
                         </div>
-                    </div>
+                    </>
                 )}
 
-                {/* ETAPA 3: RESULTADO PRELIMINAR */}
-                {step === 3 && (
-                    <div className="space-y-6">
-                        {/* Resumen del puntaje */}
-                        <Card className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 p-8 text-center relative overflow-hidden">
-                            <div className="absolute inset-0 bg-[linear-gradient(to_right,#slate-50_1px,transparent_1px)] opacity-10 pointer-events-none" />
-                            
-                            <div className="max-w-md mx-auto space-y-4">
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary ring-1 ring-brand-primary/10">
+                {resultado && (
+                    <>
+                        <Card className="overflow-hidden border-brand-border bg-brand-card">
+                            <div className="bg-gradient-to-br from-brand-primary to-brand-secondary p-7 text-center text-white sm:p-9">
+                                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-brand-accent">
                                     <Award className="h-4 w-4" />
-                                    Diagnóstico Académico Finalizado
+                                    Evaluación finalizada
                                 </span>
-                                
-                                <div className="space-y-1">
-                                    <h2 className="text-xl font-bold text-slate-900">Resultado preliminar de desempeño</h2>
-                                    <p className="text-xs text-slate-400">Puntaje ponderado calculado a partir de tus respuestas.</p>
-                                </div>
-
-                                <div className="relative flex items-center justify-center my-6">
-                                    <div className="text-center bg-brand-secondary/10 ring-4 ring-brand-secondary/5 h-28 w-28 rounded-full flex flex-col justify-center items-center">
-                                        <span className="text-3xl font-black text-brand-primary leading-none">{score}</span>
-                                        <span className="text-[10px] font-bold text-brand-secondary mt-1 uppercase tracking-wider">de 100 Pts</span>
-                                    </div>
-                                </div>
-
-                                <p className="text-xs leading-relaxed text-slate-500">
-                                    Has respondido correctamente <span className="font-bold text-slate-900">{correctCount} de {totalQuestions}</span> reactivos evaluados en el examen.
+                                <h1 className="mt-4 text-2xl font-black">
+                                    {resultado.plantilla?.nombre_plan}
+                                </h1>
+                                <p className="mt-5 text-5xl font-black">
+                                    {Number(resultado.porcentaje).toFixed(1)}%
+                                </p>
+                                <p className="mt-2 text-sm text-slate-200">
+                                    {Number(resultado.puntaje_total).toFixed(2)} de{' '}
+                                    {Number(resultado.puntaje_maximo).toFixed(2)}{' '}
+                                    puntos · {resultado.correctas} de{' '}
+                                    {resultado.total_preguntas} respuestas
+                                    correctas
                                 </p>
                             </div>
                         </Card>
 
-                        {/* Desglose de respuestas */}
-                        <div className="space-y-4">
-                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-500">Desglose de competencias</h3>
+                        <section className="space-y-3">
+                            <h2 className="text-lg font-black text-text-main">
+                                Respuestas registradas
+                            </h2>
+                            {resultado.respuestas.map((respuesta) => (
+                                <article
+                                    key={respuesta.id_resp_eval}
+                                    className="rounded-2xl border border-brand-border bg-brand-card p-5"
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <span
+                                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                                                respuesta.es_correcta
+                                                    ? 'bg-brand-success/10 text-brand-success'
+                                                    : 'bg-brand-danger/10 text-brand-danger'
+                                            }`}
+                                        >
+                                            {respuesta.es_correcta ? (
+                                                <CheckCircle2 className="h-5 w-5" />
+                                            ) : (
+                                                <AlertTriangle className="h-5 w-5" />
+                                            )}
+                                        </span>
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-bold uppercase tracking-wider text-brand-secondary">
+                                                {respuesta.materia} ·{' '}
+                                                {respuesta.area}
+                                            </p>
+                                            <p className="mt-2 text-sm font-semibold leading-6 text-text-main">
+                                                {respuesta.enunciado}
+                                            </p>
+                                            <p className="mt-2 text-xs text-text-muted">
+                                                Respuesta:{' '}
+                                                {respuesta.alternativa
+                                                    ? `${respuesta.alternativa.letra_alt}. ${respuesta.alternativa.texto_alt}`
+                                                    : 'Sin respuesta'}{' '}
+                                                ·{' '}
+                                                {Number(
+                                                    respuesta.puntaje_obtenido,
+                                                ).toFixed(2)}{' '}
+                                                /{' '}
+                                                {Number(
+                                                    respuesta.puntaje_maximo,
+                                                ).toFixed(2)}{' '}
+                                                pts
+                                            </p>
+                                            {respuesta.explicacion && (
+                                                <p className="mt-3 rounded-xl bg-brand-bg p-3 text-xs leading-5 text-text-muted">
+                                                    {respuesta.explicacion}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </section>
 
-                            <div className="space-y-3">
-                                {examQuestions.map((q) => {
-                                    const isCorrect = answers[q.id] === q.correct;
-                                    return (
-                                        <Card key={q.id} className="border-0 bg-white shadow-sm ring-1 ring-slate-200/80 p-4">
-                                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                                <div className="flex items-start gap-3">
-                                                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${
-                                                        isCorrect 
-                                                            ? 'bg-brand-success/10 text-brand-success'
-                                                            : 'bg-brand-danger/10 text-brand-danger'
-                                                    }`}>
-                                                        {isCorrect ? <CheckCircle2 className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-                                                    </span>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-slate-800 uppercase tracking-widest">{q.area}</p>
-                                                        <p className="text-xs text-slate-500 mt-0.5 leading-snug">{q.question.substring(0, 100)}...</p>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex items-center gap-3 shrink-0 text-xs">
-                                                    <span className="text-slate-400">Tu respuesta: <span className="font-bold text-slate-700">{answers[q.id]}</span></span>
-                                                    <span className="text-slate-400">Correcta: <span className="font-bold text-brand-success">{q.correct}</span></span>
-                                                </div>
-                                            </div>
-
-                                            {/* Retroalimentación */}
-                                            <div className={`mt-3 p-3 rounded-xl border text-[11px] leading-relaxed ${
-                                                isCorrect 
-                                                    ? 'border-brand-success/20 bg-brand-success/5 text-brand-success'
-                                                    : 'border-brand-danger/20 bg-brand-danger/5 text-brand-danger'
-                                            }`}>
-                                                <span className="font-bold block uppercase text-[9px] tracking-wider mb-1">Recomendación:</span>
-                                                {isCorrect ? q.feedbackSuccess : q.feedbackFail}
-                                            </div>
-                                        </Card>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Recomendaciones Generales de Learning Analytics */}
-                        <Card className="border-0 bg-gradient-to-br from-brand-primary/5 to-brand-secondary/5 shadow-sm ring-1 ring-slate-200/80 dark:from-brand-primary/20 dark:to-brand-secondary/10 dark:ring-slate-800">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                                    <TrendingUp className="h-4.5 w-4.5 text-brand-secondary" />
-                                    Plan de nivelación sugerido
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <ul className="space-y-2 text-xs leading-relaxed text-slate-600">
-                                    <li className="flex gap-2 items-start">
-                                        <ChevronRight className="h-4 w-4 text-brand-secondary shrink-0 mt-0.5" />
-                                        <span><strong>Competencia de Aritmética:</strong> {answers[1] === 'B' ? 'Excelente comprensión conceptual de porcentajes y balances proporcionales.' : 'Se sugiere priorizar la resolución guiada de problemas de porcentajes y fracciones sucesivas.'}</span>
-                                    </li>
-                                    <li className="flex gap-2 items-start">
-                                        <ChevronRight className="h-4 w-4 text-brand-secondary shrink-0 mt-0.5" />
-                                        <span><strong>Competencia de Álgebra:</strong> {answers[2] === 'C' ? 'Habilidad consolidada en resolución de sistemas lineales y simplificación algebraica.' : 'Es crítico practicar la igualación y eliminación en ecuaciones con dos incógnitas.'}</span>
-                                    </li>
-                                    <li className="flex gap-2 items-start">
-                                        <ChevronRight className="h-4 w-4 text-brand-secondary shrink-0 mt-0.5" />
-                                        <span><strong>Competencia de Razonamiento Lógico:</strong> {answers[3] === 'B' ? 'Destreza en identificación de reglas matemáticas recurrentes y secuencias.' : 'Se aconseja trabajar en la inducción de sucesiones mediante diferencias consecutivas.'}</span>
-                                    </li>
-                                </ul>
-                            </CardContent>
-                        </Card>
-
-                        {/* Acciones */}
-                        <div className="flex justify-between items-center pt-4">
-                            <button
-                                type="button"
-                                onClick={handleReset}
-                                className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-                            >
-                                <RefreshCw className="h-4 w-4" />
-                                Volver a evaluaciones
-                            </button>
-                            
-                            <Link href="/">
-                                <button className="inline-flex h-10 items-center gap-2 rounded-xl bg-brand-secondary px-5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-secondary/90">
-                                    Finalizar y salir
-                                </button>
-                            </Link>
-                        </div>
-                    </div>
+                        <button
+                            type="button"
+                            onClick={() =>
+                                router.get(
+                                    route('estudiante.evaluaciones'),
+                                )
+                            }
+                            className="inline-flex items-center gap-2 rounded-xl border border-brand-border px-5 py-3 text-sm font-bold text-text-main hover:bg-brand-border/30"
+                        >
+                            <RefreshCw className="h-4 w-4" />
+                            Volver a evaluaciones
+                        </button>
+                    </>
                 )}
-            </div>
+
+                {!evaluacionActiva && historial.length > 0 && (
+                    <section className="rounded-2xl border border-brand-border bg-brand-card p-5 sm:p-6">
+                        <h2 className="flex items-center gap-2 text-lg font-black text-text-main">
+                            <History className="h-5 w-5 text-brand-secondary" />
+                            Historial reciente
+                        </h2>
+                        <div className="mt-4 grid gap-3 md:grid-cols-2">
+                            {historial.map((item) => (
+                                <button
+                                    key={item.id_eval_apl}
+                                    type="button"
+                                    onClick={() =>
+                                        router.get(
+                                            route('estudiante.evaluaciones'),
+                                            {
+                                                resultado:
+                                                    item.id_eval_apl,
+                                            },
+                                        )
+                                    }
+                                    className="rounded-xl border border-brand-border bg-brand-bg p-4 text-left hover:border-brand-secondary/40"
+                                >
+                                    <p className="font-bold leading-snug text-text-main">
+                                        {item.plantilla?.nombre_plan}
+                                    </p>
+                                    <p className="mt-2 text-xs text-text-muted">
+                                        {formatDate(
+                                            item.fecha_fin_eval_apl,
+                                        )}{' '}
+                                        ·{' '}
+                                        {Number(
+                                            item.porcentaje_eval_apl,
+                                        ).toFixed(1)}
+                                        %
+                                    </p>
+                                </button>
+                            ))}
+                        </div>
+                    </section>
+                )}
+            </main>
         </AuthenticatedLayout>
     );
 }
