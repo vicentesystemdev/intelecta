@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\AreaConocimientoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EvaluacionAplicadaController;
+use App\Http\Controllers\Estudiante\SeguimientoAcademicoController;
 use App\Http\Controllers\Institucional\AsignacionTutorController;
 use App\Http\Controllers\Institucional\AsistenciaAcademicaController;
 use App\Http\Controllers\Institucional\FichaAcademicaController;
@@ -378,10 +379,10 @@ Route::middleware('auth')->group(function () {
                 ->name('admin.sistema.usuarios.update');
 
             Route::get('/roles-permisos', [RolPermisoController::class, 'index'])
-                ->middleware('permission:roles.ver')
+                ->middleware('permission:roles-permisos.ver')
                 ->name('admin.sistema.roles-permisos');
             Route::put('/roles-permisos/{rol}', [RolPermisoController::class, 'update'])
-                ->middleware('permission:roles.editar')
+                ->middleware('permission:roles-permisos.editar')
                 ->name('admin.sistema.roles-permisos.update');
 
             Route::get('/configuracion', function () {
@@ -393,6 +394,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/estudiante/evaluaciones', [EvaluacionAplicadaController::class, 'index'])
         ->middleware('verified')
         ->name('estudiante.evaluaciones');
+    Route::get('/estudiante/mi-ficha', [SeguimientoAcademicoController::class, 'ficha'])
+        ->middleware('verified')
+        ->name('estudiante.ficha');
+    Route::get('/estudiante/ranking', [SeguimientoAcademicoController::class, 'ranking'])
+        ->middleware('verified')
+        ->name('estudiante.ranking');
     Route::post(
         '/estudiante/evaluaciones/{plantilla}/iniciar',
         [EvaluacionAplicadaController::class, 'iniciar'],

@@ -68,7 +68,7 @@ class RolPermisoController extends Controller
         return Inertia::render('Sistema/RolesPermisos/Index', [
             'roles' => $roles,
             'permisosAgrupados' => $permissions,
-            'puedeEditar' => $request->user()->can('roles.editar'),
+            'puedeEditar' => $request->user()->can('roles-permisos.editar'),
         ]);
     }
 

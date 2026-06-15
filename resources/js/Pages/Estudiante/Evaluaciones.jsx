@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
+import StudentTrackingNav from '@/Components/Estudiante/StudentTrackingNav';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import {
@@ -151,6 +152,8 @@ export default function Evaluaciones({
             <Head title="Evaluaciones del Postulante" />
 
             <main className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+                <StudentTrackingNav />
+
                 {(errors?.postulante ||
                     errors?.habilitacion ||
                     errors?.plantilla ||

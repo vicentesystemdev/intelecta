@@ -81,7 +81,7 @@ const navigationGroups = [
         label: 'ADMINISTRACIÓN DEL SISTEMA',
         items: [
             { label: 'Usuarios', icon: Users, href: '/admin/sistema/usuarios', routeName: 'admin.sistema.usuarios', permission: 'usuarios.ver' },
-            { label: 'Roles y Permisos', icon: ShieldCheck, href: '/admin/sistema/roles-permisos', routeName: 'admin.sistema.roles-permisos', permission: 'roles.ver' },
+            { label: 'Roles y Permisos', icon: ShieldCheck, href: '/admin/sistema/roles-permisos', routeName: 'admin.sistema.roles-permisos', permission: 'roles-permisos.ver' },
             { label: 'Configuración', icon: Settings, href: '/admin/sistema/configuracion', routeName: 'admin.sistema.configuracion', permission: 'configuracion.ver' },
         ],
     },
@@ -93,9 +93,9 @@ const groupIsActive = (group) =>
 export default function AppSidebar({ open = false, onClose = () => {} }) {
     const auth = usePage().props.auth || {};
     const permissions = auth.permissions || [];
-    const isSuperAdministrator = (auth.roles || []).includes(
-        'Super Administrador',
-    );
+    const isSuperAdministrator =
+        auth.isSuperAdministrator ||
+        (auth.roles || []).includes('Super Administrador');
     const visibleGroups = navigationGroups
         .map((group) => ({
             ...group,

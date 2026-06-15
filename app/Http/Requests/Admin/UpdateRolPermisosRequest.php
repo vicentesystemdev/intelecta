@@ -9,7 +9,7 @@ class UpdateRolPermisosRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('roles.editar') ?? false;
+        return $this->user()?->can('roles-permisos.editar') ?? false;
     }
 
     /**

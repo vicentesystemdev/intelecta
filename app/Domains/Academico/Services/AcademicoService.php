@@ -64,6 +64,11 @@ class AcademicoService
         ];
     }
 
+    public function rankingPortal(Postulante $postulante): array
+    {
+        return $this->repository->rankingPortal($postulante);
+    }
+
     public function ficha(Postulante $postulante): array
     {
         return $this->repository->ficha($postulante);

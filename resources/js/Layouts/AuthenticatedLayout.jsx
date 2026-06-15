@@ -66,9 +66,9 @@ export default function AuthenticatedLayout({ header, children }) {
             </header>
 
             {header && (
-                <div className="border-b border-slate-200/70 bg-white dark:border-slate-800 dark:bg-slate-900">
+                <div className="border-b border-brand-border bg-brand-card">
                     <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-4 sm:px-6 lg:px-8">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-secondary/10 text-brand-secondary">
                             <UserRound className="h-4 w-4" />
                         </span>
                         {header}

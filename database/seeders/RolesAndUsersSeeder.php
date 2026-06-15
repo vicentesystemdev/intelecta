@@ -86,6 +86,8 @@ class RolesAndUsersSeeder extends Seeder
             'roles.ver',
             'roles.crear',
             'roles.editar',
+            'roles-permisos.ver',
+            'roles-permisos.editar',
             'configuracion.ver',
 
             // Permisos heredados que siguen vinculados a rutas y roles existentes.

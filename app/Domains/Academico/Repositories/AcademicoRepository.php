@@ -286,6 +286,65 @@ class AcademicoRepository
         ];
     }
 
+    public function rankingPortal(Postulante $postulante, int $perPage = 15): array
+    {
+        $payload = $this->ranking([], $perPage);
+        $ranking = $payload['ranking'];
+        $positions = RendimientoPostulante::query()
+            ->orderByDesc('promedio_general_rend')
+            ->orderBy('id_rend')
+            ->pluck('id_post')
+            ->values();
+        $currentIndex = $positions->search($postulante->id_post);
+
+        $ranking->setCollection(
+            $ranking->getCollection()->map(
+                function (RendimientoPostulante $item) use ($postulante): array {
+                    $isCurrent = $item->id_post === $postulante->id_post;
+                    $firstName = str($item->postulante?->nombres_post)->before(' ')->toString();
+                    $surnameInitials = collect(
+                        preg_split('/\s+/', trim((string) $item->postulante?->apellidos_post)),
+                    )
+                        ->filter()
+                        ->map(fn (string $surname) => mb_strtoupper(mb_substr($surname, 0, 1)).'.')
+                        ->implode(' ');
+
+                    return [
+                        'id_rend' => $item->id_rend,
+                        'posicion' => $item->posicion,
+                        'percentil' => $item->percentil,
+                        'es_actual' => $isCurrent,
+                        'nombre' => $isCurrent
+                            ? trim("{$item->postulante?->nombres_post} {$item->postulante?->apellidos_post}")
+                            : trim("{$firstName} {$surnameInitials}"),
+                        'carrera' => $item->postulante?->carrera?->nombre_car,
+                        'programa' => $item->programa?->nombre_prog,
+                        'grupo' => $item->grupo?->codigo_grupo ?: $item->grupo?->nombre_grupo,
+                        'promedio' => (float) $item->promedio_general_rend,
+                        'estado' => $item->nivel_riesgo_rend,
+                    ];
+                },
+            ),
+        );
+
+        $myPerformance = RendimientoPostulante::query()
+            ->where('id_post', $postulante->id_post)
+            ->latest('created_at')
+            ->first();
+
+        return [
+            'ranking' => $ranking,
+            'metricas' => $payload['metricas'],
+            'miPosicion' => $currentIndex === false ? null : $currentIndex + 1,
+            'miRendimiento' => $myPerformance
+                ? [
+                    'promedio' => (float) $myPerformance->promedio_general_rend,
+                    'estado' => $myPerformance->nivel_riesgo_rend,
+                ]
+                : null,
+        ];
+    }
+
     public function paginateFichas(array $filters, int $perPage = 12): LengthAwarePaginator
     {
         $paginator = Postulante::query()
