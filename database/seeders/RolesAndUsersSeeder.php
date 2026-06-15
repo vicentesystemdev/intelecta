@@ -11,6 +11,12 @@ use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndUsersSeeder extends Seeder
 {
+    public const ADMIN_EMAIL = 'marco.torrez@avalancha.edu.bo';
+
+    public const STUDENT_EMAIL = 'valeria.nina@postulante.avalancha.edu.bo';
+
+    public const TEACHER_EMAIL = 'rodrigo.salazar@avalancha.edu.bo';
+
     public function run(): void
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
@@ -146,12 +152,12 @@ class RolesAndUsersSeeder extends Seeder
 
         foreach ([
             ['Adriana Choque Mamani', 'adriana.choque@avalancha.edu.bo', $superAdmin],
-            ['Marco Antonio Torrez Quispe', 'marco.torrez@avalancha.edu.bo', $administrador],
-            ['Rodrigo Salazar Condori', 'rodrigo.salazar@avalancha.edu.bo', $docente],
+            ['Marco Antonio Torrez Quispe', self::ADMIN_EMAIL, $administrador],
+            ['Rodrigo Salazar Condori', self::TEACHER_EMAIL, $docente],
             ['Carla Mendoza Rojas', 'carla.mendoza@avalancha.edu.bo', $docente],
             ['Luis Fernando Arce Huanca', 'luis.arce@avalancha.edu.bo', $docente],
             ['Patricia Vargas Choque', 'patricia.vargas@avalancha.edu.bo', $docente],
-            ['Valeria Nina Choque', 'valeria.nina@postulante.avalancha.edu.bo', $estudiante],
+            ['Valeria Nina Choque', self::STUDENT_EMAIL, $estudiante],
             ['Diego Mamani Flores', 'diego.mamani@postulante.avalancha.edu.bo', $estudiante],
             ['Mariana Quispe Rojas', 'mariana.quispe@postulante.avalancha.edu.bo', $estudiante],
         ] as [$name, $email, $role]) {

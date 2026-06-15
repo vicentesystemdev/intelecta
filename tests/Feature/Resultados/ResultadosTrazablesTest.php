@@ -37,8 +37,8 @@ class ResultadosTrazablesTest extends TestCase
         parent::setUp();
 
         $this->seed(RolesAndUsersSeeder::class);
-        $this->administrator = User::where('email', 'admin@intelecta.test')->firstOrFail();
-        $this->student = User::where('email', 'estudiante@intelecta.test')->firstOrFail();
+        $this->administrator = User::where('email', RolesAndUsersSeeder::ADMIN_EMAIL)->firstOrFail();
+        $this->student = User::where('email', RolesAndUsersSeeder::STUDENT_EMAIL)->firstOrFail();
         $this->postulante = Postulante::create([
             'nombres_post' => 'María Elena',
             'apellidos_post' => 'Quispe Choque',

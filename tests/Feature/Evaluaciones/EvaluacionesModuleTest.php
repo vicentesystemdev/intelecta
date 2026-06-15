@@ -27,7 +27,7 @@ class EvaluacionesModuleTest extends TestCase
         parent::setUp();
 
         $this->seed(RolesAndUsersSeeder::class);
-        $this->administrator = User::where('email', 'admin@intelecta.test')->firstOrFail();
+        $this->administrator = User::where('email', RolesAndUsersSeeder::ADMIN_EMAIL)->firstOrFail();
         $this->area = AreaConocimiento::create([
             'nombre_area' => 'Álgebra',
             'descripcion_area' => 'Estructuras y ecuaciones algebraicas.',
@@ -177,8 +177,8 @@ class EvaluacionesModuleTest extends TestCase
 
     public function test_permissions_allow_teacher_and_reject_student(): void
     {
-        $teacher = User::where('email', 'docente@intelecta.test')->firstOrFail();
-        $student = User::where('email', 'estudiante@intelecta.test')->firstOrFail();
+        $teacher = User::where('email', RolesAndUsersSeeder::TEACHER_EMAIL)->firstOrFail();
+        $student = User::where('email', RolesAndUsersSeeder::STUDENT_EMAIL)->firstOrFail();
 
         $this->actingAs($teacher)->get(route('preguntas.create'))->assertOk();
         $this->actingAs($student)->get(route('preguntas.index'))->assertForbidden();

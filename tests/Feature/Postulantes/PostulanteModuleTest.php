@@ -29,7 +29,7 @@ class PostulanteModuleTest extends TestCase
         parent::setUp();
 
         $this->seed(RolesAndUsersSeeder::class);
-        $this->administrator = User::where('email', 'admin@intelecta.test')->firstOrFail();
+        $this->administrator = User::where('email', RolesAndUsersSeeder::ADMIN_EMAIL)->firstOrFail();
         $this->colegio = Colegio::create([
             'nombre_col' => 'Colegio Nacional San Simón',
             'tipo_col' => 'Público',
@@ -71,7 +71,7 @@ class PostulanteModuleTest extends TestCase
 
     public function test_user_without_permission_cannot_view_postulantes(): void
     {
-        $student = User::where('email', 'estudiante@intelecta.test')->firstOrFail();
+        $student = User::where('email', RolesAndUsersSeeder::STUDENT_EMAIL)->firstOrFail();
 
         $this->actingAs($student)
             ->get(route('postulantes.index'))
