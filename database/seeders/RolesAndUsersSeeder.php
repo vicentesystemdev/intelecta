@@ -144,26 +144,19 @@ class RolesAndUsersSeeder extends Seeder
 
         $estudiante->syncPermissions([]);
 
-        $this->createUserWithRole(
-            name: 'Super Administrador',
-            email: 'superadmin@intelecta.test',
-            role: $superAdmin,
-        );
-        $this->createUserWithRole(
-            name: 'Administrador Académico',
-            email: 'admin@intelecta.test',
-            role: $administrador,
-        );
-        $this->createUserWithRole(
-            name: 'Docente Académico',
-            email: 'docente@intelecta.test',
-            role: $docente,
-        );
-        $this->createUserWithRole(
-            name: 'Estudiante Institucional',
-            email: 'estudiante@intelecta.test',
-            role: $estudiante,
-        );
+        foreach ([
+            ['Adriana Choque Mamani', 'adriana.choque@avalancha.edu.bo', $superAdmin],
+            ['Marco Antonio Torrez Quispe', 'marco.torrez@avalancha.edu.bo', $administrador],
+            ['Rodrigo Salazar Condori', 'rodrigo.salazar@avalancha.edu.bo', $docente],
+            ['Carla Mendoza Rojas', 'carla.mendoza@avalancha.edu.bo', $docente],
+            ['Luis Fernando Arce Huanca', 'luis.arce@avalancha.edu.bo', $docente],
+            ['Patricia Vargas Choque', 'patricia.vargas@avalancha.edu.bo', $docente],
+            ['Valeria Nina Choque', 'valeria.nina@postulante.avalancha.edu.bo', $estudiante],
+            ['Diego Mamani Flores', 'diego.mamani@postulante.avalancha.edu.bo', $estudiante],
+            ['Mariana Quispe Rojas', 'mariana.quispe@postulante.avalancha.edu.bo', $estudiante],
+        ] as [$name, $email, $role]) {
+            $this->createUserWithRole($name, $email, $role);
+        }
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
@@ -174,7 +167,7 @@ class RolesAndUsersSeeder extends Seeder
             ['email' => $email],
             [
                 'name' => $name,
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Avalancha#2026'),
                 'email_verified_at' => now(),
             ],
         );
