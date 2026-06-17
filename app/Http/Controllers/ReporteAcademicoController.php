@@ -12,15 +12,41 @@ use App\Domains\Evaluaciones\Models\AreaConocimiento;
 use App\Domains\Evaluaciones\Models\Materia;
 use App\Domains\Evaluaciones\Models\Tema;
 use App\Domains\Reportes\Services\CoberturaCurricularService;
+use App\Domains\Reportes\Services\ReporteExportacionService;
 use App\Domains\Resultados\Models\EvaluacionAplicada;
+use App\Exports\Reportes\ReporteAcademicoExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Maatwebsite\Excel\Facades\Excel;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ReporteAcademicoController extends Controller
 {
+    public function descargarPdf(string $tipo, ReporteExportacionService $reportes)
+    {
+        $reporte = $reportes->obtenerReporte($tipo);
+
+        $pdf = Pdf::loadView('reportes.pdf.reporte', [
+            'reporte' => $reporte,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download($reportes->obtenerNombreArchivo($tipo, 'pdf'));
+    }
+
+    public function descargarExcel(string $tipo, ReporteExportacionService $reportes): BinaryFileResponse
+    {
+        $reporte = $reportes->obtenerReporte($tipo);
+
+        return Excel::download(
+            new ReporteAcademicoExport($reporte),
+            $reportes->obtenerNombreArchivo($tipo, 'xlsx'),
+        );
+    }
+
     public function index(Request $request, CoberturaCurricularService $cobertura): Response
     {
         // 1. KPIs principales

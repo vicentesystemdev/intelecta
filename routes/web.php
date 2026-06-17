@@ -129,6 +129,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/reportes-academicos', [ReporteAcademicoController::class, 'index'])
         ->middleware(['verified', 'administrative', 'permission:reportes.ver'])
         ->name('reportes-academicos.index');
+    Route::get('/reportes-academicos/pdf/{tipo}', [ReporteAcademicoController::class, 'descargarPdf'])
+        ->middleware(['verified', 'administrative', 'permission:reportes.ver'])
+        ->name('reportes.pdf');
+    Route::get('/reportes-academicos/excel/{tipo}', [ReporteAcademicoController::class, 'descargarExcel'])
+        ->middleware(['verified', 'administrative', 'permission:reportes.ver'])
+        ->name('reportes.excel');
 
     // Rutas planificadas del panel administrativo
     Route::prefix('admin')

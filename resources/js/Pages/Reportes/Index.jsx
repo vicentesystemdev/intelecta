@@ -21,7 +21,10 @@ import {
     CheckCircle2,
     ChevronDown,
     ChevronUp,
+    Download,
     FileQuestion,
+    FileSpreadsheet,
+    FileText,
     GraduationCap,
     Layers3,
     LibraryBig,
@@ -190,6 +193,33 @@ export default function Index({
         },
     ];
 
+    const reportesSignificativos = [
+        {
+            tipo: 'rendimiento',
+            titulo: 'Rendimiento Académico',
+            descripcion:
+                'Consolida el desempeño académico de los postulantes a partir de evaluaciones aplicadas, asistencia y seguimiento institucional.',
+        },
+        {
+            tipo: 'evaluaciones',
+            titulo: 'Evaluaciones Aplicadas',
+            descripcion:
+                'Lista las evaluaciones finalizadas con puntajes calculados desde respuestas registradas.',
+        },
+        {
+            tipo: 'asistencia',
+            titulo: 'Asistencia Académica',
+            descripcion:
+                'Resume la asistencia por postulante, programa y grupo académico.',
+        },
+        {
+            tipo: 'habilitacion',
+            titulo: 'Habilitación Académica',
+            descripcion:
+                'Presenta el estado administrativo-académico de los postulantes según matrícula, cuotas y habilitación.',
+        },
+    ];
+
     const dataUniversidades = postulantesPorUniversidad.map((item) => ({
         name: item.sigla_uni || item.nombre_uni,
         value: Number(item.total) || 0,
@@ -282,6 +312,60 @@ export default function Index({
                     >
                         Volver al Dashboard
                     </Link>
+                </section>
+
+                <section className="rounded-3xl border border-brand-border bg-brand-card p-5 shadow-sm dark:shadow-black/20 sm:p-6">
+                    <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <Badge className="border border-brand-info/20 bg-brand-info/10 text-brand-info hover:bg-brand-info/15">
+                                <Download className="mr-1 h-3.5 w-3.5" />
+                                Exportación institucional
+                            </Badge>
+                            <h2 className="mt-3 text-xl font-black text-text-main">
+                                Reportes significativos
+                            </h2>
+                            <p className="mt-1 max-w-3xl text-sm leading-6 text-text-muted">
+                                Descarga reportes profesionales en PDF y Excel usando
+                                información real de evaluaciones aplicadas, asistencia,
+                                matrícula, habilitación y rendimiento académico.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="grid gap-4 lg:grid-cols-4">
+                        {reportesSignificativos.map((reporte) => (
+                            <article
+                                key={reporte.tipo}
+                                className="flex min-h-full flex-col rounded-2xl border border-brand-border bg-brand-bg/40 p-4 shadow-sm dark:bg-slate-950/20"
+                            >
+                                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-secondary/10 text-brand-secondary">
+                                    <FileText className="h-5 w-5" />
+                                </div>
+                                <h3 className="text-sm font-black text-text-main">
+                                    {reporte.titulo}
+                                </h3>
+                                <p className="mt-2 flex-1 text-xs leading-5 text-text-muted">
+                                    {reporte.descripcion}
+                                </p>
+                                <div className="mt-5 grid gap-2">
+                                    <a
+                                        href={route('reportes.pdf', reporte.tipo)}
+                                        className="inline-flex h-10 items-center justify-center rounded-xl bg-brand-secondary px-3 text-xs font-bold text-white shadow-md transition-all hover:bg-brand-secondary/90 active:scale-95"
+                                    >
+                                        <FileText className="mr-2 h-4 w-4" />
+                                        Descargar PDF
+                                    </a>
+                                    <a
+                                        href={route('reportes.excel', reporte.tipo)}
+                                        className="inline-flex h-10 items-center justify-center rounded-xl border border-brand-border bg-transparent px-3 text-xs font-bold text-text-main transition-all hover:bg-brand-border/30"
+                                    >
+                                        <FileSpreadsheet className="mr-2 h-4 w-4" />
+                                        Descargar Excel
+                                    </a>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
                 </section>
 
                 <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
