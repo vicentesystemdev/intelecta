@@ -3,6 +3,7 @@
 namespace Tests\Feature\Evaluaciones;
 
 use App\Domains\Evaluaciones\Models\AreaConocimiento;
+use App\Domains\Evaluaciones\Models\Materia;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
 use App\Domains\Evaluaciones\Models\Pregunta;
 use App\Domains\Evaluaciones\Models\Tema;
@@ -20,6 +21,8 @@ class EvaluacionesModuleTest extends TestCase
 
     private AreaConocimiento $area;
 
+    private Materia $materia;
+
     private Tema $tema;
 
     protected function setUp(): void
@@ -28,7 +31,13 @@ class EvaluacionesModuleTest extends TestCase
 
         $this->seed(RolesAndUsersSeeder::class);
         $this->administrator = User::where('email', RolesAndUsersSeeder::ADMIN_EMAIL)->firstOrFail();
+        $this->materia = Materia::create([
+            'nombre_mat' => 'Matematica',
+            'codigo_mat' => 'MAT',
+            'estado_mat' => 'activo',
+        ]);
         $this->area = AreaConocimiento::create([
+            'id_mat' => $this->materia->id_mat,
             'nombre_area' => 'Álgebra',
             'descripcion_area' => 'Estructuras y ecuaciones algebraicas.',
             'estado_area' => 'activo',
@@ -51,6 +60,41 @@ class EvaluacionesModuleTest extends TestCase
                 ->has('areas.data', 1)
                 ->where('areas.data.0.nombre_area', 'Álgebra')
             );
+    }
+
+    public function test_administrator_can_create_area_with_required_materia(): void
+    {
+        $response = $this->actingAs($this->administrator)
+            ->post(route('areas-conocimiento.store'), [
+                'id_mat' => $this->materia->id_mat,
+                'nombre_area' => 'Geometria',
+                'descripcion_area' => 'Figuras, medidas y relaciones espaciales.',
+                'estado_area' => 'activo',
+            ]);
+
+        $response->assertRedirect(route('areas-conocimiento.index'));
+        $this->assertDatabaseHas('areas_conocimiento', [
+            'id_mat' => $this->materia->id_mat,
+            'nombre_area' => 'Geometria',
+        ]);
+    }
+
+    public function test_administrator_can_update_area_with_required_materia(): void
+    {
+        $response = $this->actingAs($this->administrator)
+            ->put(route('areas-conocimiento.update', $this->area->id_area), [
+                'id_mat' => $this->materia->id_mat,
+                'nombre_area' => 'Algebra elemental',
+                'descripcion_area' => 'Estructuras algebraicas de ingreso.',
+                'estado_area' => 'activo',
+            ]);
+
+        $response->assertRedirect(route('areas-conocimiento.index'));
+        $this->assertDatabaseHas('areas_conocimiento', [
+            'id_area' => $this->area->id_area,
+            'id_mat' => $this->materia->id_mat,
+            'nombre_area' => 'Algebra elemental',
+        ]);
     }
 
     public function test_administrator_can_list_temas(): void
