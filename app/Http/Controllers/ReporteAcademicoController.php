@@ -14,6 +14,7 @@ use App\Domains\Evaluaciones\Models\Tema;
 use App\Domains\Reportes\Services\CoberturaCurricularService;
 use App\Domains\Reportes\Services\ReporteExportacionService;
 use App\Domains\Resultados\Models\EvaluacionAplicada;
+use App\Domains\Seguridad\Services\BitacoraService;
 use App\Exports\Reportes\ReporteAcademicoExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -26,9 +27,27 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ReporteAcademicoController extends Controller
 {
-    public function descargarPdf(string $tipo, ReporteExportacionService $reportes)
+    public function descargarPdf(
+        string $tipo,
+        ReporteExportacionService $reportes,
+        BitacoraService $bitacora,
+    )
     {
         $reporte = $reportes->obtenerReporte($tipo);
+        $nombreReporte = $this->nombreReporte($tipo);
+
+        $bitacora->registrar([
+            'accion' => 'exportar_pdf',
+            'modulo' => 'Reportes Académicos',
+            'entidad' => 'reporte',
+            'entidad_id' => $tipo,
+            'descripcion' => "Se descargó el Reporte de {$nombreReporte} en formato PDF.",
+            'valores_nuevos' => [
+                'tipo' => $tipo,
+                'formato' => 'pdf',
+                'filas' => collect($reporte['filas'])->count(),
+            ],
+        ]);
 
         $pdf = Pdf::loadView('reportes.pdf.reporte', [
             'reporte' => $reporte,
@@ -37,14 +56,43 @@ class ReporteAcademicoController extends Controller
         return $pdf->download($reportes->obtenerNombreArchivo($tipo, 'pdf'));
     }
 
-    public function descargarExcel(string $tipo, ReporteExportacionService $reportes): BinaryFileResponse
+    public function descargarExcel(
+        string $tipo,
+        ReporteExportacionService $reportes,
+        BitacoraService $bitacora,
+    ): BinaryFileResponse
     {
         $reporte = $reportes->obtenerReporte($tipo);
+        $nombreReporte = $this->nombreReporte($tipo);
+
+        $bitacora->registrar([
+            'accion' => 'exportar_excel',
+            'modulo' => 'Reportes Académicos',
+            'entidad' => 'reporte',
+            'entidad_id' => $tipo,
+            'descripcion' => "Se descargó el Reporte de {$nombreReporte} en formato Excel.",
+            'valores_nuevos' => [
+                'tipo' => $tipo,
+                'formato' => 'xlsx',
+                'filas' => collect($reporte['filas'])->count(),
+            ],
+        ]);
 
         return Excel::download(
             new ReporteAcademicoExport($reporte),
             $reportes->obtenerNombreArchivo($tipo, 'xlsx'),
         );
+    }
+
+    private function nombreReporte(string $tipo): string
+    {
+        return match ($tipo) {
+            'rendimiento' => 'Rendimiento Académico',
+            'evaluaciones' => 'Evaluaciones Aplicadas',
+            'asistencia' => 'Asistencia Académica',
+            'habilitacion' => 'Habilitación Académica',
+            default => 'Seguimiento Académico',
+        };
     }
 
     public function index(Request $request, CoberturaCurricularService $cobertura): Response

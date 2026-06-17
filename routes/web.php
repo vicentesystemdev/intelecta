@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\RolPermisoController;
+use App\Http\Controllers\Admin\BitacoraSistemaController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\AreaConocimientoController;
 use App\Http\Controllers\DashboardController;
@@ -390,6 +391,13 @@ Route::middleware('auth')->group(function () {
             Route::put('/roles-permisos/{rol}', [RolPermisoController::class, 'update'])
                 ->middleware('permission:roles-permisos.editar')
                 ->name('admin.sistema.roles-permisos.update');
+
+            Route::get('/bitacora', [BitacoraSistemaController::class, 'index'])
+                ->middleware('permission:bitacora.ver')
+                ->name('admin.sistema.bitacora.index');
+            Route::get('/bitacora/exportar', [BitacoraSistemaController::class, 'exportar'])
+                ->middleware('permission:bitacora.exportar')
+                ->name('admin.sistema.bitacora.exportar');
 
             Route::get('/configuracion', function () {
                 return Inertia::render('Sistema/Configuracion/Index');

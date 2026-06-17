@@ -82,6 +82,7 @@ const navigationGroups = [
         items: [
             { label: 'Usuarios', icon: Users, href: '/admin/sistema/usuarios', routeName: 'admin.sistema.usuarios', permission: 'usuarios.ver' },
             { label: 'Roles y Permisos', icon: ShieldCheck, href: '/admin/sistema/roles-permisos', routeName: 'admin.sistema.roles-permisos', permission: 'roles-permisos.ver' },
+            { label: 'Bitácora del Sistema', icon: ClipboardList, href: '/admin/sistema/bitacora', routeName: 'admin.sistema.bitacora.*', permission: 'bitacora.ver' },
             { label: 'Configuración', icon: Settings, href: '/admin/sistema/configuracion', routeName: 'admin.sistema.configuracion', permission: 'configuracion.ver' },
         ],
     },

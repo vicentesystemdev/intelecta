@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Domains\Seguridad\Services\BitacoraService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateRolPermisosRequest;
 use Illuminate\Http\RedirectResponse;
@@ -75,6 +76,7 @@ class RolPermisoController extends Controller
     public function update(
         UpdateRolPermisosRequest $request,
         Role $rol,
+        BitacoraService $bitacora,
     ): RedirectResponse {
         if ($rol->name === 'Super Administrador') {
             throw ValidationException::withMessages([
@@ -82,7 +84,20 @@ class RolPermisoController extends Controller
             ]);
         }
 
+        $anteriores = $rol->permissions()->pluck('name')->values()->all();
         $rol->syncPermissions($request->validated('permissions'));
+        $rol->load('permissions');
+
+        $bitacora->registrar([
+            'accion' => 'actualizar_permisos',
+            'modulo' => 'Roles y Permisos',
+            'entidad' => 'roles',
+            'entidad_id' => $rol->id,
+            'descripcion' => "Se actualizaron permisos del rol {$rol->name}.",
+            'valores_anteriores' => ['permissions' => $anteriores],
+            'valores_nuevos' => ['permissions' => $rol->permissions->pluck('name')->values()->all()],
+            'severidad' => 'seguridad',
+        ]);
 
         return back()->with('success', "Permisos del rol {$rol->name} actualizados correctamente.");
     }

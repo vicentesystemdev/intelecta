@@ -9,6 +9,7 @@ use App\Domains\Postulantes\Actions\ListarPostulantesAction;
 use App\Domains\Postulantes\DTOs\PostulanteData;
 use App\Domains\Postulantes\Models\Postulante;
 use App\Domains\Postulantes\Services\PostulanteService;
+use App\Domains\Seguridad\Services\BitacoraService;
 use App\Http\Requests\Postulantes\StorePostulanteRequest;
 use App\Http\Requests\Postulantes\UpdatePostulanteRequest;
 use Illuminate\Http\RedirectResponse;
@@ -49,10 +50,28 @@ class PostulanteController extends Controller
     public function store(
         StorePostulanteRequest $request,
         CrearPostulanteAction $action,
+        BitacoraService $bitacora,
     ): RedirectResponse {
         $postulante = $action->execute(
             PostulanteData::fromArray($request->validated())
         );
+
+        $bitacora->registrar([
+            'accion' => 'crear',
+            'modulo' => 'Postulantes',
+            'entidad' => 'postulantes',
+            'entidad_id' => $postulante->id_post,
+            'descripcion' => 'Se registró un nuevo postulante.',
+            'valores_nuevos' => $postulante->only([
+                'id_post',
+                'nombres_post',
+                'apellidos_post',
+                'email_post',
+                'id_col',
+                'id_car',
+                'estado_post',
+            ]),
+        ]);
 
         return to_route('postulantes.index')
             ->with('success', 'Postulante registrado correctamente.');
@@ -86,11 +105,38 @@ class PostulanteController extends Controller
         UpdatePostulanteRequest $request,
         Postulante $postulante,
         ActualizarPostulanteAction $action,
+        BitacoraService $bitacora,
     ): RedirectResponse {
-        $action->execute(
+        $anteriores = $postulante->only([
+            'nombres_post',
+            'apellidos_post',
+            'email_post',
+            'id_col',
+            'id_car',
+            'estado_post',
+        ]);
+
+        $actualizado = $action->execute(
             $postulante,
             PostulanteData::fromArray($request->validated())
         );
+
+        $bitacora->registrar([
+            'accion' => 'editar',
+            'modulo' => 'Postulantes',
+            'entidad' => 'postulantes',
+            'entidad_id' => $actualizado->id_post,
+            'descripcion' => 'Se actualizó información de un postulante.',
+            'valores_anteriores' => $anteriores,
+            'valores_nuevos' => $actualizado->only([
+                'nombres_post',
+                'apellidos_post',
+                'email_post',
+                'id_col',
+                'id_car',
+                'estado_post',
+            ]),
+        ]);
 
         return to_route('postulantes.index')
             ->with('success', 'Información del postulante actualizada correctamente.');
@@ -99,8 +145,21 @@ class PostulanteController extends Controller
     public function cambiarEstado(
         Postulante $postulante,
         CambiarEstadoPostulanteAction $action,
+        BitacoraService $bitacora,
     ): RedirectResponse {
+        $anterior = ['estado_post' => $postulante->estado_post];
         $actualizado = $action->execute($postulante);
+
+        $bitacora->registrar([
+            'accion' => 'cambiar_estado',
+            'modulo' => 'Postulantes',
+            'entidad' => 'postulantes',
+            'entidad_id' => $actualizado->id_post,
+            'descripcion' => 'Se cambió el estado de un postulante.',
+            'valores_anteriores' => $anterior,
+            'valores_nuevos' => ['estado_post' => $actualizado->estado_post],
+            'severidad' => 'aviso',
+        ]);
 
         return back()->with(
             'success',

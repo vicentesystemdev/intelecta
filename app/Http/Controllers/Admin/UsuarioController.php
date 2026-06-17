@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Domains\Seguridad\Services\BitacoraService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUsuarioRequest;
 use App\Http\Requests\Admin\UpdateUsuarioRequest;
@@ -67,12 +68,12 @@ class UsuarioController extends Controller
         ]);
     }
 
-    public function store(StoreUsuarioRequest $request): RedirectResponse
+    public function store(StoreUsuarioRequest $request, BitacoraService $bitacora): RedirectResponse
     {
         $data = $request->validated();
         $this->ensureRoleCanBeAssigned($request, $data['role']);
 
-        DB::transaction(function () use ($data): void {
+        $createdUser = DB::transaction(function () use ($data): User {
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -81,7 +82,23 @@ class UsuarioController extends Controller
 
             $user->forceFill(['email_verified_at' => now()])->save();
             $user->syncRoles([$data['role']]);
+
+            return $user;
         });
+
+        $bitacora->registrar([
+            'accion' => 'crear',
+            'modulo' => 'Usuarios',
+            'entidad' => 'users',
+            'entidad_id' => $createdUser->id,
+            'descripcion' => 'Se registró un nuevo usuario institucional.',
+            'valores_nuevos' => [
+                'name' => $createdUser->name,
+                'email' => $createdUser->email,
+                'role' => $data['role'],
+            ],
+            'severidad' => 'seguridad',
+        ]);
 
         return back()->with('success', 'Usuario institucional registrado correctamente.');
     }
@@ -89,11 +106,17 @@ class UsuarioController extends Controller
     public function update(
         UpdateUsuarioRequest $request,
         User $usuario,
+        BitacoraService $bitacora,
     ): RedirectResponse {
         $data = $request->validated();
         $this->ensureSuperAdministratorCanBeEdited($request, $usuario);
         $this->ensureRoleCanBeAssigned($request, $data['role']);
         $this->protectLastSuperAdministrator($usuario, $data['role']);
+        $anteriores = [
+            'name' => $usuario->name,
+            'email' => $usuario->email,
+            'roles' => $usuario->getRoleNames()->values()->all(),
+        ];
 
         DB::transaction(function () use ($usuario, $data): void {
             $attributes = [
@@ -108,6 +131,22 @@ class UsuarioController extends Controller
             $usuario->update($attributes);
             $usuario->syncRoles([$data['role']]);
         });
+
+        $usuario->refresh();
+        $bitacora->registrar([
+            'accion' => 'editar',
+            'modulo' => 'Usuarios',
+            'entidad' => 'users',
+            'entidad_id' => $usuario->id,
+            'descripcion' => 'Se actualizó información de un usuario institucional.',
+            'valores_anteriores' => $anteriores,
+            'valores_nuevos' => [
+                'name' => $usuario->name,
+                'email' => $usuario->email,
+                'roles' => $usuario->getRoleNames()->values()->all(),
+            ],
+            'severidad' => 'seguridad',
+        ]);
 
         return back()->with('success', 'Información del usuario actualizada correctamente.');
     }

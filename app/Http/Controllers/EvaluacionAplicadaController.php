@@ -10,6 +10,7 @@ use App\Domains\Resultados\Actions\IniciarEvaluacionAplicadaAction;
 use App\Domains\Resultados\DTOs\EnviarEvaluacionData;
 use App\Domains\Resultados\Models\EvaluacionAplicada;
 use App\Domains\Resultados\Repositories\EvaluacionAplicadaRepository;
+use App\Domains\Seguridad\Services\BitacoraService;
 use App\Http\Requests\Resultados\EnviarRespuestasEvaluacionRequest;
 use App\Http\Requests\Resultados\IniciarEvaluacionAplicadaRequest;
 use Illuminate\Http\RedirectResponse;
@@ -82,6 +83,7 @@ class EvaluacionAplicadaController extends Controller
         IniciarEvaluacionAplicadaRequest $request,
         PlantillaEvaluacion $plantilla,
         IniciarEvaluacionAplicadaAction $action,
+        BitacoraService $bitacora,
     ): RedirectResponse {
         $this->ensureResultsSchema();
         $postulante = $this->requirePostulante($request);
@@ -93,6 +95,19 @@ class EvaluacionAplicadaController extends Controller
             tipo: $request->validated('tipo_eval_apl'),
         );
 
+        $bitacora->registrar([
+            'accion' => 'iniciar_evaluacion',
+            'modulo' => 'Evaluaciones Aplicadas',
+            'entidad' => 'evaluaciones_aplicadas',
+            'entidad_id' => $evaluacion->id_eval_apl,
+            'descripcion' => 'Un postulante inició una evaluación aplicada.',
+            'valores_nuevos' => [
+                'id_post' => $postulante->id_post,
+                'id_plantilla' => $plantilla->id_plan,
+                'estado_eval_apl' => $evaluacion->estado_eval_apl,
+            ],
+        ]);
+
         return to_route('estudiante.evaluaciones', [
             'evaluacion' => $evaluacion->id_eval_apl,
         ]);
@@ -102,6 +117,7 @@ class EvaluacionAplicadaController extends Controller
         EnviarRespuestasEvaluacionRequest $request,
         int $evaluacion,
         EnviarRespuestasEvaluacionAction $action,
+        BitacoraService $bitacora,
     ): RedirectResponse {
         $this->ensureResultsSchema();
         $postulante = $this->requirePostulante($request);
@@ -112,6 +128,21 @@ class EvaluacionAplicadaController extends Controller
             $postulante,
             EnviarEvaluacionData::fromArray($request->validated()),
         );
+
+        $bitacora->registrar([
+            'accion' => 'finalizar_evaluacion',
+            'modulo' => 'Evaluaciones Aplicadas',
+            'entidad' => 'evaluaciones_aplicadas',
+            'entidad_id' => $evaluacion->id_eval_apl,
+            'descripcion' => 'Un postulante finalizó y envió respuestas de una evaluación aplicada.',
+            'valores_nuevos' => [
+                'id_post' => $postulante->id_post,
+                'estado_eval_apl' => $evaluacion->estado_eval_apl,
+                'puntaje_total_eval_apl' => $evaluacion->puntaje_total_eval_apl,
+                'puntaje_maximo_eval_apl' => $evaluacion->puntaje_maximo_eval_apl,
+                'porcentaje_eval_apl' => $evaluacion->porcentaje_eval_apl,
+            ],
+        ]);
 
         return to_route('estudiante.evaluaciones', [
             'resultado' => $evaluacion->id_eval_apl,
