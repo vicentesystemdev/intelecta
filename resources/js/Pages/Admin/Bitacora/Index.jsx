@@ -33,6 +33,10 @@ const actionLabels = {
     editar_matricula: 'Edición de matrícula',
     crear_cuota: 'Registro de cuota',
     editar_cuota: 'Actualización de cuota',
+    login_exitoso: 'Inicio de sesión exitoso',
+    logout: 'Cierre de sesión',
+    login_fallido: 'Intento fallido de inicio de sesión',
+    login_bloqueado: 'Bloqueo por intentos fallidos',
 };
 
 const moduleLabels = {
@@ -41,6 +45,7 @@ const moduleLabels = {
     Evaluaciones: 'Gestión Evaluativa',
     'Evaluaciones Aplicadas': 'Evaluaciones Aplicadas',
     Seguridad: 'Seguridad y Accesos',
+    'Seguridad y Accesos': 'Seguridad y Accesos',
     Usuarios: 'Usuarios y Accesos',
     'Roles y Permisos': 'Roles y Permisos',
     'Matrículas y Cuotas': 'Matrículas y Cuotas',
@@ -56,6 +61,8 @@ const routeLabels = {
     'admin.sistema.roles-permisos.update': 'Roles y Permisos / Actualización',
     'estudiante.evaluaciones.iniciar': 'Portal Postulante / Inicio de evaluación',
     'estudiante.evaluaciones.enviar': 'Portal Postulante / Envío de evaluación',
+    login: 'Autenticación / Inicio de sesión',
+    logout: 'Autenticación / Cierre de sesión',
 };
 
 const severityLabels = {
@@ -81,7 +88,8 @@ const reportLabels = {
 
 const entityLabels = {
     postulantes: 'Postulante',
-    users: 'Usuario institucional',
+    users: 'Usuario del sistema',
+    autenticacion: 'Proceso de autenticación',
     roles: 'Rol institucional',
     evaluaciones_aplicadas: 'Evaluación aplicada',
     matriculas_academicas: 'Matrícula académica',
@@ -118,6 +126,13 @@ const fieldLabels = {
     name: 'Nombre',
     email: 'Correo electrónico',
     role: 'Rol',
+    correo: 'Correo electrónico',
+    correo_intentado: 'Correo intentado',
+    nombre: 'Nombre del usuario',
+    rol: 'Rol',
+    guard: 'Guard de autenticación',
+    motivo: 'Motivo',
+    ip: 'Dirección IP',
 };
 
 const sensitiveKeys = new Set([

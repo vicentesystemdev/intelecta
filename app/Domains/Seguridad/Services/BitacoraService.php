@@ -10,6 +10,14 @@ use Throwable;
 
 class BitacoraService
 {
+    private const DEDUPLICATED_ACTIONS = [
+        'login_exitoso',
+        'logout',
+        'login_bloqueado',
+    ];
+
+    private const DEDUPLICATION_WINDOW_SECONDS = 5;
+
     private const SENSITIVE_KEYS = [
         'password',
         'password_confirmation',
@@ -34,9 +42,9 @@ class BitacoraService
                 return;
             }
 
-            $user = $this->request->user();
+            $user = auth()->user() ?? $this->request->user();
 
-            BitacoraSistema::create([
+            $attributes = [
                 'user_id' => $data['user_id'] ?? $user?->getKey(),
                 'nombre_usuario' => $data['nombre_usuario'] ?? $user?->name,
                 'correo_usuario' => $data['correo_usuario'] ?? $user?->email,
@@ -54,7 +62,13 @@ class BitacoraService
                 'ruta' => $data['ruta'] ?? optional($this->request->route())->getName(),
                 'url' => $data['url'] ?? $this->request->fullUrl(),
                 'severidad' => $data['severidad'] ?? 'info',
-            ]);
+            ];
+
+            if ($this->isRecentDuplicate($attributes)) {
+                return;
+            }
+
+            BitacoraSistema::create($attributes);
         } catch (Throwable $exception) {
             Log::warning('No fue posible registrar bitacora institucional.', [
                 'error' => $exception->getMessage(),
@@ -62,6 +76,23 @@ class BitacoraService
                 'modulo' => $data['modulo'] ?? null,
             ]);
         }
+    }
+
+    private function isRecentDuplicate(array $attributes): bool
+    {
+        if (! in_array($attributes['accion'], self::DEDUPLICATED_ACTIONS, true)) {
+            return false;
+        }
+
+        return BitacoraSistema::query()
+            ->where('accion', $attributes['accion'])
+            ->where('user_id', $attributes['user_id'])
+            ->where('correo_usuario', $attributes['correo_usuario'])
+            ->where('ip', $attributes['ip'])
+            ->where('metodo_http', $attributes['metodo_http'])
+            ->where('ruta', $attributes['ruta'])
+            ->where('created_at', '>=', now()->subSeconds(self::DEDUPLICATION_WINDOW_SECONDS))
+            ->exists();
     }
 
     private function sanitize(mixed $value): mixed
