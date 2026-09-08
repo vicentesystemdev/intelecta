@@ -2,12 +2,15 @@
 
 namespace App\Http\Requests\Institucional;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Domains\Academico\Enums\EstadoRegistro;
+use App\Domains\Academico\Models\GrupoAcademico;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-class AsignacionTutorRequest extends FormRequest
+class AsignacionTutorRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -41,7 +44,7 @@ class AsignacionTutorRequest extends FormRequest
             'fecha_inicio_asig' => [
                 'bail',
                 'nullable',
-                'date',
+                'date_format:Y-m-d', 'date',
                 function (string $attribute, mixed $value, \Closure $fail) use ($asignacion): void {
                     if (
                         ! $value
@@ -56,8 +59,8 @@ class AsignacionTutorRequest extends FormRequest
                     }
                 },
             ],
-            'fecha_fin_asig' => ['nullable', 'date', 'after_or_equal:fecha_inicio_asig'],
-            'estado_asig' => ['required', Rule::in(['activo', 'inactivo'])],
+            'fecha_fin_asig' => ['nullable', 'date_format:Y-m-d', 'date', ...InputRules::dateOrder('after_or_equal:fecha_inicio_asig', $this->input('fecha_inicio_asig'))],
+            'estado_asig' => ['required', Rule::enum(EstadoRegistro::class)],
             'observacion_asig' => ['nullable', 'string', 'max:2000'],
         ];
     }
@@ -65,12 +68,16 @@ class AsignacionTutorRequest extends FormRequest
     public function after(): array
     {
         return [
-            function (Validator $validator) {
+            function (Validator $validator): void {
+                if ($validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
                 if (! $this->filled('id_prog') || ! $this->filled('id_grupo')) {
                     return;
                 }
 
-                $belongsToProgram = \App\Domains\Academico\Models\GrupoAcademico::query()
+                $belongsToProgram = GrupoAcademico::query()
                     ->where('id_grupo', $this->integer('id_grupo'))
                     ->where('id_prog', $this->integer('id_prog'))
                     ->exists();

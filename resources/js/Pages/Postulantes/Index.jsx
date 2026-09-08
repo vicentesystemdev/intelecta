@@ -1,3 +1,4 @@
+import { formatDateLatam } from '@/lib/dateOnly';
 import ConfirmModal from '@/Components/ConfirmModal';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import PostulanteForm from '@/Components/Postulantes/PostulanteForm';
@@ -352,7 +353,7 @@ export default function Index({
                                                 'Sin asignar'}
                                         </TableCell>
                                         <TableCell className="text-slate-700 dark:text-slate-300">
-                                            {postulante.edad_post || '—'}
+                                            {postulante.edad_actual || '—'}
                                         </TableCell>
                                         <TableCell>
                                             <StatusBadge
@@ -537,7 +538,8 @@ export default function Index({
                                     <dl className="grid gap-5 sm:grid-cols-2">
                                         <DetailField label="Nombres" value={detailModal.postulante.nombres_post} />
                                         <DetailField label="Apellidos" value={detailModal.postulante.apellidos_post} />
-                                        <DetailField label="Edad" value={detailModal.postulante.edad_post} />
+                                        <DetailField label="Fecha de nacimiento" value={formatDateLatam(detailModal.postulante.fecha_nacimiento_post) || 'Pendiente de completar'} />
+                                        <DetailField label="Edad" value={detailModal.postulante.edad_actual} />
                                         <DetailField label="Celular" value={detailModal.postulante.celular_post} />
                                         <div className="sm:col-span-2">
                                             <DetailField label="Correo electrónico" value={detailModal.postulante.email_post} />

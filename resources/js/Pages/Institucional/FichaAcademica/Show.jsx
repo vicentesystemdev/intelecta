@@ -1,3 +1,4 @@
+import { formatDateLatam } from '@/lib/dateOnly';
 import {
     InstitutionalBanner,
     InstitutionalStatus,
@@ -97,7 +98,8 @@ export default function Show({
                             <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                                 {detail('Nombres', postulante.nombres_post)}
                                 {detail('Apellidos', postulante.apellidos_post)}
-                                {detail('Edad', postulante.edad_post ? `${postulante.edad_post} años` : null)}
+                                {detail('Fecha de nacimiento', formatDateLatam(postulante.fecha_nacimiento_post) || 'Pendiente de completar')}
+                                {detail('Edad', postulante.edad_actual ? `${postulante.edad_actual} años` : null)}
                                 {detail('Colegio de procedencia', postulante.colegio?.nombre_col)}
                                 {detail('Universidad objetivo', postulante.carrera?.universidad?.sigla_uni || postulante.carrera?.universidad?.nombre_uni)}
                                 {detail('Carrera objetivo', postulante.carrera?.nombre_car)}

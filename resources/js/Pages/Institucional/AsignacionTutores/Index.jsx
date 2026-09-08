@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import {
     EmptyInstitutional,
     Field,
@@ -325,7 +326,7 @@ export default function Index({
                 size="lg"
             >
                 <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-                    <SelectField
+                    <SelectField {...validationProps('id_tutor', { required: true })}
                         label="Tutor académico"
                         value={form.data.id_tutor}
                         onChange={(event) => form.setData('id_tutor', event.target.value)}
@@ -342,7 +343,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <SelectField
+                    <SelectField {...validationProps('id_prog', { required: !form.data.id_grupo })}
                         label="Programa académico"
                         value={form.data.id_prog}
                         onChange={(event) => {
@@ -361,7 +362,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <SelectField
+                    <SelectField {...validationProps('id_grupo', { required: !form.data.id_prog })}
                         label="Grupo / paralelo"
                         value={form.data.id_grupo}
                         onChange={(event) => {
@@ -385,7 +386,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field
+                    <Field {...validationProps('materia_referencia_asig')}
                         label="Materia de referencia"
                         value={form.data.materia_referencia_asig}
                         onChange={(event) =>
@@ -396,7 +397,7 @@ export default function Index({
                         }
                         error={form.errors.materia_referencia_asig}
                     />
-                    <Field
+                    <Field {...validationProps('rol_asig')}
                         label="Rol tutorial"
                         value={form.data.rol_asig}
                         onChange={(event) =>
@@ -404,7 +405,7 @@ export default function Index({
                         }
                         error={form.errors.rol_asig}
                     />
-                    <Field
+                    <Field {...validationProps('fecha_inicio_asig')}
                         type="date"
                         min={
                             !modal.asignacion && form.data.estado_asig === 'activo'
@@ -418,7 +419,7 @@ export default function Index({
                         }
                         error={form.errors.fecha_inicio_asig}
                     />
-                    <Field
+                    <Field {...validationProps('fecha_fin_asig')}
                         type="date"
                         min={form.data.fecha_inicio_asig || undefined}
                         label="Fecha de finalización"
@@ -428,7 +429,7 @@ export default function Index({
                         }
                         error={form.errors.fecha_fin_asig}
                     />
-                    <SelectField
+                    <SelectField {...validationProps('estado_asig')}
                         label="Estado"
                         value={form.data.estado_asig}
                         onChange={(event) =>
@@ -439,7 +440,7 @@ export default function Index({
                         <option value="activo">Activo</option>
                         <option value="inactivo">Inactivo</option>
                     </SelectField>
-                    <TextareaField
+                    <TextareaField {...validationProps('observacion_asig')}
                         label="Observación"
                         value={form.data.observacion_asig}
                         onChange={(event) =>

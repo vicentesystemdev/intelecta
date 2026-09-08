@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Resultados;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NormalizedFormRequest;
 
-class IniciarEvaluacionAplicadaRequest extends FormRequest
+class IniciarEvaluacionAplicadaRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {

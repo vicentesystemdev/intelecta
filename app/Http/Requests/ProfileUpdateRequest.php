@@ -3,11 +3,11 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
+use App\Support\Validation\InputRules;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ProfileUpdateRequest extends FormRequest
+class ProfileUpdateRequest extends NormalizedFormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -17,13 +17,10 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', ...InputRules::person(255)],
             'email' => [
                 'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
+                ...InputRules::email(),
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
         ];

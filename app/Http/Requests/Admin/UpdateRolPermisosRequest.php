@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Admin;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NormalizedFormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateRolPermisosRequest extends FormRequest
+class UpdateRolPermisosRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -18,9 +18,11 @@ class UpdateRolPermisosRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'permissions' => ['present', 'array'],
+            'permissions' => ['present', 'array', 'list', 'max:500'],
             'permissions.*' => [
                 'string',
+                'max:255',
+                'distinct',
                 Rule::exists('permissions', 'name')->where('guard_name', 'web'),
             ],
         ];

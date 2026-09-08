@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import StatusBadge from '@/Components/StatusBadge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
@@ -195,7 +196,7 @@ export default function Index({ temas, areas, filtros = {}, permisos = {} }) {
                                 <label className="text-xs font-bold uppercase tracking-wider text-text-muted">
                                     Área de conocimiento
                                 </label>
-                                <select
+                                <select {...validationProps('id_area', { required: true })}
                                     className="mt-1 h-11 w-full rounded-xl border border-brand-border bg-brand-card px-3 text-sm text-text-main focus:border-brand-secondary focus:outline-none focus:ring-2 focus:ring-brand-secondary/20"
                                     value={form.data.id_area}
                                     onChange={(event) => form.setData('id_area', event.target.value)}
@@ -214,7 +215,7 @@ export default function Index({ temas, areas, filtros = {}, permisos = {} }) {
                                 <label className="text-xs font-bold uppercase tracking-wider text-text-muted">
                                     Nombre del tema
                                 </label>
-                                <input
+                                <input {...validationProps('nombre_tem')}
                                     type="text"
                                     className="mt-1 h-11 w-full rounded-xl border border-brand-border bg-brand-card px-3 text-sm text-text-main focus:border-brand-secondary focus:outline-none focus:ring-2 focus:ring-brand-secondary/20"
                                     value={form.data.nombre_tem}
@@ -227,7 +228,7 @@ export default function Index({ temas, areas, filtros = {}, permisos = {} }) {
                                 <label className="text-xs font-bold uppercase tracking-wider text-text-muted">
                                     Descripción
                                 </label>
-                                <textarea
+                                <textarea {...validationProps('descripcion_tem')}
                                     rows="3"
                                     className="mt-1 w-full rounded-xl border border-brand-border bg-brand-card px-3 py-2 text-sm text-text-main focus:border-brand-secondary focus:outline-none focus:ring-2 focus:ring-brand-secondary/20"
                                     value={form.data.descripcion_tem}
@@ -241,7 +242,7 @@ export default function Index({ temas, areas, filtros = {}, permisos = {} }) {
                                     <label className="text-xs font-bold uppercase tracking-wider text-text-muted">
                                         Nivel
                                     </label>
-                                    <select
+                                    <select {...validationProps('nivel_tem')}
                                         className="mt-1 h-11 w-full rounded-xl border border-brand-border bg-brand-card px-3 text-sm text-text-main focus:border-brand-secondary focus:outline-none focus:ring-2 focus:ring-brand-secondary/20"
                                         value={form.data.nivel_tem}
                                         onChange={(event) => form.setData('nivel_tem', event.target.value)}
@@ -250,6 +251,7 @@ export default function Index({ temas, areas, filtros = {}, permisos = {} }) {
                                         <option value="basico">Básico</option>
                                         <option value="intermedio">Intermedio</option>
                                         <option value="avanzado">Avanzado</option>
+                            <option value="preuniversitario">Preuniversitario</option>
                                     </select>
                                     <FieldError message={form.errors.nivel_tem} />
                                 </div>
@@ -258,7 +260,7 @@ export default function Index({ temas, areas, filtros = {}, permisos = {} }) {
                                     <label className="text-xs font-bold uppercase tracking-wider text-text-muted">
                                         Estado
                                     </label>
-                                    <select
+                                    <select {...validationProps('estado_tem')}
                                         className="mt-1 h-11 w-full rounded-xl border border-brand-border bg-brand-card px-3 text-sm text-text-main focus:border-brand-secondary focus:outline-none focus:ring-2 focus:ring-brand-secondary/20"
                                         value={form.data.estado_tem}
                                         onChange={(event) => form.setData('estado_tem', event.target.value)}

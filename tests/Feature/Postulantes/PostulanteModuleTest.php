@@ -6,6 +6,7 @@ use App\Domains\Institucional\Models\Carrera;
 use App\Domains\Institucional\Models\Colegio;
 use App\Domains\Institucional\Models\Universidad;
 use App\Domains\Postulantes\Models\Postulante;
+use App\Domains\Postulantes\Support\BirthDate;
 use App\Models\User;
 use Database\Seeders\RolesAndUsersSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -106,9 +107,9 @@ class PostulanteModuleTest extends TestCase
             ->post(route('postulantes.store'), [
                 ...$this->validData(),
                 'nombres_post' => '',
-                'edad_post' => 12,
+                'fecha_nacimiento_post' => BirthDate::today()->subYears(12)->format('d/m/Y'),
             ])
-            ->assertSessionHasErrors(['nombres_post', 'ci_post', 'edad_post']);
+            ->assertSessionHasErrors(['nombres_post', 'ci_post', 'fecha_nacimiento_post']);
     }
 
     public function test_administrator_can_update_a_postulante(): void
@@ -206,7 +207,7 @@ class PostulanteModuleTest extends TestCase
             'ci_post' => '8765432',
             'email_post' => 'lucia.fernandez@correo.test',
             'celular_post' => '70123456',
-            'edad_post' => 18,
+            'fecha_nacimiento_post' => BirthDate::today()->subYears(18)->toDateString(),
             'id_col' => $this->colegio->id_col,
             'id_uni' => $this->universidad->id_uni,
             'id_car' => $this->carrera->id_car,

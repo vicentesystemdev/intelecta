@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import {
     EmptyInstitutional,
     Field,
@@ -243,7 +244,7 @@ export default function Index({
                 size="xl"
             >
                 <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-                    <Field
+                    <Field {...validationProps('nombres_tutor')}
                         label="Nombres"
                         value={form.data.nombres_tutor}
                         onChange={(event) =>
@@ -251,7 +252,7 @@ export default function Index({
                         }
                         error={form.errors.nombres_tutor}
                     />
-                    <Field
+                    <Field {...validationProps('apellidos_tutor')}
                         label="Apellidos"
                         value={form.data.apellidos_tutor}
                         onChange={(event) =>
@@ -259,13 +260,13 @@ export default function Index({
                         }
                         error={form.errors.apellidos_tutor}
                     />
-                    <Field
+                    <Field {...validationProps('ci_tutor')}
                         label="C.I."
                         value={form.data.ci_tutor}
                         onChange={(event) => form.setData('ci_tutor', event.target.value)}
                         error={form.errors.ci_tutor}
                     />
-                    <Field
+                    <Field {...validationProps('celular_tutor')}
                         label="Celular"
                         value={form.data.celular_tutor}
                         onChange={(event) =>
@@ -273,7 +274,7 @@ export default function Index({
                         }
                         error={form.errors.celular_tutor}
                     />
-                    <Field
+                    <Field {...validationProps('correo_tutor')}
                         type="email"
                         label="Correo de contacto"
                         value={form.data.correo_tutor}
@@ -282,7 +283,7 @@ export default function Index({
                         }
                         error={form.errors.correo_tutor}
                     />
-                    <Field
+                    <Field {...validationProps('especialidad_tutor')}
                         label="Especialidad"
                         value={form.data.especialidad_tutor}
                         onChange={(event) =>
@@ -290,7 +291,7 @@ export default function Index({
                         }
                         error={form.errors.especialidad_tutor}
                     />
-                    <Field
+                    <Field {...validationProps('formacion_tutor')}
                         label="Formación profesional"
                         value={form.data.formacion_tutor}
                         onChange={(event) =>
@@ -299,7 +300,7 @@ export default function Index({
                         error={form.errors.formacion_tutor}
                         className="sm:col-span-2"
                     />
-                    <SelectField
+                    <SelectField {...validationProps('user_id')}
                         label="Cuenta de acceso vinculada"
                         value={form.data.user_id}
                         onChange={(event) => form.setData('user_id', event.target.value)}
@@ -312,7 +313,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <SelectField
+                    <SelectField {...validationProps('estado_tutor')}
                         label="Estado"
                         value={form.data.estado_tutor}
                         onChange={(event) =>
@@ -323,7 +324,7 @@ export default function Index({
                         <option value="activo">Activo</option>
                         <option value="inactivo">Inactivo</option>
                     </SelectField>
-                    <TextareaField
+                    <TextareaField {...validationProps('experiencia_tutor')}
                         label="Experiencia académica"
                         value={form.data.experiencia_tutor}
                         onChange={(event) =>
@@ -331,7 +332,7 @@ export default function Index({
                         }
                         error={form.errors.experiencia_tutor}
                     />
-                    <TextareaField
+                    <TextareaField {...validationProps('observacion_tutor')}
                         label="Observación institucional"
                         value={form.data.observacion_tutor}
                         onChange={(event) =>

@@ -1,3 +1,5 @@
+import InputError from '@/Components/InputError';
+import { validationProps } from '@/lib/inputValidation';
 import {
     EmptyInstitutional,
     Field,
@@ -57,7 +59,7 @@ function AccessFlag({ enabled, icon: Icon, children }) {
     );
 }
 
-function AccessToggle({ label, description, checked, onChange }) {
+function AccessToggle({ label, description, checked, onChange, error }) {
     return (
         <label className="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-brand-border p-4">
             <span>
@@ -67,11 +69,13 @@ function AccessToggle({ label, description, checked, onChange }) {
                 </span>
             </span>
             <input
+                aria-invalid={Boolean(error)}
                 type="checkbox"
                 checked={checked}
                 onChange={(event) => onChange(event.target.checked)}
                 className="mt-1 h-5 w-5 rounded border-brand-border text-brand-secondary focus:ring-brand-secondary"
             />
+            <InputError message={error} />
         </label>
     );
 }
@@ -339,7 +343,7 @@ export default function Index({
                 size="lg"
             >
                 <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-                    <SelectField
+                    <SelectField {...validationProps('estado_hab')}
                         label="Estado de habilitación"
                         value={form.data.estado_hab}
                         onChange={(event) =>
@@ -355,7 +359,7 @@ export default function Index({
                             ),
                         )}
                     </SelectField>
-                    <Field
+                    <Field {...validationProps('motivo_hab')}
                         label="Motivo"
                         value={form.data.motivo_hab}
                         onChange={(event) =>
@@ -363,7 +367,7 @@ export default function Index({
                         }
                         error={form.errors.motivo_hab}
                     />
-                    <Field
+                    <Field {...validationProps('fecha_inicio_hab')}
                         type="date"
                         label="Fecha de inicio"
                         value={form.data.fecha_inicio_hab}
@@ -372,7 +376,7 @@ export default function Index({
                         }
                         error={form.errors.fecha_inicio_hab}
                     />
-                    <Field
+                    <Field {...validationProps('fecha_fin_hab')}
                         type="date"
                         label="Fecha de finalización"
                         min={form.data.fecha_inicio_hab || undefined}
@@ -386,6 +390,7 @@ export default function Index({
                         <AccessToggle
                             label="Acceso a evaluaciones"
                             description="Permite iniciar instrumentos académicos disponibles."
+                            error={form.errors.habilitado_evaluaciones_hab}
                             checked={form.data.habilitado_evaluaciones_hab}
                             onChange={(value) =>
                                 form.setData('habilitado_evaluaciones_hab', value)
@@ -394,6 +399,7 @@ export default function Index({
                         <AccessToggle
                             label="Acceso a simulacros"
                             description="Permite participar en simulacros programados."
+                            error={form.errors.habilitado_simulacros_hab}
                             checked={form.data.habilitado_simulacros_hab}
                             onChange={(value) =>
                                 form.setData('habilitado_simulacros_hab', value)
@@ -402,13 +408,14 @@ export default function Index({
                         <AccessToggle
                             label="Acceso a reportes"
                             description="Permite consultar lecturas y reportes académicos habilitados."
+                            error={form.errors.habilitado_reportes_hab}
                             checked={form.data.habilitado_reportes_hab}
                             onChange={(value) =>
                                 form.setData('habilitado_reportes_hab', value)
                             }
                         />
                     </div>
-                    <TextareaField
+                    <TextareaField {...validationProps('observacion_hab')}
                         label="Observación administrativa"
                         value={form.data.observacion_hab}
                         onChange={(event) =>

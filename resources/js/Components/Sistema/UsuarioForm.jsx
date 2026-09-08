@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import ConfirmModal from '@/Components/ConfirmModal';
 import InputError from '@/Components/InputError';
 import { Button } from '@/Components/ui/button';
@@ -66,7 +67,7 @@ export default function UsuarioForm({
                 <div className="grid gap-5 sm:grid-cols-2">
                     <div>
                         <Label htmlFor="name">Nombre completo *</Label>
-                        <Input
+                        <Input {...validationProps('name')}
                             id="name"
                             className={fieldClass}
                             value={data.name}
@@ -80,7 +81,7 @@ export default function UsuarioForm({
 
                     <div>
                         <Label htmlFor="email">Correo electrónico *</Label>
-                        <Input
+                        <Input {...validationProps('email')}
                             id="email"
                             type="email"
                             className={fieldClass}
@@ -96,7 +97,7 @@ export default function UsuarioForm({
                         <Label htmlFor="role">Rol institucional *</Label>
                         <div className="relative mt-1.5">
                             <ShieldCheck className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                            <select
+                            <select {...validationProps('role')}
                                 id="role"
                                 className={`${fieldClass} mt-0 w-full rounded-lg pl-9 pr-3 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
                                 value={data.role}
@@ -119,7 +120,7 @@ export default function UsuarioForm({
                         <Label htmlFor="password">
                             {usuario ? 'Nueva contraseña' : 'Contraseña *'}
                         </Label>
-                        <Input
+                        <Input {...validationProps('password', { minLength: 8, maxLength: 72, required: !usuario })}
                             id="password"
                             type="password"
                             className={fieldClass}
@@ -144,7 +145,7 @@ export default function UsuarioForm({
                         <Label htmlFor="password_confirmation">
                             Confirmar contraseña{usuario ? '' : ' *'}
                         </Label>
-                        <Input
+                        <Input {...validationProps('password_confirmation', { required: Boolean(data.password) })}
                             id="password_confirmation"
                             type="password"
                             className={fieldClass}
@@ -157,6 +158,7 @@ export default function UsuarioForm({
                             }
                             autoComplete="new-password"
                         />
+                        <InputError className="mt-1" message={errors.password_confirmation} />
                     </div>
                 </div>
 

@@ -2,11 +2,12 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\NormalizedFormRequest;
 use App\Models\User;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Support\Validation\InputRules;
 use Illuminate\Validation\Rule;
 
-class UpdateUsuarioRequest extends FormRequest
+class UpdateUsuarioRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -22,19 +23,18 @@ class UpdateUsuarioRequest extends FormRequest
         $usuario = $this->route('usuario');
 
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', ...InputRules::person(255)],
             'email' => [
                 'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
+                ...InputRules::email(),
                 Rule::unique('users', 'email')->ignore($usuario->getKey()),
             ],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'password' => ['nullable', ...InputRules::password()],
+            'password_confirmation' => ['nullable', 'required_with:password', 'string'],
             'role' => [
                 'required',
                 'string',
+                'max:255',
                 Rule::exists('roles', 'name')->where('guard_name', 'web'),
             ],
         ];

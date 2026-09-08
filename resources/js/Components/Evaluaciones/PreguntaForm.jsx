@@ -1,3 +1,4 @@
+import { inputOptions, validationProps } from '@/lib/inputValidation';
 import AlternativasEditor from '@/Components/Evaluaciones/AlternativasEditor';
 import InputError from '@/Components/InputError';
 import { Button } from '@/Components/ui/button';
@@ -115,7 +116,7 @@ export default function PreguntaForm({
                 <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
                     <div>
                         <Label htmlFor="id_mat">Materia</Label>
-                        <select
+                        <select {...validationProps('id_mat')}
                             id="id_mat"
                             className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
                             value={data.id_mat}
@@ -138,10 +139,11 @@ export default function PreguntaForm({
                                 </option>
                             ))}
                         </select>
+                        <InputError className="mt-1" message={errors.id_mat} />
                     </div>
                     <div>
                         <Label htmlFor="id_area">Área de conocimiento</Label>
-                        <select
+                        <select {...validationProps('id_area')}
                             id="id_area"
                             className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
                             value={data.id_area}
@@ -160,10 +162,11 @@ export default function PreguntaForm({
                                 </option>
                             ))}
                         </select>
+                        <InputError className="mt-1" message={errors.id_area} />
                     </div>
                     <div>
                         <Label htmlFor="id_tem">Tema</Label>
-                        <select
+                        <select {...validationProps('id_tem')}
                             id="id_tem"
                             className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
                             value={data.id_tem}
@@ -182,7 +185,7 @@ export default function PreguntaForm({
                     </div>
                     <div>
                         <Label htmlFor="subtema_preg">Subtema</Label>
-                        <Input
+                        <Input {...validationProps('subtema_preg')}
                             id="subtema_preg"
                             className="mt-1.5"
                             value={data.subtema_preg}
@@ -190,10 +193,11 @@ export default function PreguntaForm({
                                 setData('subtema_preg', event.target.value)
                             }
                         />
+                        <InputError className="mt-1" message={errors.subtema_preg} />
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="enunciado_preg">Enunciado *</Label>
-                        <Textarea
+                        <Textarea {...validationProps('enunciado_preg')}
                             id="enunciado_preg"
                             className="mt-1.5 min-h-28"
                             value={data.enunciado_preg}
@@ -209,7 +213,7 @@ export default function PreguntaForm({
                     </div>
                     <div>
                         <Label htmlFor="tipo_preg">Tipo de pregunta *</Label>
-                        <select
+                        <select {...validationProps('tipo_preg')}
                             id="tipo_preg"
                             className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
                             value={data.tipo_preg}
@@ -225,10 +229,11 @@ export default function PreguntaForm({
                                 Respuesta corta
                             </option>
                         </select>
+                        <InputError className="mt-1" message={errors.tipo_preg} />
                     </div>
                     <div>
                         <Label htmlFor="dificultad_preg">Dificultad</Label>
-                        <select
+                        <select {...validationProps('dificultad_preg')}
                             id="dificultad_preg"
                             className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
                             value={data.dificultad_preg}
@@ -240,12 +245,13 @@ export default function PreguntaForm({
                             <option value="media">Media</option>
                             <option value="avanzada">Avanzada</option>
                         </select>
+                        <InputError className="mt-1" message={errors.dificultad_preg} />
                     </div>
                     <div>
                         <Label htmlFor="puntaje_preg">
                             Puntaje de referencia
                         </Label>
-                        <Input
+                        <Input {...validationProps('puntaje_preg')}
                             id="puntaje_preg"
                             type="number"
                             min="0.01"
@@ -265,7 +271,7 @@ export default function PreguntaForm({
                         <Label htmlFor="exigencia_preg">
                             Referencia de exigencia
                         </Label>
-                        <select
+                        <select {...validationProps('exigencia_preg')}
                             id="exigencia_preg"
                             className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
                             value={data.exigencia_preg}
@@ -273,26 +279,19 @@ export default function PreguntaForm({
                                 setData('exigencia_preg', event.target.value)
                             }
                         >
-                            {[
-                                'Contenido Común',
-                                'UMSA Prefacultativo',
-                                'UMSA PSA',
-                                'EMI PSA',
-                                'UPEA Suficiencia',
-                                'UCB PAA',
-                                'UPB PAA',
-                            ].map((value) => (
+                            {inputOptions.exigencia_preg.map((value) => (
                                 <option key={value} value={value}>
                                     {value}
                                 </option>
                             ))}
                         </select>
+                        <InputError className="mt-1" message={errors.exigencia_preg} />
                     </div>
                     <div>
                         <Label htmlFor="habilidad_preg">
                             Habilidad evaluada
                         </Label>
-                        <select
+                        <select {...validationProps('habilidad_preg')}
                             id="habilidad_preg"
                             className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
                             value={data.habilidad_preg}
@@ -300,24 +299,19 @@ export default function PreguntaForm({
                                 setData('habilidad_preg', event.target.value)
                             }
                         >
-                            {[
-                                'Procedimental',
-                                'Modelado Fenomenológico',
-                                'Aptitud Psicométrica',
-                                'Conceptual',
-                                'Cálculo Operativo',
-                            ].map((value) => (
+                            {inputOptions.habilidad_preg.map((value) => (
                                 <option key={value} value={value}>
                                     {value}
                                 </option>
                             ))}
                         </select>
+                        <InputError className="mt-1" message={errors.habilidad_preg} />
                     </div>
                     <div>
                         <Label htmlFor="tiempo_estimado_seg_preg">
                             Tiempo estimado (segundos)
                         </Label>
-                        <Input
+                        <Input {...validationProps('tiempo_estimado_seg_preg')}
                             id="tiempo_estimado_seg_preg"
                             type="number"
                             min="15"
@@ -331,10 +325,11 @@ export default function PreguntaForm({
                                 )
                             }
                         />
+                        <InputError className="mt-1" message={errors.tiempo_estimado_seg_preg} />
                     </div>
                     <div>
                         <Label htmlFor="estado_preg">Estado</Label>
-                        <select
+                        <select {...validationProps('estado_preg')}
                             id="estado_preg"
                             className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
                             value={data.estado_preg}
@@ -345,12 +340,13 @@ export default function PreguntaForm({
                             <option value="activo">Activo</option>
                             <option value="inactivo">Inactivo</option>
                         </select>
+                        <InputError className="mt-1" message={errors.estado_preg} />
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="explicacion_preg">
                             Explicación de la respuesta
                         </Label>
-                        <Textarea
+                        <Textarea {...validationProps('explicacion_preg')}
                             id="explicacion_preg"
                             className="mt-1.5 min-h-24"
                             value={data.explicacion_preg}
@@ -358,12 +354,13 @@ export default function PreguntaForm({
                                 setData('explicacion_preg', event.target.value)
                             }
                         />
+                        <InputError className="mt-1" message={errors.explicacion_preg} />
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="relacion_ingenieria_preg">
                             Relación con la preparación para Ingeniería
                         </Label>
-                        <Textarea
+                        <Textarea {...validationProps('relacion_ingenieria_preg')}
                             id="relacion_ingenieria_preg"
                             className="mt-1.5 min-h-20"
                             value={data.relacion_ingenieria_preg}
@@ -374,6 +371,7 @@ export default function PreguntaForm({
                                 )
                             }
                         />
+                        <InputError className="mt-1" message={errors.relacion_ingenieria_preg} />
                     </div>
                 </CardContent>
             </Card>

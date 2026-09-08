@@ -1,0 +1,131 @@
+{
+  "date": "2026-09-07",
+  "scope": "postulantes.fecha_nacimiento_post exclusively",
+  "database_before": {
+    "postulantes": 72,
+    "legacy_age_sha256": "9b2caee9a1d1619b72c3efd530facf23339c93310f0c73f529185c0f7676589f",
+    "birth_date_column_exists": false
+  },
+  "database_after": {
+    "postulantes": 72,
+    "fecha_null": 72,
+    "fecha_present": 0,
+    "soft_deleted": 0,
+    "legacy_age_sha256": "9b2caee9a1d1619b72c3efd530facf23339c93310f0c73f529185c0f7676589f"
+  },
+  "phpunit": {
+    "tool": "phpunit",
+    "result": "passed",
+    "tests": 198,
+    "passed": 198,
+    "assertions": 1014,
+    "duration_ms": 53519
+  },
+  "node": {
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "duration_ms": 192.351
+  },
+  "postgres_checks": {
+    "checks": 18,
+    "tests": 83,
+    "passed": 83,
+    "failed": 0,
+    "assertions": 83,
+    "duration_ms": 322,
+    "real_data_modified": false
+  },
+  "postgres_birth_date": {
+    "passed": 11,
+    "failed": 0,
+    "assertions": 11,
+    "duration_ms": 757,
+    "input_ui": "15/08/2005",
+    "postgres_date": "2005-08-15",
+    "output_ui": "15/08/2005",
+    "legacy_null_dates": 72,
+    "real_data_modified": false
+  },
+  "ui": {
+    "passed": 17,
+    "failed": 0,
+    "assertions": 17,
+    "browser": "Chrome headless",
+    "locale": "en-US",
+    "timezone": "America/La_Paz",
+    "database": "isolated SQLite",
+    "postgres_modified": false,
+    "scenarios": [
+      "create",
+      "invalid calendar",
+      "edit preloaded date",
+      "legacy pending",
+      "legacy unrelated edit",
+      "legacy completion"
+    ],
+    "browser_errors": []
+  },
+  "build": {
+    "passed": true,
+    "modules": 3445,
+    "duration_seconds": 26.37,
+    "warning": "laravel plugin timings (non-blocking)"
+  },
+  "pint": {
+    "tool": "pint",
+    "result": "passed"
+  },
+  "git_diff_check": {
+    "exit_code": 0
+  },
+  "audit": {
+    "read_only": true,
+    "records": 1268,
+    "incompatible": 0,
+    "normalization_needed": 0
+  },
+  "preservation": {
+    "composer_json_unchanged_from_phase_start": true,
+    "original_migration_unchanged": true,
+    "age_check_migration_unchanged": true,
+    "previous_changes_preserved": true
+  },
+  "phase_files": [
+    "app/Domains/Postulantes/DTOs/PostulanteData.php",
+    "app/Domains/Postulantes/Models/Postulante.php",
+    "app/Domains/Postulantes/Support/BirthDate.php",
+    "app/Http/Controllers/ReporteAcademicoController.php",
+    "app/Http/Requests/Postulantes/StorePostulanteRequest.php",
+    "app/Http/Requests/Postulantes/UpdatePostulanteRequest.php",
+    "app/Rules/PostulanteBirthDate.php",
+    "database/migrations/2026_09_07_010000_add_fecha_nacimiento_to_postulantes.php",
+    "database/seeders/BaseLimpiaAvalanchaSeeder.php",
+    "database/seeders/PostulantesSeeder.php",
+    "docs/audit-input-data.php",
+    "docs/auditoria-fecha-nacimiento-2026-09-07.md",
+    "docs/evidencia-fecha-nacimiento/01-crear.png",
+    "docs/evidencia-fecha-nacimiento/02-fecha-invalida.png",
+    "docs/evidencia-fecha-nacimiento/03-editar-fecha.png",
+    "docs/evidencia-fecha-nacimiento/04-legacy-pendiente.png",
+    "docs/evidencia-fecha-nacimiento/resultado.json",
+    "docs/fecha-nacimiento-verificacion-2026-09-07.json",
+    "docs/test-birth-date-ui.mjs",
+    "docs/test-birth-date-ui.php",
+    "docs/test-postgres-birth-date.php",
+    "lang/es/validation.php",
+    "resources/js/Components/Postulantes/PostulanteForm.jsx",
+    "resources/js/Pages/Institucional/FichaAcademica/Show.jsx",
+    "resources/js/Pages/Postulantes/Index.jsx",
+    "resources/js/Pages/Postulantes/Show.jsx",
+    "resources/js/lib/dateOnly.js",
+    "resources/js/lib/inputValidation.js",
+    "tests/Feature/Postulantes/PostulanteBirthDateTest.php",
+    "tests/Feature/Postulantes/PostulanteModuleTest.php",
+    "tests/Feature/Validation/RequestValidationTest.php",
+    "tests/input-validation.test.mjs"
+  ],
+  "commit": false,
+  "push": false,
+  "temporary_ui_processes_stopped": true
+}

@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -29,7 +30,7 @@ export default function Register() {
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 
-                    <TextInput
+                    <TextInput {...validationProps('name')}
                         id="name"
                         name="name"
                         value={data.name}
@@ -46,7 +47,7 @@ export default function Register() {
                 <div className="mt-4">
                     <InputLabel htmlFor="email" value="Email" />
 
-                    <TextInput
+                    <TextInput {...validationProps('email')}
                         id="email"
                         type="email"
                         name="email"
@@ -63,7 +64,7 @@ export default function Register() {
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
 
-                    <TextInput
+                    <TextInput {...validationProps('password', { minLength: 8, maxLength: 72, required: true })}
                         id="password"
                         type="password"
                         name="password"
@@ -83,7 +84,7 @@ export default function Register() {
                         value="Confirm Password"
                     />
 
-                    <TextInput
+                    <TextInput {...validationProps('password_confirmation', { required: true })}
                         id="password_confirmation"
                         type="password"
                         name="password_confirmation"

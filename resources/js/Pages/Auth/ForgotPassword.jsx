@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
@@ -32,7 +33,7 @@ export default function ForgotPassword({ status }) {
             )}
 
             <form onSubmit={submit}>
-                <TextInput
+                <TextInput {...validationProps('email')}
                     id="email"
                     type="email"
                     name="email"

@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Evaluaciones;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Domains\Academico\Enums\EstadoRegistro;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-class StorePreguntaRequest extends FormRequest
+class StorePreguntaRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -15,24 +18,27 @@ class StorePreguntaRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id_mat' => ['nullable', 'integer', 'exists:materias,id_mat'],
+            'id_area' => ['nullable', 'integer', 'exists:areas_conocimiento,id_area'],
             'id_tem' => ['nullable', 'integer', 'exists:temas,id_tem'],
             'subtema_preg' => ['nullable', 'string', 'max:255'],
             'enunciado_preg' => ['required', 'string', 'max:5000'],
             'tipo_preg' => ['required', 'in:opcion_multiple,verdadero_falso,respuesta_corta'],
             'dificultad_preg' => ['nullable', 'in:basica,media,avanzada'],
-            'exigencia_preg' => ['nullable', 'string', 'max:255'],
-            'habilidad_preg' => ['nullable', 'string', 'max:255'],
+            'exigencia_preg' => ['nullable', 'string', Rule::in(InputRules::options('exigencia_preg'))],
+            'habilidad_preg' => ['nullable', 'string', Rule::in(InputRules::options('habilidad_preg'))],
             'tiempo_estimado_seg_preg' => ['nullable', 'integer', 'min:15', 'max:7200'],
             'relacion_ingenieria_preg' => ['nullable', 'string', 'max:2000'],
-            'puntaje_preg' => ['required', 'numeric', 'min:0.01', 'max:100'],
+            'puntaje_preg' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:100'],
             'explicacion_preg' => ['nullable', 'string', 'max:5000'],
-            'estado_preg' => ['required', 'in:activo,inactivo'],
-            'alternativas' => ['array'],
+            'estado_preg' => ['required', Rule::enum(EstadoRegistro::class)],
+            'alternativas' => ['array', 'list', 'max:5'],
+            'alternativas.*' => ['required', 'array:letra_alt,texto_alt,es_correcta_alt,orden_alt,estado_alt'],
             'alternativas.*.texto_alt' => ['required_with:alternativas', 'string', 'max:2000'],
-            'alternativas.*.letra_alt' => ['nullable', 'in:A,B,C,D,E'],
+            'alternativas.*.letra_alt' => ['nullable', 'distinct', 'in:A,B,C,D,E'],
             'alternativas.*.es_correcta_alt' => ['required_with:alternativas', 'boolean'],
-            'alternativas.*.orden_alt' => ['required_with:alternativas', 'integer', 'min:1', 'max:5'],
-            'alternativas.*.estado_alt' => ['nullable', 'in:activo,inactivo'],
+            'alternativas.*.orden_alt' => ['required_with:alternativas', 'integer', 'distinct', 'min:1', 'max:5'],
+            'alternativas.*.estado_alt' => ['nullable', Rule::enum(EstadoRegistro::class)],
         ];
     }
 
@@ -40,6 +46,10 @@ class StorePreguntaRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
+                if ($validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
                 $tipo = $this->input('tipo_preg');
                 $alternativas = $this->input('alternativas', []);
                 $cantidadEsperada = $tipo === 'opcion_multiple' ? 5 : ($tipo === 'verdadero_falso' ? 2 : 0);

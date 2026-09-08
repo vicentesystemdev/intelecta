@@ -3,15 +3,17 @@
 namespace App\Domains\Postulantes\Models;
 
 use App\Domains\Academico\Models\AsistenciaAcademica;
-use App\Domains\Academico\Models\InscripcionAcademica;
 use App\Domains\Academico\Models\HabilitacionAcademica;
+use App\Domains\Academico\Models\InscripcionAcademica;
 use App\Domains\Academico\Models\MatriculaAcademica;
 use App\Domains\Academico\Models\RendimientoPostulante;
 use App\Domains\Institucional\Models\Carrera;
 use App\Domains\Institucional\Models\Colegio;
 use App\Domains\Institucional\Models\Universidad;
+use App\Domains\Postulantes\Support\BirthDate;
 use App\Domains\Resultados\Models\EvaluacionAplicada;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -25,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'email_post',
     'celular_post',
     'edad_post',
+    'fecha_nacimiento_post',
     'id_col',
     'id_car',
     'turno_post',
@@ -38,12 +41,23 @@ class Postulante extends Model
 
     protected $primaryKey = 'id_post';
 
+    protected $appends = ['edad_actual'];
+
     protected function casts(): array
     {
         return [
             'edad_post' => 'integer',
+            'fecha_nacimiento_post' => 'date:Y-m-d',
             'gestion_post' => 'integer',
         ];
+    }
+
+    protected function edadActual(): Attribute
+    {
+        return Attribute::get(fn (): ?int => $this->fecha_nacimiento_post !== null
+            ? BirthDate::age($this->fecha_nacimiento_post->format('Y-m-d'))
+            // Temporary legacy compatibility: preserve the historical value, never invent a date.
+            : $this->edad_post);
     }
 
     public function colegio(): BelongsTo

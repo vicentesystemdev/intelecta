@@ -1,3 +1,4 @@
+import { formatDateLatam } from '@/lib/dateOnly';
 import ConfirmModal from '@/Components/ConfirmModal';
 import StatusBadge from '@/Components/StatusBadge';
 import { Button } from '@/Components/ui/button';
@@ -155,7 +156,8 @@ export default function Show({ postulante, permisos }) {
                                     label="Apellidos"
                                     value={postulante.apellidos_post}
                                 />
-                                <Detail label="Edad" value={postulante.edad_post} />
+                                <Detail label="Fecha de nacimiento" value={formatDateLatam(postulante.fecha_nacimiento_post) || 'Pendiente de completar'} />
+                                <Detail label="Edad" value={postulante.edad_actual} />
                                 <Detail
                                     label="Celular"
                                     value={postulante.celular_post}

@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Evaluaciones;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Domains\Academico\Enums\EstadoRegistro;
+use App\Http\Requests\NormalizedFormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreTemaRequest extends FormRequest
+class StoreTemaRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -19,12 +20,13 @@ class StoreTemaRequest extends FormRequest
             'nombre_tem' => [
                 'required',
                 'string',
+                'min:2',
                 'max:120',
-                Rule::unique('temas', 'nombre_tem')->where('id_area', $this->integer('id_area')),
+                Rule::unique('temas', 'nombre_tem')->where('id_area', $this->integer('id_area'))->ignore($this->route('tema')?->id_tem, 'id_tem'),
             ],
             'descripcion_tem' => ['nullable', 'string', 'max:2000'],
-            'nivel_tem' => ['nullable', 'in:basico,intermedio,avanzado'],
-            'estado_tem' => ['required', 'in:activo,inactivo'],
+            'nivel_tem' => ['nullable', 'in:basico,intermedio,avanzado,preuniversitario'],
+            'estado_tem' => ['required', Rule::enum(EstadoRegistro::class)],
         ];
     }
 

@@ -1,3 +1,5 @@
+import { formatDateLatam } from '@/lib/dateOnly';
+import { inputOptions, validationProps } from '@/lib/inputValidation';
 import InputError from '@/Components/InputError';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -26,7 +28,7 @@ export default function PostulanteForm({
         ci_post: postulante?.ci_post || '',
         email_post: postulante?.email_post || '',
         celular_post: postulante?.celular_post || '',
-        edad_post: postulante?.edad_post || '',
+        fecha_nacimiento_post: formatDateLatam(postulante?.fecha_nacimiento_post),
         id_col: postulante?.id_col || '',
         id_uni: postulante?.carrera?.id_uni || '',
         id_car: postulante?.id_car || '',
@@ -94,7 +96,7 @@ export default function PostulanteForm({
                 <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
                     <div>
                         <Label htmlFor="nombres_post">Nombres *</Label>
-                        <Input
+                        <Input {...validationProps('nombres_post')}
                             id="nombres_post"
                             className={fieldClass}
                             value={data.nombres_post}
@@ -110,7 +112,7 @@ export default function PostulanteForm({
                     </div>
                     <div>
                         <Label htmlFor="apellidos_post">Apellidos *</Label>
-                        <Input
+                        <Input {...validationProps('apellidos_post')}
                             id="apellidos_post"
                             className={fieldClass}
                             value={data.apellidos_post}
@@ -125,7 +127,7 @@ export default function PostulanteForm({
                     </div>
                     <div>
                         <Label htmlFor="ci_post">C.I.</Label>
-                        <Input
+                        <Input {...validationProps('ci_post')}
                             id="ci_post"
                             className={fieldClass}
                             value={data.ci_post}
@@ -134,23 +136,32 @@ export default function PostulanteForm({
                         <InputError className="mt-1.5" message={errors.ci_post} />
                     </div>
                     <div>
-                        <Label htmlFor="edad_post">Edad</Label>
-                        <Input
-                            id="edad_post"
-                            type="number"
-                            min="14"
-                            max="80"
+                        <Label htmlFor="fecha_nacimiento_post">
+                            Fecha de nacimiento{!postulante || postulante.fecha_nacimiento_post ? ' *' : ''}
+                        </Label>
+                        <Input {...validationProps('fecha_nacimiento_post', { required: !postulante || !!postulante.fecha_nacimiento_post })}
+                            id="fecha_nacimiento_post"
+                            type="text"
+                            placeholder="DD/MM/AAAA"
+                            autoComplete="bday"
+                            title="Ingrese la fecha en formato DD/MM/AAAA."
+                            aria-describedby="fecha_nacimiento_ayuda fecha_nacimiento_error"
+                            aria-invalid={!!errors.fecha_nacimiento_post}
                             className={fieldClass}
-                            value={data.edad_post}
-                            onChange={(event) =>
-                                field('edad_post', event.target.value)
-                            }
+                            value={data.fecha_nacimiento_post}
+                            onChange={(event) => field('fecha_nacimiento_post', event.target.value)}
                         />
-                        <InputError className="mt-1.5" message={errors.edad_post} />
+                        <div id="fecha_nacimiento_ayuda" className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
+                            <p>Formato: DD/MM/AAAA</p>
+                            {postulante && !postulante.fecha_nacimiento_post && (
+                                <p>Fecha de nacimiento pendiente de completar</p>
+                            )}
+                        </div>
+                        <InputError id="fecha_nacimiento_error" className="mt-1.5" message={errors.fecha_nacimiento_post} />
                     </div>
                     <div>
                         <Label htmlFor="email_post">Correo electrónico</Label>
-                        <Input
+                        <Input {...validationProps('email_post')}
                             id="email_post"
                             type="email"
                             className={fieldClass}
@@ -163,7 +174,7 @@ export default function PostulanteForm({
                     </div>
                     <div>
                         <Label htmlFor="celular_post">Celular</Label>
-                        <Input
+                        <Input {...validationProps('celular_post')}
                             id="celular_post"
                             className={fieldClass}
                             value={data.celular_post}
@@ -188,7 +199,7 @@ export default function PostulanteForm({
                 <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
                     <div>
                         <Label htmlFor="id_col">Colegio de procedencia</Label>
-                        <select
+                        <select {...validationProps('id_col')}
                             id="id_col"
                             className={`${fieldClass} w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
                             value={data.id_col}
@@ -207,7 +218,7 @@ export default function PostulanteForm({
                     </div>
                     <div>
                         <Label htmlFor="id_uni">Universidad postulada</Label>
-                        <select
+                        <select {...validationProps('id_uni')}
                             id="id_uni"
                             className={`${fieldClass} w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
                             value={data.id_uni}
@@ -231,7 +242,7 @@ export default function PostulanteForm({
                     </div>
                     <div>
                         <Label htmlFor="id_car">Carrera postulada</Label>
-                        <select
+                        <select {...validationProps('id_car')}
                             id="id_car"
                             className={`${fieldClass} w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
                             value={data.id_car}
@@ -256,7 +267,7 @@ export default function PostulanteForm({
                     </div>
                     <div>
                         <Label htmlFor="turno_post">Turno</Label>
-                        <select
+                        <select {...validationProps('turno_post')}
                             id="turno_post"
                             className={`${fieldClass} w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
                             value={data.turno_post}
@@ -265,9 +276,7 @@ export default function PostulanteForm({
                             }
                         >
                             <option value="">Sin asignar</option>
-                            <option value="Mañana">Mañana</option>
-                            <option value="Tarde">Tarde</option>
-                            <option value="Noche">Noche</option>
+                            {inputOptions.turno_post.map((turno) => <option key={turno} value={turno}>{turno}</option>)}
                         </select>
                         <InputError
                             className="mt-1.5"
@@ -276,7 +285,7 @@ export default function PostulanteForm({
                     </div>
                     <div>
                         <Label htmlFor="gestion_post">Gestión *</Label>
-                        <Input
+                        <Input {...validationProps('gestion_post')}
                             id="gestion_post"
                             type="number"
                             min="2000"
@@ -294,7 +303,7 @@ export default function PostulanteForm({
                     </div>
                     <div>
                         <Label htmlFor="estado_post">Estado *</Label>
-                        <select
+                        <select {...validationProps('estado_post')}
                             id="estado_post"
                             className={`${fieldClass} w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
                             value={data.estado_post}
@@ -312,7 +321,7 @@ export default function PostulanteForm({
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="observaciones_post">Observaciones</Label>
-                        <Textarea
+                        <Textarea {...validationProps('observaciones_post')}
                             id="observaciones_post"
                             className="mt-1.5 min-h-28 border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                             value={data.observaciones_post}

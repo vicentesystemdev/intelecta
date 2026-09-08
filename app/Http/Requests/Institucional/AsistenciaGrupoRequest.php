@@ -4,11 +4,12 @@ namespace App\Http\Requests\Institucional;
 
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Models\InscripcionAcademica;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-class AsistenciaGrupoRequest extends FormRequest
+class AsistenciaGrupoRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -17,8 +18,10 @@ class AsistenciaGrupoRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        parent::prepareForValidation();
+
         $this->merge([
-            'sesion_asist' => trim((string) $this->input('sesion_asist')) ?: 'General',
+            'sesion_asist' => $this->input('sesion_asist') ?? 'General',
         ]);
     }
 
@@ -28,9 +31,10 @@ class AsistenciaGrupoRequest extends FormRequest
             'id_prog' => ['nullable', 'integer', 'exists:programas_academicos,id_prog'],
             'id_grupo' => ['required', 'integer', 'exists:grupos_academicos,id_grupo'],
             'id_tutor' => ['nullable', 'integer', 'exists:tutores_academicos,id_tutor'],
-            'fecha_asist' => ['required', 'date', 'before_or_equal:today'],
-            'sesion_asist' => ['required', 'string', 'max:120'],
-            'registros' => ['required', 'array', 'min:1'],
+            'fecha_asist' => ['required', 'date_format:Y-m-d', 'date', 'before_or_equal:today'],
+            'sesion_asist' => ['required', 'string', 'min:2', 'max:120'],
+            'registros' => ['required', 'array', 'list', 'min:1', 'max:'.InputRules::MAX_ATTENDANCE],
+            'registros.*' => ['required', 'array:id_post,estado_asist,observacion_asist'],
             'registros.*.id_post' => ['required', 'integer', 'distinct', 'exists:postulantes,id_post'],
             'registros.*.estado_asist' => ['required', Rule::in(['presente', 'ausente', 'retraso', 'justificado'])],
             'registros.*.observacion_asist' => ['nullable', 'string', 'max:1000'],
@@ -56,6 +60,10 @@ class AsistenciaGrupoRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
+                if ($validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
                 $grupo = GrupoAcademico::find($this->integer('id_grupo'));
                 if (! $grupo) {
                     return;

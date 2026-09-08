@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -64,7 +65,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                         value="Current Password"
                     />
 
-                    <TextInput
+                    <TextInput {...validationProps('current_password', { required: true })}
                         id="current_password"
                         ref={currentPasswordInput}
                         value={data.current_password}
@@ -85,7 +86,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                 <div>
                     <InputLabel htmlFor="password" value="New Password" />
 
-                    <TextInput
+                    <TextInput {...validationProps('password', { minLength: 8, maxLength: 72, required: true })}
                         id="password"
                         ref={passwordInput}
                         value={data.password}
@@ -104,7 +105,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                         value="Confirm Password"
                     />
 
-                    <TextInput
+                    <TextInput {...validationProps('password_confirmation', { required: true })}
                         id="password_confirmation"
                         value={data.password_confirmation}
                         onChange={(e) =>

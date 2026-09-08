@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import DangerButton from '@/Components/DangerButton';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
@@ -84,7 +85,7 @@ export default function DeleteUserForm({ className = '' }) {
                             className="sr-only"
                         />
 
-                        <TextInput
+                        <TextInput {...validationProps('password', { required: true })}
                             id="password"
                             type="password"
                             name="password"

@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Admin;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
 use Illuminate\Validation\Rule;
 
-class StoreUsuarioRequest extends FormRequest
+class StoreUsuarioRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -18,12 +19,14 @@ class StoreUsuarioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'name' => ['required', ...InputRules::person(255)],
+            'email' => ['required', ...InputRules::email(254), 'unique:users,email'],
+            'password' => ['required', ...InputRules::password()],
+            'password_confirmation' => ['nullable', 'required_with:password', 'string'],
             'role' => [
                 'required',
                 'string',
+                'max:255',
                 Rule::exists('roles', 'name')->where('guard_name', 'web'),
             ],
         ];

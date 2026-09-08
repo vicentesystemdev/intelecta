@@ -4,11 +4,12 @@ namespace App\Http\Requests\Institucional;
 
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Models\InscripcionAcademica;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NormalizedFormRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-class AsistenciaAcademicaRequest extends FormRequest
+class AsistenciaAcademicaRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -21,15 +22,15 @@ class AsistenciaAcademicaRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        parent::prepareForValidation();
+
         $this->merge([
-            'sesion_asist' => trim((string) $this->input('sesion_asist')) ?: 'General',
+            'sesion_asist' => $this->input('sesion_asist') ?? 'General',
         ]);
     }
 
     public function rules(): array
     {
-        $asistencia = $this->route('asistencia');
-
         return [
             'id_prog' => ['nullable', 'integer', 'exists:programas_academicos,id_prog'],
             'id_grupo' => ['required', 'integer', 'exists:grupos_academicos,id_grupo'],
@@ -37,16 +38,10 @@ class AsistenciaAcademicaRequest extends FormRequest
                 'required',
                 'integer',
                 'exists:postulantes,id_post',
-                Rule::unique('asistencias_academicas', 'id_post')
-                    ->where(fn ($query) => $query
-                        ->where('id_grupo', $this->input('id_grupo'))
-                        ->where('fecha_asist', $this->input('fecha_asist'))
-                        ->where('sesion_asist', $this->input('sesion_asist')))
-                    ->ignore($asistencia?->id_asist, 'id_asist'),
             ],
             'id_tutor' => ['nullable', 'integer', 'exists:tutores_academicos,id_tutor'],
-            'fecha_asist' => ['required', 'date', 'before_or_equal:today'],
-            'sesion_asist' => ['required', 'string', 'max:120'],
+            'fecha_asist' => ['required', 'date_format:Y-m-d', 'date', 'before_or_equal:today'],
+            'sesion_asist' => ['required', 'string', 'min:2', 'max:120'],
             'estado_asist' => ['required', Rule::in(['presente', 'ausente', 'retraso', 'justificado'])],
             'observacion_asist' => ['nullable', 'string', 'max:2000'],
         ];
@@ -74,6 +69,21 @@ class AsistenciaAcademicaRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
+                if ($validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
+                $duplicate = DB::table('asistencias_academicas')
+                    ->where('id_post', $this->integer('id_post'))
+                    ->where('id_grupo', $this->integer('id_grupo'))
+                    ->where('fecha_asist', $this->input('fecha_asist'))
+                    ->where('sesion_asist', $this->input('sesion_asist'))
+                    ->when($this->route('asistencia'), fn ($query, $asistencia) => $query->where('id_asist', '!=', $asistencia->id_asist))
+                    ->exists();
+                if ($duplicate) {
+                    $validator->errors()->add('id_post', $this->messages()['id_post.unique']);
+                }
+
                 $grupo = GrupoAcademico::find($this->integer('id_grupo'));
 
                 if ($grupo && $this->filled('id_prog') && $grupo->id_prog !== $this->integer('id_prog')) {

@@ -1,0 +1,91 @@
+{
+  "read_only": true,
+  "tables": {
+    "users": {
+      "records": 9,
+      "fields": 2
+    },
+    "postulantes": {
+      "records": 72,
+      "fields": 12
+    },
+    "tutores_academicos": {
+      "records": 4,
+      "fields": 11
+    },
+    "programas_academicos": {
+      "records": 4,
+      "fields": 9
+    },
+    "grupos_academicos": {
+      "records": 6,
+      "fields": 9
+    },
+    "inscripciones_academicas": {
+      "records": 72,
+      "fields": 6
+    },
+    "simulacros_programados": {
+      "records": 12,
+      "fields": 10
+    },
+    "asignaciones_tutores": {
+      "records": 16,
+      "fields": 9
+    },
+    "matriculas_academicas": {
+      "records": 72,
+      "fields": 7
+    },
+    "cuotas_academicas": {
+      "records": 180,
+      "fields": 9
+    },
+    "habilitaciones_academicas": {
+      "records": 72,
+      "fields": 8
+    },
+    "asistencias_academicas": {
+      "records": 544,
+      "fields": 8
+    },
+    "areas_conocimiento": {
+      "records": 16,
+      "fields": 4
+    },
+    "temas": {
+      "records": 51,
+      "fields": 5
+    },
+    "preguntas": {
+      "records": 125,
+      "fields": 12
+    },
+    "plantillas_evaluacion": {
+      "records": 13,
+      "fields": 6
+    }
+  },
+  "incompatible": [],
+  "normalization_needed": [],
+  "checks": {
+    "intelecta_postulantes_edad_check": [],
+    "intelecta_postulantes_gestion_check": [],
+    "intelecta_grupos_capacidad_check": [],
+    "intelecta_preguntas_puntaje_check": [],
+    "intelecta_preguntas_tiempo_check": [],
+    "intelecta_alternativas_orden_check": [],
+    "intelecta_plantillas_duracion_check": [],
+    "intelecta_plantilla_preguntas_orden_check": [],
+    "intelecta_plantilla_preguntas_puntaje_check": [],
+    "intelecta_programas_fechas_check": [],
+    "intelecta_asignaciones_fechas_check": [],
+    "intelecta_habilitaciones_fechas_check": [],
+    "intelecta_simulacros_horas_check": [],
+    "intelecta_matriculas_monto_check": [],
+    "intelecta_cuotas_monto_check": [],
+    "intelecta_cuotas_numero_check": [],
+    "intelecta_evaluaciones_porcentaje_check": [],
+    "intelecta_rendimientos_asistencia_check": []
+  }
+}

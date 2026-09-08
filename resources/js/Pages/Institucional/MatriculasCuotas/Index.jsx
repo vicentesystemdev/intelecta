@@ -1,3 +1,5 @@
+import InputError from '@/Components/InputError';
+import { validationProps } from '@/lib/inputValidation';
 import {
     EmptyInstitutional,
     Field,
@@ -489,7 +491,7 @@ export default function Index({
                 size="lg"
             >
                 <form onSubmit={submitMatricula} className="grid gap-4 sm:grid-cols-2">
-                    <SelectField
+                    <SelectField {...validationProps('id_insc', { required: true })}
                         label="Inscripción académica"
                         value={matriculaForm.data.id_insc}
                         onChange={(event) =>
@@ -510,7 +512,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field
+                    <Field {...validationProps('codigo_mat')}
                         label="Código de matrícula"
                         placeholder="Se genera automáticamente"
                         value={matriculaForm.data.codigo_mat}
@@ -519,7 +521,7 @@ export default function Index({
                         }
                         error={matriculaForm.errors.codigo_mat}
                     />
-                    <Field
+                    <Field {...validationProps('fecha_matricula_mat')}
                         type="date"
                         label="Fecha de matrícula"
                         max={localToday()}
@@ -532,7 +534,7 @@ export default function Index({
                         }
                         error={matriculaForm.errors.fecha_matricula_mat}
                     />
-                    <Field
+                    <Field {...validationProps('monto_matricula_mat')}
                         type="number"
                         min="0"
                         step="0.01"
@@ -546,7 +548,7 @@ export default function Index({
                         }
                         error={matriculaForm.errors.monto_matricula_mat}
                     />
-                    <SelectField
+                    <SelectField {...validationProps('estado_matricula_mat')}
                         label="Estado"
                         value={matriculaForm.data.estado_matricula_mat}
                         onChange={(event) =>
@@ -565,7 +567,7 @@ export default function Index({
                             ),
                         )}
                     </SelectField>
-                    <Field
+                    <Field {...validationProps('tipo_beneficio_mat')}
                         label="Tipo de beneficio"
                         placeholder="Beca, convenio o exención"
                         value={matriculaForm.data.tipo_beneficio_mat}
@@ -578,7 +580,7 @@ export default function Index({
                         error={matriculaForm.errors.tipo_beneficio_mat}
                         className="sm:col-span-2"
                     />
-                    <TextareaField
+                    <TextareaField {...validationProps('observacion_mat')}
                         label="Observación administrativa"
                         value={matriculaForm.data.observacion_mat}
                         onChange={(event) =>
@@ -622,7 +624,8 @@ export default function Index({
                 size="lg"
             >
                 <form onSubmit={submitCuota} className="grid gap-4 sm:grid-cols-2">
-                    <Field
+                    <InputError message={cuotaForm.errors.id_mat} />
+                    <Field {...validationProps('nro_cuota')}
                         type="number"
                         min="1"
                         label="Número de cuota"
@@ -632,7 +635,7 @@ export default function Index({
                         }
                         error={cuotaForm.errors.nro_cuota}
                     />
-                    <Field
+                    <Field {...validationProps('concepto_cuota')}
                         label="Concepto"
                         value={cuotaForm.data.concepto_cuota}
                         onChange={(event) =>
@@ -640,7 +643,7 @@ export default function Index({
                         }
                         error={cuotaForm.errors.concepto_cuota}
                     />
-                    <Field
+                    <Field {...validationProps('monto_cuota')}
                         type="number"
                         min="0"
                         step="0.01"
@@ -651,7 +654,7 @@ export default function Index({
                         }
                         error={cuotaForm.errors.monto_cuota}
                     />
-                    <SelectField
+                    <SelectField {...validationProps('estado_cuota')}
                         label="Estado"
                         value={cuotaForm.data.estado_cuota}
                         onChange={(event) =>
@@ -667,7 +670,7 @@ export default function Index({
                             ),
                         )}
                     </SelectField>
-                    <Field
+                    <Field {...validationProps('fecha_vencimiento_cuota')}
                         type="date"
                         label="Fecha de vencimiento"
                         value={cuotaForm.data.fecha_vencimiento_cuota}
@@ -679,7 +682,7 @@ export default function Index({
                         }
                         error={cuotaForm.errors.fecha_vencimiento_cuota}
                     />
-                    <Field
+                    <Field {...validationProps('fecha_pago_cuota', { required: cuotaForm.data.estado_cuota === 'pagada' })}
                         type="date"
                         label="Fecha de pago"
                         max={localToday()}
@@ -689,7 +692,7 @@ export default function Index({
                         }
                         error={cuotaForm.errors.fecha_pago_cuota}
                     />
-                    <Field
+                    <Field {...validationProps('metodo_pago_cuota')}
                         label="Método referencial"
                         placeholder="Efectivo, transferencia u otro"
                         value={cuotaForm.data.metodo_pago_cuota}
@@ -702,7 +705,7 @@ export default function Index({
                         error={cuotaForm.errors.metodo_pago_cuota}
                         className="sm:col-span-2"
                     />
-                    <TextareaField
+                    <TextareaField {...validationProps('observacion_cuota')}
                         label="Observación"
                         value={cuotaForm.data.observacion_cuota}
                         onChange={(event) =>

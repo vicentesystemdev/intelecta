@@ -2,11 +2,29 @@
 
 namespace App\Http\Requests\Postulantes;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Domains\Academico\Enums\EstadoRegistro;
+use App\Domains\Postulantes\Support\BirthDate;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Rules\PostulanteBirthDate;
+use App\Support\Validation\InputRules;
 use Illuminate\Validation\Rule;
 
-class StorePostulanteRequest extends FormRequest
+class StorePostulanteRequest extends NormalizedFormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        parent::prepareForValidation();
+
+        if ($date = BirthDate::canonical($this->input('fecha_nacimiento_post'))) {
+            $this->merge(['fecha_nacimiento_post' => $date]);
+        }
+    }
+
+    protected function birthDateRules(): array
+    {
+        return ['required', 'string', new PostulanteBirthDate];
+    }
+
     public function authorize(): bool
     {
         return $this->user()?->can('postulantes.crear') ?? false;
@@ -18,12 +36,16 @@ class StorePostulanteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombres_post' => ['required', 'string', 'max:120'],
-            'apellidos_post' => ['required', 'string', 'max:120'],
-            'ci_post' => ['nullable', 'string', 'max:30', 'unique:postulantes,ci_post'],
-            'email_post' => ['nullable', 'email', 'max:255'],
-            'celular_post' => ['nullable', 'string', 'max:30'],
-            'edad_post' => ['nullable', 'integer', 'min:14', 'max:80'],
+            'nombres_post' => ['required', ...InputRules::person(120)],
+            'apellidos_post' => ['required', ...InputRules::person(120)],
+            'ci_post' => [
+                'nullable',
+                ...InputRules::document(), Rule::unique('postulantes', 'ci_post')->ignore($this->route('postulante')?->getKey(), 'id_post')],
+            'email_post' => ['nullable', ...InputRules::email(254)],
+            'celular_post' => ['nullable', ...InputRules::phone()],
+            'fecha_nacimiento_post' => $this->birthDateRules(),
+            // Old clients may still send this field; it is never a writable source of truth.
+            'edad_post' => ['exclude'],
             'id_col' => ['nullable', 'integer', 'exists:colegios,id_col'],
             'id_uni' => ['nullable', 'integer', 'exists:universidades,id_uni'],
             'id_car' => [
@@ -36,9 +58,9 @@ class StorePostulanteRequest extends FormRequest
                     )
                 ),
             ],
-            'turno_post' => ['nullable', 'string', 'max:60'],
+            'turno_post' => ['nullable', 'string', Rule::in(InputRules::options('turno_post'))],
             'gestion_post' => ['required', 'integer', 'min:2000', 'max:'.(now()->year + 1)],
-            'estado_post' => ['required', 'in:activo,inactivo'],
+            'estado_post' => ['required', Rule::enum(EstadoRegistro::class)],
             'observaciones_post' => ['nullable', 'string', 'max:2000'],
         ];
     }
@@ -54,7 +76,7 @@ class StorePostulanteRequest extends FormRequest
             'ci_post' => 'C.I.',
             'email_post' => 'correo electrónico',
             'celular_post' => 'celular',
-            'edad_post' => 'edad',
+            'fecha_nacimiento_post' => 'fecha de nacimiento',
             'id_col' => 'colegio de procedencia',
             'id_uni' => 'universidad postulada',
             'id_car' => 'carrera postulada',
@@ -72,9 +94,8 @@ class StorePostulanteRequest extends FormRequest
             'apellidos_post.required' => 'Los apellidos del postulante son obligatorios.',
             'ci_post.unique' => 'El C.I. ya está registrado para otro postulante.',
             'email_post.email' => 'Ingrese un correo electrónico válido.',
-            'edad_post.integer' => 'La edad debe ser un número entero.',
-            'edad_post.min' => 'La edad mínima permitida es 14 años.',
-            'edad_post.max' => 'La edad máxima permitida es 80 años.',
+            'fecha_nacimiento_post.required' => __('validation.birth_date_required'),
+            'fecha_nacimiento_post.string' => __('validation.birth_date_format'),
             'id_col.exists' => 'El colegio de procedencia seleccionado no existe.',
             'id_uni.exists' => 'La universidad seleccionada no existe.',
             'id_car.exists' => 'La carrera seleccionada no pertenece a la universidad indicada.',

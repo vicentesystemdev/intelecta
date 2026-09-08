@@ -1,0 +1,37 @@
+{
+  "turno_post": [
+    "Mañana",
+    "Tarde",
+    "Noche",
+    "Fin de Semana"
+  ],
+  "exigencia_preg": [
+    "Contenido Común",
+    "UMSA Prefacultativo",
+    "UMSA PSA",
+    "EMI PSA",
+    "UPEA Suficiencia",
+    "UCB PAA",
+    "UPB PAA",
+    "Aptitud académica",
+    "Ingreso a Ingeniería"
+  ],
+  "habilidad_preg": [
+    "Procedimental",
+    "Modelado Fenomenológico",
+    "Aptitud Psicométrica",
+    "Conceptual",
+    "Cálculo Operativo",
+    "Razonamiento lógico",
+    "Análisis de patrones",
+    "Interpretación física",
+    "Interpretación gráfica",
+    "Cálculo operativo",
+    "Razonamiento químico",
+    "Comprensión de problemas",
+    "Análisis conceptual",
+    "Cálculo estequiométrico",
+    "Modelado matemático",
+    "Modelado fenomenológico"
+  ]
+}

@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Institucional;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Domains\Academico\Enums\EstadoRegistro;
+use App\Http\Requests\NormalizedFormRequest;
 use Illuminate\Validation\Rule;
 
-class InscripcionAcademicaRequest extends FormRequest
+class InscripcionAcademicaRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -36,8 +37,8 @@ class InscripcionAcademicaRequest extends FormRequest
                     ->where(fn ($query) => $query->where('id_prog', $this->integer('id_prog')))
                     ->ignore($inscripcion?->id_insc, 'id_insc'),
             ],
-            'fecha_inscripcion' => ['nullable', 'date', 'before_or_equal:today'],
-            'estado_inscripcion' => ['required', 'in:activo,inactivo'],
+            'fecha_inscripcion' => ['nullable', 'date_format:Y-m-d', 'date', 'before_or_equal:today'],
+            'estado_inscripcion' => ['required', Rule::enum(EstadoRegistro::class)],
             'observacion_inscripcion' => ['nullable', 'string', 'max:2000'],
         ];
     }

@@ -1,0 +1,19 @@
+{
+  "passed": 17,
+  "failed": 0,
+  "assertions": 17,
+  "browser": "Chrome headless",
+  "locale": "en-US",
+  "timezone": "America/La_Paz",
+  "database": "isolated SQLite",
+  "postgres_modified": false,
+  "scenarios": [
+    "create",
+    "invalid calendar",
+    "edit preloaded date",
+    "legacy pending",
+    "legacy unrelated edit",
+    "legacy completion"
+  ],
+  "browser_errors": []
+}

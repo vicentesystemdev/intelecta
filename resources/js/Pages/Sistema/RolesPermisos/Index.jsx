@@ -1,3 +1,4 @@
+import InputError from '@/Components/InputError';
 import ConfirmModal from '@/Components/ConfirmModal';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
@@ -49,6 +50,7 @@ const groupLabels = {
 
 function PermissionEditor({ role, grupos, onClose }) {
     const [selected, setSelected] = useState(role.permissions);
+    const [errors, setErrors] = useState({});
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [processing, setProcessing] = useState(false);
 
@@ -71,6 +73,7 @@ function PermissionEditor({ role, grupos, onClose }) {
                     setConfirmOpen(false);
                     onClose();
                 },
+                onError: (errors) => { setErrors(errors); setConfirmOpen(false); },
                 onFinish: () => setProcessing(false),
             },
         );
@@ -89,6 +92,7 @@ function PermissionEditor({ role, grupos, onClose }) {
                     </p>
                 </div>
 
+                <InputError message={errors.permissions} />
                 <div className="grid gap-4 lg:grid-cols-2">
                     {Object.entries(grupos).map(([group, permissions]) => (
                         <section
@@ -117,7 +121,7 @@ function PermissionEditor({ role, grupos, onClose }) {
                                                 )
                                             }
                                         />
-                                        <span>{permission.name}</span>
+                                        <span>{permission.name}<InputError message={errors[`permissions.${selected.indexOf(permission.name)}`]} /></span>
                                     </label>
                                 ))}
                             </div>

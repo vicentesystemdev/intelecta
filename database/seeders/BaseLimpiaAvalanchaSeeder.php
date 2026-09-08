@@ -248,7 +248,7 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
         return [$materias, $preguntas];
     }
 
-    private function seedTemplates(Collection $questions): \Illuminate\Support\Collection
+    private function seedTemplates(Collection $questions): Collection
     {
         $templates = collect();
 
@@ -533,18 +533,22 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
         $schoolList = $schools->values();
         $postulantes = collect();
 
+        // Explicit synthetic dates for NEW demo records only, unrelated to historical ages.
+        $birthDates = ['2005-08-15', '2007-03-22', '2008-02-29', '2004-11-09', '2009-06-18'];
+
         for ($index = 0; $index < 72; $index++) {
             [$names, $lastNames, $email] = $this->applicantIdentity($index, $givenNames, $surnames);
             $career = $this->careerForApplicant($index, $careers);
             $school = $schoolList[$index % $schoolList->count()];
-            $postulante = Postulante::updateOrCreate(
+            $existing = Postulante::withTrashed()->where('ci_post', (string) (9100000 + $index))->first();
+            $postulante = Postulante::withTrashed()->updateOrCreate(
                 ['ci_post' => (string) (9100000 + $index)],
                 [
                     'nombres_post' => $names,
                     'apellidos_post' => $lastNames,
                     'email_post' => $email,
                     'celular_post' => '765'.str_pad((string) (10000 + $index), 5, '0', STR_PAD_LEFT),
-                    'edad_post' => 17 + ($index % 5),
+                    ...($existing ? [] : ['fecha_nacimiento_post' => $birthDates[$index % count($birthDates)]]),
                     'id_col' => $school->id_col,
                     'id_car' => $career->id_car,
                     'turno_post' => $turns[$index % count($turns)],

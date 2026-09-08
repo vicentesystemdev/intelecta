@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -40,7 +41,7 @@ export default function UpdateProfileInformation({
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 
-                    <TextInput
+                    <TextInput {...validationProps('name')}
                         id="name"
                         className="mt-1 block w-full"
                         value={data.name}
@@ -56,7 +57,7 @@ export default function UpdateProfileInformation({
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
 
-                    <TextInput
+                    <TextInput {...validationProps('email')}
                         id="email"
                         type="email"
                         className="mt-1 block w-full"

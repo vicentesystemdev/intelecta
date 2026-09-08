@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import Checkbox from '@/Components/Checkbox';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
@@ -188,7 +189,7 @@ export default function Login({ status, canResetPassword }) {
                                         <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                                             <Mail className="h-4 w-4" />
                                         </span>
-                                        <TextInput
+                                        <TextInput {...validationProps('email')}
                                             id="email"
                                             type="email"
                                             name="email"
@@ -211,7 +212,7 @@ export default function Login({ status, canResetPassword }) {
                                         <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                                             <Lock className="h-4 w-4" />
                                         </span>
-                                        <TextInput
+                                        <TextInput {...validationProps('password', { required: true })}
                                             id="password"
                                             type="password"
                                             name="password"
@@ -238,6 +239,7 @@ export default function Login({ status, canResetPassword }) {
                                             Recordarme
                                         </span>
                                     </label>
+                    <InputError message={errors.remember} />
 
                                     {canResetPassword && (
                                         <Link

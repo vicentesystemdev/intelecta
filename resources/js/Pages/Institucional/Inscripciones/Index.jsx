@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import Pagination from '@/Components/Pagination';
 import {
@@ -353,7 +354,7 @@ export default function Index({
                 size="lg"
             >
                 <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-                    <SelectField
+                    <SelectField {...validationProps('id_prog', { required: true })}
                         label="Programa académico"
                         value={form.data.id_prog}
                         onChange={(event) => {
@@ -372,7 +373,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <SelectField
+                    <SelectField {...validationProps('id_grupo')}
                         label="Grupo/paralelo"
                         value={form.data.id_grupo}
                         onChange={(event) => form.setData('id_grupo', event.target.value)}
@@ -386,7 +387,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <SelectField
+                    <SelectField {...validationProps('id_post', { required: true })}
                         label="Postulante"
                         value={form.data.id_post}
                         onChange={(event) => form.setData('id_post', event.target.value)}
@@ -401,7 +402,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field
+                    <Field {...validationProps('fecha_inscripcion')}
                         type="date"
                         label="Fecha de inscripción"
                         max={localToday()}
@@ -411,7 +412,7 @@ export default function Index({
                         }
                         error={form.errors.fecha_inscripcion}
                     />
-                    <SelectField
+                    <SelectField {...validationProps('estado_inscripcion')}
                         label="Estado"
                         value={form.data.estado_inscripcion}
                         onChange={(event) =>
@@ -422,7 +423,7 @@ export default function Index({
                         <option value="activo">Activa</option>
                         <option value="inactivo">Inactiva</option>
                     </SelectField>
-                    <TextareaField
+                    <TextareaField {...validationProps('observacion_inscripcion')}
                         label="Observación"
                         value={form.data.observacion_inscripcion}
                         onChange={(event) =>

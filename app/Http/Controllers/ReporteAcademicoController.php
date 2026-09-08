@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Domains\Postulantes\Models\Postulante;
-use App\Domains\Institucional\Models\Colegio;
-use App\Domains\Institucional\Models\Universidad;
-use App\Domains\Institucional\Models\Carrera;
-use App\Domains\Evaluaciones\Models\Pregunta;
-use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
 use App\Domains\Evaluaciones\Models\AreaConocimiento;
 use App\Domains\Evaluaciones\Models\Materia;
+use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
+use App\Domains\Evaluaciones\Models\Pregunta;
 use App\Domains\Evaluaciones\Models\Tema;
+use App\Domains\Institucional\Models\Carrera;
+use App\Domains\Institucional\Models\Colegio;
+use App\Domains\Institucional\Models\Universidad;
+use App\Domains\Postulantes\Models\Postulante;
 use App\Domains\Reportes\Services\CoberturaCurricularService;
 use App\Domains\Reportes\Services\ReporteExportacionService;
 use App\Domains\Resultados\Models\EvaluacionAplicada;
@@ -20,9 +20,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Maatwebsite\Excel\Facades\Excel;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ReporteAcademicoController extends Controller
@@ -31,8 +31,7 @@ class ReporteAcademicoController extends Controller
         string $tipo,
         ReporteExportacionService $reportes,
         BitacoraService $bitacora,
-    )
-    {
+    ) {
         $reporte = $reportes->obtenerReporte($tipo);
         $nombreReporte = $this->nombreReporte($tipo);
 
@@ -60,8 +59,7 @@ class ReporteAcademicoController extends Controller
         string $tipo,
         ReporteExportacionService $reportes,
         BitacoraService $bitacora,
-    ): BinaryFileResponse
-    {
+    ): BinaryFileResponse {
         $reporte = $reportes->obtenerReporte($tipo);
         $nombreReporte = $this->nombreReporte($tipo);
 
@@ -226,8 +224,8 @@ class ReporteAcademicoController extends Controller
 
                 return [
                     'id_post' => $postulante->id_post,
-                    'nombre_completo' => trim(($postulante->nombres_post ?? '') . ' ' . ($postulante->apellidos_post ?? '')),
-                    'edad' => $postulante->edad_post ?? 'No registrado',
+                    'nombre_completo' => trim(($postulante->nombres_post ?? '').' '.($postulante->apellidos_post ?? '')),
+                    'edad' => $postulante->edad_actual ?? 'No registrado',
                     'colegio' => $postulante->colegio ? $postulante->colegio->nombre_col : 'No registrado',
                     'universidad' => $universidad ? $universidad->nombre_uni : 'No registrado',
                     'carrera' => $carrera ? $carrera->nombre_car : 'No registrado',

@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import InputError from '@/Components/InputError';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -127,7 +128,7 @@ export default function PlantillaEvaluacionForm({
                 <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
                     <div className="sm:col-span-2">
                         <Label htmlFor="nombre_plan">Nombre institucional *</Label>
-                        <Input
+                        <Input {...validationProps('nombre_plan')}
                             id="nombre_plan"
                             className="mt-1.5"
                             value={data.nombre_plan}
@@ -145,7 +146,7 @@ export default function PlantillaEvaluacionForm({
                         <Label htmlFor="duracion_minutos_plan">
                             Duración (minutos)
                         </Label>
-                        <Input
+                        <Input {...validationProps('duracion_minutos_plan')}
                             id="duracion_minutos_plan"
                             type="number"
                             min="1"
@@ -158,10 +159,11 @@ export default function PlantillaEvaluacionForm({
                                 )
                             }
                         />
+                        <InputError className="mt-1" message={errors.duracion_minutos_plan} />
                     </div>
                     <div>
                         <Label htmlFor="dificultad_plan">Dificultad</Label>
-                        <select
+                        <select {...validationProps('dificultad_plan')}
                             id="dificultad_plan"
                             className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
                             value={data.dificultad_plan}
@@ -182,10 +184,11 @@ export default function PlantillaEvaluacionForm({
                                 </option>
                             ))}
                         </select>
+                        <InputError className="mt-1" message={errors.dificultad_plan} />
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="descripcion_plan">Descripción</Label>
-                        <Textarea
+                        <Textarea {...validationProps('descripcion_plan')}
                             id="descripcion_plan"
                             className="mt-1.5"
                             value={data.descripcion_plan}
@@ -193,10 +196,11 @@ export default function PlantillaEvaluacionForm({
                                 setData('descripcion_plan', event.target.value)
                             }
                         />
+                        <InputError className="mt-1" message={errors.descripcion_plan} />
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="objetivo_plan">Objetivo académico</Label>
-                        <Textarea
+                        <Textarea {...validationProps('objetivo_plan')}
                             id="objetivo_plan"
                             className="mt-1.5"
                             value={data.objetivo_plan}
@@ -204,10 +208,11 @@ export default function PlantillaEvaluacionForm({
                                 setData('objetivo_plan', event.target.value)
                             }
                         />
+                        <InputError className="mt-1" message={errors.objetivo_plan} />
                     </div>
                     <div>
                         <Label htmlFor="estado_plan">Estado</Label>
-                        <select
+                        <select {...validationProps('estado_plan')}
                             id="estado_plan"
                             className="mt-1.5 h-10 w-full rounded-lg border-slate-200 text-sm"
                             value={data.estado_plan}
@@ -218,6 +223,7 @@ export default function PlantillaEvaluacionForm({
                             <option value="activa">Activa</option>
                             <option value="inactiva">Inactiva</option>
                         </select>
+                        <InputError className="mt-1" message={errors.estado_plan} />
                     </div>
                 </CardContent>
             </Card>
@@ -291,6 +297,7 @@ export default function PlantillaEvaluacionForm({
                     </div>
                     <div className="max-h-[34rem] space-y-2 overflow-y-auto pr-1">
                         {filtered.map((pregunta) => {
+                            const currentIndex = data.preguntas.findIndex((item) => item.id_preg === pregunta.id_preg);
                             const current = data.preguntas.find(
                                 (item) => item.id_preg === pregunta.id_preg,
                             );
@@ -307,6 +314,8 @@ export default function PlantillaEvaluacionForm({
                                         type="checkbox"
                                         checked={Boolean(current)}
                                         onChange={() => toggle(pregunta.id_preg)}
+                                        disabled={!current && data.preguntas.length >= 1000}
+                                        aria-label={`Seleccionar pregunta ${pregunta.id_preg}`}
                                         className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                                     />
                                     <div>
@@ -329,6 +338,7 @@ export default function PlantillaEvaluacionForm({
                                             </span>
                                         </div>
                                     </div>
+                                    <InputError message={errors[`preguntas.${currentIndex}`] || errors[`preguntas.${currentIndex}.id_preg`] || errors[`preguntas.${currentIndex}.orden_pp`]} />
                                     {current && (
                                         <div>
                                             <Label
@@ -338,6 +348,7 @@ export default function PlantillaEvaluacionForm({
                                                 Puntaje
                                             </Label>
                                             <Input
+                                                {...validationProps('puntaje_pp')}
                                                 id={`puntaje-${pregunta.id_preg}`}
                                                 type="number"
                                                 min="0.01"
@@ -362,6 +373,7 @@ export default function PlantillaEvaluacionForm({
                                                     )
                                                 }
                                             />
+                                            <InputError message={errors[`preguntas.${currentIndex}.puntaje_pp`]} />
                                         </div>
                                     )}
                                 </div>

@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import InputError from '@/Components/InputError';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -57,7 +58,7 @@ export default function AlternativasEditor({
                         {alternativa.letra_alt}
                     </span>
                     <div>
-                        <Input
+                        <Input {...validationProps('texto_alt')}
                             value={alternativa.texto_alt}
                             onChange={(event) =>
                                 update(index, 'texto_alt', event.target.value)
@@ -82,6 +83,9 @@ export default function AlternativasEditor({
                         <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                         Respuesta correcta
                     </label>
+                    <InputError message={errors[`alternativas.${index}`]} />
+                    <InputError message={errors[`alternativas.${index}.es_correcta_alt`]} />
+                    <InputError message={errors[`alternativas.${index}.letra_alt`] || errors[`alternativas.${index}.orden_alt`] || errors[`alternativas.${index}.estado_alt`]} />
                 </div>
             ))}
             <InputError message={errors.alternativas} />

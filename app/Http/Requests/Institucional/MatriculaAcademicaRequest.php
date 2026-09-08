@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Institucional;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
 use Illuminate\Validation\Rule;
 
-class MatriculaAcademicaRequest extends FormRequest
+class MatriculaAcademicaRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -30,13 +31,12 @@ class MatriculaAcademicaRequest extends FormRequest
             ],
             'codigo_mat' => [
                 'nullable',
-                'string',
-                'max:60',
+                ...InputRules::code(),
                 Rule::unique('matriculas_academicas', 'codigo_mat')
                     ->ignore($matricula?->id_mat, 'id_mat'),
             ],
-            'fecha_matricula_mat' => ['nullable', 'date', 'before_or_equal:today'],
-            'monto_matricula_mat' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+            'fecha_matricula_mat' => ['nullable', 'date_format:Y-m-d', 'date', 'before_or_equal:today'],
+            'monto_matricula_mat' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:99999999.99'],
             'estado_matricula_mat' => ['required', Rule::in(['activa', 'observada', 'inactiva', 'becada', 'exenta'])],
             'tipo_beneficio_mat' => ['nullable', 'string', 'max:120'],
             'observacion_mat' => ['nullable', 'string', 'max:2000'],

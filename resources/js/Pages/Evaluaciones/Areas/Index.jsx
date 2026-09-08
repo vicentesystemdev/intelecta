@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import Pagination from '@/Components/Pagination';
 import StatusBadge from '@/Components/StatusBadge';
 import { Button } from '@/Components/ui/button';
@@ -233,7 +234,7 @@ export default function Index({ areas, materias = [], filtros = {}, permisos = {
                                 <label className="text-xs font-bold uppercase tracking-wider text-text-muted">
                                     Materia obligatoria
                                 </label>
-                                <select
+                                <select {...validationProps('id_mat', { required: true })}
                                     className="mt-1 h-11 w-full rounded-xl border border-brand-border bg-brand-card px-3 text-sm text-text-main focus:border-brand-secondary focus:outline-none focus:ring-2 focus:ring-brand-secondary/20"
                                     value={form.data.id_mat}
                                     onChange={(event) => form.setData('id_mat', event.target.value)}
@@ -253,7 +254,7 @@ export default function Index({ areas, materias = [], filtros = {}, permisos = {
                                 <label className="text-xs font-bold uppercase tracking-wider text-text-muted">
                                     Nombre del área
                                 </label>
-                                <input
+                                <input {...validationProps('nombre_area')}
                                     type="text"
                                     className="mt-1 h-11 w-full rounded-xl border border-brand-border bg-brand-card px-3 text-sm text-text-main focus:border-brand-secondary focus:outline-none focus:ring-2 focus:ring-brand-secondary/20"
                                     value={form.data.nombre_area}
@@ -267,7 +268,7 @@ export default function Index({ areas, materias = [], filtros = {}, permisos = {
                                 <label className="text-xs font-bold uppercase tracking-wider text-text-muted">
                                     Descripción
                                 </label>
-                                <textarea
+                                <textarea {...validationProps('descripcion_area')}
                                     rows="3"
                                     className="mt-1 w-full rounded-xl border border-brand-border bg-brand-card px-3 py-2 text-sm text-text-main focus:border-brand-secondary focus:outline-none focus:ring-2 focus:ring-brand-secondary/20"
                                     value={form.data.descripcion_area}
@@ -280,7 +281,7 @@ export default function Index({ areas, materias = [], filtros = {}, permisos = {
                                 <label className="text-xs font-bold uppercase tracking-wider text-text-muted">
                                     Estado
                                 </label>
-                                <select
+                                <select {...validationProps('estado_area')}
                                     className="mt-1 h-11 w-full rounded-xl border border-brand-border bg-brand-card px-3 text-sm text-text-main focus:border-brand-secondary focus:outline-none focus:ring-2 focus:ring-brand-secondary/20"
                                     value={form.data.estado_area}
                                     onChange={(event) => form.setData('estado_area', event.target.value)}

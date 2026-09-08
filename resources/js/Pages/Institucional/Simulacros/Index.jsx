@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import Pagination from '@/Components/Pagination';
 import {
@@ -292,7 +293,7 @@ export default function Index({
                 size="lg"
             >
                 <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-                    <SelectField
+                    <SelectField {...validationProps('id_prog', { required: true })}
                         label="Programa académico"
                         value={form.data.id_prog}
                         onChange={(e) =>
@@ -311,7 +312,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <SelectField
+                    <SelectField {...validationProps('id_grupo')}
                         label="Grupo/paralelo"
                         value={form.data.id_grupo}
                         onChange={(e) => form.setData('id_grupo', e.target.value)}
@@ -324,14 +325,14 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field
+                    <Field {...validationProps('titulo_sim')}
                         label="Título"
                         value={form.data.titulo_sim}
                         onChange={(e) => form.setData('titulo_sim', e.target.value)}
                         error={form.errors.titulo_sim}
                         className="sm:col-span-2"
                     />
-                    <SelectField
+                    <SelectField {...validationProps('id_plantilla')}
                         label="Plantilla de evaluación"
                         value={form.data.id_plantilla}
                         onChange={(e) => form.setData('id_plantilla', e.target.value)}
@@ -345,7 +346,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field
+                    <Field {...validationProps('fecha_sim')}
                         type="date"
                         min={
                             formModal.simulacro &&
@@ -358,16 +359,16 @@ export default function Index({
                         onChange={(e) => form.setData('fecha_sim', e.target.value)}
                         error={form.errors.fecha_sim}
                     />
-                    <Field label="Modalidad" value={form.data.modalidad_sim} onChange={(e) => form.setData('modalidad_sim', e.target.value)} error={form.errors.modalidad_sim} />
-                    <Field type="time" label="Hora de inicio" value={form.data.hora_inicio_sim} onChange={(e) => form.setData('hora_inicio_sim', e.target.value)} error={form.errors.hora_inicio_sim} />
-                    <Field type="time" min={form.data.hora_inicio_sim || undefined} label="Hora de finalización" value={form.data.hora_fin_sim} onChange={(e) => form.setData('hora_fin_sim', e.target.value)} error={form.errors.hora_fin_sim} />
-                    <SelectField label="Estado" value={form.data.estado_sim} onChange={(e) => form.setData('estado_sim', e.target.value)} error={form.errors.estado_sim}>
+                    <Field {...validationProps('modalidad_sim')} label="Modalidad" value={form.data.modalidad_sim} onChange={(e) => form.setData('modalidad_sim', e.target.value)} error={form.errors.modalidad_sim} />
+                    <Field {...validationProps('hora_inicio_sim')} type="time" label="Hora de inicio" value={form.data.hora_inicio_sim} onChange={(e) => form.setData('hora_inicio_sim', e.target.value)} error={form.errors.hora_inicio_sim} />
+                    <Field {...validationProps('hora_fin_sim')} type="time" min={form.data.hora_inicio_sim || undefined} label="Hora de finalización" value={form.data.hora_fin_sim} onChange={(e) => form.setData('hora_fin_sim', e.target.value)} error={form.errors.hora_fin_sim} />
+                    <SelectField {...validationProps('estado_sim')} label="Estado" value={form.data.estado_sim} onChange={(e) => form.setData('estado_sim', e.target.value)} error={form.errors.estado_sim}>
                         <option value="programado">Programado</option>
                         <option value="en preparación">En preparación</option>
                         <option value="aplicado">Aplicado</option>
                         <option value="cerrado">Cerrado</option>
                     </SelectField>
-                    <TextareaField label="Observación" value={form.data.observacion_sim} onChange={(e) => form.setData('observacion_sim', e.target.value)} error={form.errors.observacion_sim} className="sm:col-span-2" />
+                    <TextareaField {...validationProps('observacion_sim')} label="Observación" value={form.data.observacion_sim} onChange={(e) => form.setData('observacion_sim', e.target.value)} error={form.errors.observacion_sim} className="sm:col-span-2" />
                     <div className="flex justify-end gap-3 border-t border-brand-border pt-4 sm:col-span-2">
                         <button type="button" className={secondaryButtonClass} onClick={() => setFormModal({ open: false, simulacro: null })}>Cancelar</button>
                         <button className={primaryButtonClass} disabled={form.processing}>{formModal.simulacro ? 'Guardar cambios' : 'Programar simulacro'}</button>

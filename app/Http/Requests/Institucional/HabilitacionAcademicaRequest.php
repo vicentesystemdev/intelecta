@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Institucional;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
 use Illuminate\Validation\Rule;
 
-class HabilitacionAcademicaRequest extends FormRequest
+class HabilitacionAcademicaRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -17,8 +18,8 @@ class HabilitacionAcademicaRequest extends FormRequest
         return [
             'estado_hab' => ['required', Rule::in(['habilitado', 'observado', 'restringido', 'temporal'])],
             'motivo_hab' => ['nullable', 'string', 'max:220'],
-            'fecha_inicio_hab' => ['nullable', 'date'],
-            'fecha_fin_hab' => ['nullable', 'date', 'after_or_equal:fecha_inicio_hab'],
+            'fecha_inicio_hab' => ['nullable', 'date_format:Y-m-d', 'date'],
+            'fecha_fin_hab' => ['nullable', 'date_format:Y-m-d', 'date', ...InputRules::dateOrder('after_or_equal:fecha_inicio_hab', $this->input('fecha_inicio_hab'))],
             'habilitado_evaluaciones_hab' => ['required', 'boolean'],
             'habilitado_simulacros_hab' => ['required', 'boolean'],
             'habilitado_reportes_hab' => ['required', 'boolean'],

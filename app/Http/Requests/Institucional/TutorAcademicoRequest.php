@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Institucional;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Domains\Academico\Enums\EstadoRegistro;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
 use Illuminate\Validation\Rule;
 
-class TutorAcademicoRequest extends FormRequest
+class TutorAcademicoRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -28,21 +30,20 @@ class TutorAcademicoRequest extends FormRequest
                 Rule::unique('tutores_academicos', 'user_id')
                     ->ignore($tutor?->id_tutor, 'id_tutor'),
             ],
-            'nombres_tutor' => ['required', 'string', 'max:120'],
-            'apellidos_tutor' => ['required', 'string', 'max:120'],
+            'nombres_tutor' => ['required', ...InputRules::person(120)],
+            'apellidos_tutor' => ['required', ...InputRules::person(120)],
             'ci_tutor' => [
                 'nullable',
-                'string',
-                'max:30',
+                ...InputRules::document(),
                 Rule::unique('tutores_academicos', 'ci_tutor')
                     ->ignore($tutor?->id_tutor, 'id_tutor'),
             ],
-            'celular_tutor' => ['nullable', 'string', 'max:30'],
-            'correo_tutor' => ['nullable', 'email', 'max:180'],
+            'celular_tutor' => ['nullable', ...InputRules::phone()],
+            'correo_tutor' => ['nullable', ...InputRules::email(180)],
             'especialidad_tutor' => ['nullable', 'string', 'max:160'],
             'formacion_tutor' => ['nullable', 'string', 'max:220'],
             'experiencia_tutor' => ['nullable', 'string', 'max:3000'],
-            'estado_tutor' => ['required', 'in:activo,inactivo'],
+            'estado_tutor' => ['required', Rule::enum(EstadoRegistro::class)],
             'observacion_tutor' => ['nullable', 'string', 'max:2000'],
         ];
     }

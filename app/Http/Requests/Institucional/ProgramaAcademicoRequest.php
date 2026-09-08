@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests\Institucional;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Domains\Academico\Enums\EstadoRegistro;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
-class ProgramaAcademicoRequest extends FormRequest
+class ProgramaAcademicoRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -22,11 +24,10 @@ class ProgramaAcademicoRequest extends FormRequest
         $programa = $this->route('programa');
 
         return [
-            'nombre_prog' => ['required', 'string', 'max:180'],
+            'nombre_prog' => ['required', 'string', 'min:2', 'max:180'],
             'codigo_prog' => [
                 'nullable',
-                'string',
-                'max:60',
+                ...InputRules::code(),
                 Rule::unique('programas_academicos', 'codigo_prog')
                     ->ignore($programa?->id_prog, 'id_prog'),
             ],
@@ -36,7 +37,7 @@ class ProgramaAcademicoRequest extends FormRequest
             'fecha_inicio_prog' => [
                 'bail',
                 'nullable',
-                'date',
+                'date_format:Y-m-d', 'date',
                 function (string $attribute, mixed $value, \Closure $fail) use ($programa): void {
                     if (! $value) {
                         return;
@@ -50,9 +51,9 @@ class ProgramaAcademicoRequest extends FormRequest
                     }
                 },
             ],
-            'fecha_fin_prog' => ['nullable', 'date', 'after_or_equal:fecha_inicio_prog'],
+            'fecha_fin_prog' => ['nullable', 'date_format:Y-m-d', 'date', ...InputRules::dateOrder('after_or_equal:fecha_inicio_prog', $this->input('fecha_inicio_prog'))],
             'descripcion_prog' => ['nullable', 'string', 'max:3000'],
-            'estado_prog' => ['required', 'in:activo,inactivo'],
+            'estado_prog' => ['required', Rule::enum(EstadoRegistro::class)],
         ];
     }
 

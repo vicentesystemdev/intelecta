@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests\Resultados;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
 
-class EnviarRespuestasEvaluacionRequest extends FormRequest
+class EnviarRespuestasEvaluacionRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -14,7 +15,8 @@ class EnviarRespuestasEvaluacionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'respuestas' => ['required', 'array', 'min:1'],
+            'respuestas' => ['required', 'array', 'list', 'min:1', 'max:'.InputRules::MAX_QUESTIONS],
+            'respuestas.*' => ['required', 'array:id_preg,id_alt,respuesta_texto,tiempo_segundos,intentos'],
             'respuestas.*.id_preg' => [
                 'required',
                 'integer',
@@ -27,9 +29,9 @@ class EnviarRespuestasEvaluacionRequest extends FormRequest
                 'exists:alternativas,id_alt',
             ],
             'respuestas.*.respuesta_texto' => ['nullable', 'string', 'max:5000'],
-            'respuestas.*.tiempo_segundos' => ['nullable', 'integer', 'min:0'],
-            'respuestas.*.intentos' => ['nullable', 'integer', 'min:1'],
-            'tiempo_total_segundos' => ['nullable', 'integer', 'min:0'],
+            'respuestas.*.tiempo_segundos' => ['nullable', 'integer', 'min:0', 'max:2147483647'],
+            'respuestas.*.intentos' => ['nullable', 'integer', 'min:1', 'max:32767'],
+            'tiempo_total_segundos' => ['nullable', 'integer', 'min:0', 'max:2147483647'],
         ];
     }
 

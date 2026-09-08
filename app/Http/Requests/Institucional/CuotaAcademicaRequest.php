@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Institucional;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NormalizedFormRequest;
 use Illuminate\Validation\Rule;
 
-class CuotaAcademicaRequest extends FormRequest
+class CuotaAcademicaRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -32,12 +32,12 @@ class CuotaAcademicaRequest extends FormRequest
                     ->ignore($cuota?->id_cuota, 'id_cuota'),
             ],
             'concepto_cuota' => ['nullable', 'string', 'max:180'],
-            'monto_cuota' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
-            'fecha_vencimiento_cuota' => ['nullable', 'date'],
+            'monto_cuota' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:99999999.99'],
+            'fecha_vencimiento_cuota' => ['nullable', 'date_format:Y-m-d', 'date'],
             'fecha_pago_cuota' => [
                 'nullable',
                 'required_if:estado_cuota,pagada',
-                'date',
+                'date_format:Y-m-d', 'date',
                 'before_or_equal:today',
             ],
             'metodo_pago_cuota' => ['nullable', 'string', 'max:120'],

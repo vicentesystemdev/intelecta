@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import Pagination from '@/Components/Pagination';
 import {
@@ -183,15 +184,15 @@ export default function Index({ programas, universidades = [], modalidades = [],
 
             <ModalInstitucional open={formModal.open} onOpenChange={(open) => setFormModal((current) => ({ ...current, open }))} title={formModal.programa ? 'Editar programa académico' : 'Nuevo programa académico'} description="Configure el ciclo de nivelación, su enfoque y vigencia." size="lg">
                 <form onSubmit={submitForm} className="grid gap-4 sm:grid-cols-2">
-                    <Field label="Nombre del programa" value={form.data.nombre_prog} onChange={(e) => form.setData('nombre_prog', e.target.value)} error={form.errors.nombre_prog} className="sm:col-span-2" />
-                    <Field label="Código" value={form.data.codigo_prog} onChange={(e) => form.setData('codigo_prog', e.target.value)} error={form.errors.codigo_prog} />
-                    <Field label="Universidad objetivo" value={form.data.universidad_objetivo_prog} onChange={(e) => form.setData('universidad_objetivo_prog', e.target.value)} error={form.errors.universidad_objetivo_prog} />
-                    <Field label="Carrera o área" value={form.data.carrera_area_prog} onChange={(e) => form.setData('carrera_area_prog', e.target.value)} error={form.errors.carrera_area_prog} />
-                    <Field label="Modalidad" value={form.data.modalidad_prog} onChange={(e) => form.setData('modalidad_prog', e.target.value)} error={form.errors.modalidad_prog} />
-                    <Field type="date" min={formModal.programa ? undefined : localToday()} label="Fecha de inicio" value={form.data.fecha_inicio_prog} onChange={(e) => form.setData('fecha_inicio_prog', e.target.value)} error={form.errors.fecha_inicio_prog} />
-                    <Field type="date" min={form.data.fecha_inicio_prog || undefined} label="Fecha de finalización" value={form.data.fecha_fin_prog} onChange={(e) => form.setData('fecha_fin_prog', e.target.value)} error={form.errors.fecha_fin_prog} />
-                    <SelectField label="Estado" value={form.data.estado_prog} onChange={(e) => form.setData('estado_prog', e.target.value)} error={form.errors.estado_prog}><option value="activo">Activo</option><option value="inactivo">Inactivo</option></SelectField>
-                    <TextareaField label="Descripción" value={form.data.descripcion_prog} onChange={(e) => form.setData('descripcion_prog', e.target.value)} error={form.errors.descripcion_prog} className="sm:col-span-2" />
+                    <Field {...validationProps('nombre_prog')} label="Nombre del programa" value={form.data.nombre_prog} onChange={(e) => form.setData('nombre_prog', e.target.value)} error={form.errors.nombre_prog} className="sm:col-span-2" />
+                    <Field {...validationProps('codigo_prog')} label="Código" value={form.data.codigo_prog} onChange={(e) => form.setData('codigo_prog', e.target.value)} error={form.errors.codigo_prog} />
+                    <Field {...validationProps('universidad_objetivo_prog')} label="Universidad objetivo" value={form.data.universidad_objetivo_prog} onChange={(e) => form.setData('universidad_objetivo_prog', e.target.value)} error={form.errors.universidad_objetivo_prog} />
+                    <Field {...validationProps('carrera_area_prog')} label="Carrera o área" value={form.data.carrera_area_prog} onChange={(e) => form.setData('carrera_area_prog', e.target.value)} error={form.errors.carrera_area_prog} />
+                    <Field {...validationProps('modalidad_prog')} label="Modalidad" value={form.data.modalidad_prog} onChange={(e) => form.setData('modalidad_prog', e.target.value)} error={form.errors.modalidad_prog} />
+                    <Field {...validationProps('fecha_inicio_prog')} type="date" min={formModal.programa ? undefined : localToday()} label="Fecha de inicio" value={form.data.fecha_inicio_prog} onChange={(e) => form.setData('fecha_inicio_prog', e.target.value)} error={form.errors.fecha_inicio_prog} />
+                    <Field {...validationProps('fecha_fin_prog')} type="date" min={form.data.fecha_inicio_prog || undefined} label="Fecha de finalización" value={form.data.fecha_fin_prog} onChange={(e) => form.setData('fecha_fin_prog', e.target.value)} error={form.errors.fecha_fin_prog} />
+                    <SelectField {...validationProps('estado_prog')} label="Estado" value={form.data.estado_prog} onChange={(e) => form.setData('estado_prog', e.target.value)} error={form.errors.estado_prog}><option value="activo">Activo</option><option value="inactivo">Inactivo</option></SelectField>
+                    <TextareaField {...validationProps('descripcion_prog')} label="Descripción" value={form.data.descripcion_prog} onChange={(e) => form.setData('descripcion_prog', e.target.value)} error={form.errors.descripcion_prog} className="sm:col-span-2" />
                     <div className="flex justify-end gap-3 border-t border-brand-border pt-4 sm:col-span-2">
                         <button type="button" className={secondaryButtonClass} onClick={() => setFormModal({ open: false, programa: null })}>Cancelar</button>
                         <button className={primaryButtonClass} disabled={form.processing}>{formModal.programa ? 'Guardar cambios' : 'Crear programa'}</button>

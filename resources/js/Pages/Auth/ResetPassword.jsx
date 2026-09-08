@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -26,10 +27,11 @@ export default function ResetPassword({ token, email }) {
             <Head title="Reset Password" />
 
             <form onSubmit={submit}>
+                <InputError message={errors.token} />
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
 
-                    <TextInput
+                    <TextInput {...validationProps('email')}
                         id="email"
                         type="email"
                         name="email"
@@ -45,7 +47,7 @@ export default function ResetPassword({ token, email }) {
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
 
-                    <TextInput
+                    <TextInput {...validationProps('password', { minLength: 8, maxLength: 72, required: true })}
                         id="password"
                         type="password"
                         name="password"
@@ -65,7 +67,7 @@ export default function ResetPassword({ token, email }) {
                         value="Confirm Password"
                     />
 
-                    <TextInput
+                    <TextInput {...validationProps('password_confirmation', { required: true })}
                         type="password"
                         id="password_confirmation"
                         name="password_confirmation"

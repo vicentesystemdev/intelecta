@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests\Institucional;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Domains\Academico\Enums\EstadoSimulacro;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
-class SimulacroProgramadoRequest extends FormRequest
+class SimulacroProgramadoRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -30,11 +32,11 @@ class SimulacroProgramadoRequest extends FormRequest
                     ->where(fn ($query) => $query->where('id_prog', $this->integer('id_prog'))),
             ],
             'id_plantilla' => ['nullable', 'integer', 'exists:plantillas_evaluacion,id_plan'],
-            'titulo_sim' => ['required', 'string', 'max:180'],
+            'titulo_sim' => ['required', 'string', 'min:2', 'max:180'],
             'fecha_sim' => [
                 'bail',
                 'nullable',
-                'date',
+                'date_format:Y-m-d', 'date',
                 function (string $attribute, mixed $value, \Closure $fail) use ($simulacro): void {
                     if (! $value) {
                         return;
@@ -49,9 +51,9 @@ class SimulacroProgramadoRequest extends FormRequest
                 },
             ],
             'hora_inicio_sim' => ['nullable', 'date_format:H:i'],
-            'hora_fin_sim' => ['nullable', 'date_format:H:i', 'after:hora_inicio_sim'],
+            'hora_fin_sim' => ['nullable', 'date_format:H:i', ...InputRules::dateOrder('after:hora_inicio_sim', $this->input('hora_inicio_sim'), 'H:i')],
             'modalidad_sim' => ['nullable', 'string', 'max:100'],
-            'estado_sim' => ['required', 'in:programado,en preparación,aplicado,cerrado'],
+            'estado_sim' => ['required', Rule::enum(EstadoSimulacro::class)],
             'observacion_sim' => ['nullable', 'string', 'max:2000'],
         ];
     }

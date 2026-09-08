@@ -1,3 +1,5 @@
+import InputError from '@/Components/InputError';
+import { validationProps } from '@/lib/inputValidation';
 import {
     EmptyInstitutional,
     FlashMessage,
@@ -289,7 +291,7 @@ export default function Index({
                 onSubmit={applyFilters}
                 className={`${cardClass} mb-6 grid gap-3 p-5 sm:p-6 md:grid-cols-2 xl:grid-cols-7`}
             >
-                <select
+                <select {...validationProps('id_prog', { required: false })}
                     className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
                     value={filters.id_prog}
                     onChange={(event) =>
@@ -307,7 +309,8 @@ export default function Index({
                         </option>
                     ))}
                 </select>
-                <select
+                <InputError message={groupForm.errors.id_prog} />
+                <select {...validationProps('id_grupo', { required: false })}
                     className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
                     value={filters.id_grupo}
                     onChange={(event) => {
@@ -330,7 +333,8 @@ export default function Index({
                         </option>
                     ))}
                 </select>
-                <input
+                <InputError message={groupForm.errors.id_grupo} />
+                <input {...validationProps('fecha_asist', { required: false })}
                     type="date"
                     max={localToday()}
                     className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
@@ -339,7 +343,8 @@ export default function Index({
                         setFilters({ ...filters, fecha_asist: event.target.value })
                     }
                 />
-                <input
+                <InputError message={groupForm.errors.fecha_asist} />
+                <input {...validationProps('sesion_asist', { required: false })}
                     className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
                     placeholder="Sesión"
                     value={filters.sesion_asist}
@@ -347,6 +352,7 @@ export default function Index({
                         setFilters({ ...filters, sesion_asist: event.target.value })
                     }
                 />
+                <InputError message={groupForm.errors.sesion_asist} />
                 <select
                     className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
                     value={filters.estado_asist}
@@ -361,7 +367,7 @@ export default function Index({
                         </option>
                     ))}
                 </select>
-                <select
+                <select {...validationProps('id_tutor', { required: false })}
                     className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main"
                     value={filters.id_tutor}
                     onChange={(event) =>
@@ -375,6 +381,7 @@ export default function Index({
                         </option>
                     ))}
                 </select>
+                <InputError message={groupForm.errors.id_tutor} />
                 <button className={primaryButtonClass}>Aplicar filtros</button>
             </form>
 
@@ -424,6 +431,7 @@ export default function Index({
                     <form onSubmit={submitGroup} className="mt-5">
                         <div className="grid gap-3">
                             {listaGrupo.map((item) => {
+                                const recordIndex = groupForm.data.registros.findIndex((candidate) => candidate.id_post === item.id_post);
                                 const record = groupForm.data.registros.find(
                                     (candidate) =>
                                         candidate.id_post === item.id_post,
@@ -463,6 +471,9 @@ export default function Index({
                                                 </button>
                                             ))}
                                         </div>
+                                    <InputError message={groupForm.errors[`registros.${recordIndex}`] || groupForm.errors[`registros.${recordIndex}.id_post`]} />
+                                        <InputError message={groupForm.errors[`registros.${recordIndex}.estado_asist`]} />
+                                        <InputError message={groupForm.errors[`registros.${recordIndex}.observacion_asist`]} />
                                     </article>
                                 );
                             })}
@@ -649,7 +660,7 @@ export default function Index({
                 size="lg"
             >
                 <form onSubmit={submitIndividual} className="grid gap-4 sm:grid-cols-2">
-                    <SelectField
+                    <SelectField {...validationProps('id_prog')}
                         label="Programa académico"
                         value={individual.data.id_prog}
                         onChange={(event) =>
@@ -669,7 +680,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <SelectField
+                    <SelectField {...validationProps('id_grupo', { required: true })}
                         label="Grupo / paralelo"
                         value={individual.data.id_grupo}
                         onChange={(event) => {
@@ -695,7 +706,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <SelectField
+                    <SelectField {...validationProps('id_post', { required: true })}
                         label="Postulante inscrito"
                         value={individual.data.id_post}
                         onChange={(event) =>
@@ -711,7 +722,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field
+                    <Field {...validationProps('fecha_asist')}
                         type="date"
                         max={localToday()}
                         label="Fecha"
@@ -721,7 +732,7 @@ export default function Index({
                         }
                         error={individual.errors.fecha_asist}
                     />
-                    <Field
+                    <Field {...validationProps('sesion_asist')}
                         label="Sesión académica"
                         value={individual.data.sesion_asist}
                         onChange={(event) =>
@@ -729,7 +740,7 @@ export default function Index({
                         }
                         error={individual.errors.sesion_asist}
                     />
-                    <SelectField
+                    <SelectField {...validationProps('id_tutor')}
                         label="Tutor responsable"
                         value={individual.data.id_tutor}
                         onChange={(event) =>
@@ -744,7 +755,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <SelectField
+                    <SelectField {...validationProps('estado_asist')}
                         label="Estado"
                         value={individual.data.estado_asist}
                         onChange={(event) =>
@@ -758,7 +769,7 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <TextareaField
+                    <TextareaField {...validationProps('observacion_asist')}
                         label="Observación"
                         value={individual.data.observacion_asist}
                         onChange={(event) =>

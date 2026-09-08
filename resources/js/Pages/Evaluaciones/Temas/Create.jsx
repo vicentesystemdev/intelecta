@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import InputError from '@/Components/InputError';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -56,7 +57,7 @@ export function TemaForm({
                 <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
                     <div>
                         <Label>Área *</Label>
-                        <select
+                        <select {...validationProps('id_area', { required: true })}
                             className="mt-1.5 h-10 w-full rounded-lg border border-brand-border bg-brand-card px-3 text-sm text-text-main"
                             value={data.id_area}
                             onChange={(event) => setData('id_area', event.target.value)}
@@ -73,7 +74,7 @@ export function TemaForm({
                     </div>
                     <div>
                         <Label>Nivel</Label>
-                        <select
+                        <select {...validationProps('nivel_tem')}
                             className="mt-1.5 h-10 w-full rounded-lg border border-brand-border bg-brand-card px-3 text-sm text-text-main"
                             value={data.nivel_tem}
                             onChange={(event) => setData('nivel_tem', event.target.value)}
@@ -81,12 +82,13 @@ export function TemaForm({
                             <option value="basico">Básico</option>
                             <option value="intermedio">Intermedio</option>
                             <option value="avanzado">Avanzado</option>
+                            <option value="preuniversitario">Preuniversitario</option>
                         </select>
                         <InputError className="mt-1" message={errors.nivel_tem} />
                     </div>
                     <div className="sm:col-span-2">
                         <Label>Nombre *</Label>
-                        <Input
+                        <Input {...validationProps('nombre_tem')}
                             className="mt-1.5"
                             value={data.nombre_tem}
                             onChange={(event) => setData('nombre_tem', event.target.value)}
@@ -96,7 +98,7 @@ export function TemaForm({
                     </div>
                     <div className="sm:col-span-2">
                         <Label>Descripción</Label>
-                        <Textarea
+                        <Textarea {...validationProps('descripcion_tem')}
                             className="mt-1.5"
                             value={data.descripcion_tem}
                             onChange={(event) =>
@@ -107,7 +109,7 @@ export function TemaForm({
                     </div>
                     <div>
                         <Label>Estado</Label>
-                        <select
+                        <select {...validationProps('estado_tem')}
                             className="mt-1.5 h-10 w-full rounded-lg border border-brand-border bg-brand-card px-3 text-sm text-text-main"
                             value={data.estado_tem}
                             onChange={(event) => setData('estado_tem', event.target.value)}

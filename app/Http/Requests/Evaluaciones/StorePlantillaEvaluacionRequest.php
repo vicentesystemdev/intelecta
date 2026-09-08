@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Evaluaciones;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\InputRules;
 use Illuminate\Validation\Validator;
 
-class StorePlantillaEvaluacionRequest extends FormRequest
+class StorePlantillaEvaluacionRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -15,16 +16,17 @@ class StorePlantillaEvaluacionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre_plan' => ['required', 'string', 'max:180'],
+            'nombre_plan' => ['required', 'string', 'min:2', 'max:180'],
             'descripcion_plan' => ['nullable', 'string', 'max:3000'],
             'objetivo_plan' => ['nullable', 'string', 'max:3000'],
             'duracion_minutos_plan' => ['nullable', 'integer', 'min:1', 'max:480'],
             'dificultad_plan' => ['nullable', 'in:basica,basica-media,media,media-alta,avanzada,mixta'],
             'estado_plan' => ['required', 'in:activa,inactiva'],
-            'preguntas' => ['required', 'array', 'min:1'],
+            'preguntas' => ['required', 'array', 'list', 'min:1', 'max:'.InputRules::MAX_QUESTIONS],
+            'preguntas.*' => ['required', 'array:id_preg,orden_pp,puntaje_pp'],
             'preguntas.*.id_preg' => ['required', 'integer', 'distinct', 'exists:preguntas,id_preg'],
-            'preguntas.*.orden_pp' => ['required', 'integer', 'min:1'],
-            'preguntas.*.puntaje_pp' => ['required', 'numeric', 'min:0.01', 'max:100'],
+            'preguntas.*.orden_pp' => ['required', 'integer', 'distinct', 'min:1', 'max:'.InputRules::MAX_QUESTIONS],
+            'preguntas.*.puntaje_pp' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:100'],
         ];
     }
 
@@ -32,6 +34,10 @@ class StorePlantillaEvaluacionRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
+                if ($validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
                 $total = collect($this->input('preguntas', []))->sum(
                     fn (array $pregunta) => (float) ($pregunta['puntaje_pp'] ?? 0)
                 );

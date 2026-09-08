@@ -1,3 +1,4 @@
+import { validationProps } from '@/lib/inputValidation';
 import InputError from '@/Components/InputError';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -55,7 +56,7 @@ export function AreaForm({
                 <CardContent className="space-y-5 p-5">
                     <div>
                         <Label htmlFor="id_mat">Materia *</Label>
-                        <select
+                        <select {...validationProps('id_mat', { required: true })}
                             id="id_mat"
                             className="mt-1.5 h-10 w-full rounded-lg border border-brand-border bg-brand-card px-3 text-sm text-text-main outline-none focus:border-brand-secondary focus:ring-2 focus:ring-brand-secondary/15"
                             value={data.id_mat}
@@ -73,7 +74,7 @@ export function AreaForm({
                     </div>
                     <div>
                         <Label htmlFor="nombre_area">Nombre *</Label>
-                        <Input
+                        <Input {...validationProps('nombre_area')}
                             id="nombre_area"
                             className="mt-1.5"
                             value={data.nombre_area}
@@ -86,7 +87,7 @@ export function AreaForm({
                     </div>
                     <div>
                         <Label htmlFor="descripcion_area">Descripción</Label>
-                        <Textarea
+                        <Textarea {...validationProps('descripcion_area')}
                             id="descripcion_area"
                             className="mt-1.5 min-h-28"
                             value={data.descripcion_area}
@@ -101,7 +102,7 @@ export function AreaForm({
                     </div>
                     <div>
                         <Label htmlFor="estado_area">Estado</Label>
-                        <select
+                        <select {...validationProps('estado_area')}
                             id="estado_area"
                             className="mt-1.5 h-10 w-full rounded-lg border border-brand-border bg-brand-card px-3 text-sm text-text-main"
                             value={data.estado_area}

@@ -10,13 +10,14 @@ final readonly class PostulanteData
         public ?string $ciPost,
         public ?string $emailPost,
         public ?string $celularPost,
-        public ?int $edadPost,
+        public ?string $fechaNacimientoPost,
         public ?int $idCol,
         public ?int $idCar,
         public ?string $turnoPost,
         public int $gestionPost,
         public string $estadoPost,
         public ?string $observacionesPost,
+        public bool $fechaNacimientoProvided,
     ) {}
 
     /**
@@ -30,13 +31,14 @@ final readonly class PostulanteData
             ciPost: self::nullableString($data['ci_post'] ?? null),
             emailPost: self::nullableString($data['email_post'] ?? null),
             celularPost: self::nullableString($data['celular_post'] ?? null),
-            edadPost: self::nullableInteger($data['edad_post'] ?? null),
+            fechaNacimientoPost: self::nullableString($data['fecha_nacimiento_post'] ?? null),
             idCol: self::nullableInteger($data['id_col'] ?? null),
             idCar: self::nullableInteger($data['id_car'] ?? null),
             turnoPost: self::nullableString($data['turno_post'] ?? null),
             gestionPost: (int) $data['gestion_post'],
             estadoPost: $data['estado_post'] ?? 'activo',
             observacionesPost: self::nullableString($data['observaciones_post'] ?? null),
+            fechaNacimientoProvided: array_key_exists('fecha_nacimiento_post', $data),
         );
     }
 
@@ -51,7 +53,8 @@ final readonly class PostulanteData
             'ci_post' => $this->ciPost,
             'email_post' => $this->emailPost,
             'celular_post' => $this->celularPost,
-            'edad_post' => $this->edadPost,
+            // Omitted on update means keep the stored date; never overwrite the legacy age.
+            ...($this->fechaNacimientoProvided ? ['fecha_nacimiento_post' => $this->fechaNacimientoPost] : []),
             'id_col' => $this->idCol,
             'id_car' => $this->idCar,
             'turno_post' => $this->turnoPost,

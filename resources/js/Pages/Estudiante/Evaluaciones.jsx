@@ -1,3 +1,4 @@
+import InputError from '@/Components/InputError';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
 import StudentTrackingNav from '@/Components/Estudiante/StudentTrackingNav';
@@ -62,6 +63,7 @@ export default function Evaluaciones({
         [plantillas, selectedTemplate],
     );
     const answeredCount = Object.keys(answers).length;
+    const submittedQuestions = evaluacionActiva?.preguntas?.filter((question) => answers[question.id_preg]) || [];
     const totalQuestions = evaluacionActiva?.preguntas?.length || 0;
 
     useEffect(() => {
@@ -331,6 +333,7 @@ export default function Evaluaciones({
                                     Iniciar evaluación
                                     <ArrowRight className="h-4 w-4" />
                                 </button>
+                                <InputError message={errors.tipo_eval_apl || errors.id_sim} />
                             </CardContent>
                         </Card>
                     </>
@@ -390,6 +393,7 @@ export default function Evaluaciones({
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="grid gap-3">
+                                        {Object.entries(errors).filter(([key]) => key === `respuestas.${submittedQuestions.findIndex((question) => question.id_preg === pregunta.id_preg)}` || key.startsWith(`respuestas.${submittedQuestions.findIndex((question) => question.id_preg === pregunta.id_preg)}.`)).map(([key, message]) => <InputError key={key} message={message} />)}
                                         {pregunta.alternativas.map(
                                             (alternativa) => {
                                                 const checked =
@@ -442,6 +446,7 @@ export default function Evaluaciones({
                             ))}
                         </div>
 
+                        <InputError message={errors.tiempo_total_segundos} />
                         <div className="flex justify-end">
                             <button
                                 type="button"

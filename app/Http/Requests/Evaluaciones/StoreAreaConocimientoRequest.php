@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Evaluaciones;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Domains\Academico\Enums\EstadoRegistro;
+use App\Http\Requests\NormalizedFormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreAreaConocimientoRequest extends FormRequest
+class StoreAreaConocimientoRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
@@ -15,9 +17,9 @@ class StoreAreaConocimientoRequest extends FormRequest
     {
         return [
             'id_mat' => ['required', 'integer', 'exists:materias,id_mat'],
-            'nombre_area' => ['required', 'string', 'max:120', 'unique:areas_conocimiento,nombre_area'],
+            'nombre_area' => ['required', 'string', 'min:2', 'max:120', Rule::unique('areas_conocimiento', 'nombre_area')->ignore($this->route('area')?->id_area, 'id_area')],
             'descripcion_area' => ['nullable', 'string', 'max:2000'],
-            'estado_area' => ['required', 'in:activo,inactivo'],
+            'estado_area' => ['required', Rule::enum(EstadoRegistro::class)],
         ];
     }
 
