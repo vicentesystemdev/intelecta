@@ -3,6 +3,8 @@
 namespace Tests\Feature\Portal;
 
 use App\Domains\Postulantes\Models\Postulante;
+use App\Domains\Seguridad\Enums\EstadoCuenta;
+use App\Domains\Seguridad\Services\RevocarAccesoService;
 use App\Models\User;
 use Database\Seeders\RolesAndUsersSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -50,8 +52,9 @@ class StableStudentAccessTest extends TestCase
     public function test_public_registration_cannot_claim_a_contact_email(): void
     {
         Postulante::factory()->create(['email_post' => 'coincidencia@example.com']);
-        $this->post('/register', ['name' => 'Nueva Persona', 'email' => 'coincidencia@example.com', 'password' => 'Password123', 'password_confirmation' => 'Password123'])->assertRedirect();
-        $user = User::where('email', 'coincidencia@example.com')->firstOrFail();
+        $this->post('/register', ['name' => 'Nueva Persona', 'email' => 'coincidencia@example.com', 'password' => 'Password123', 'password_confirmation' => 'Password123'])->assertNotFound();
+        $this->assertDatabaseMissing('users', ['email' => 'coincidencia@example.com']);
+        $user = User::factory()->active()->create(['email' => 'coincidencia@example.com']);
         $this->assertPortalDenied($user);
         $this->assertNull($user->postulante);
     }
@@ -90,6 +93,9 @@ class StableStudentAccessTest extends TestCase
         ])->assertRedirect()->assertSessionHasNoErrors();
         $this->assertSame('nuevo.acceso@example.com', $user->fresh()->email);
         $this->assertNull($user->fresh()->email_verified_at);
+        $this->assertSame(EstadoCuenta::PENDIENTE, $user->fresh()->estado_cuenta);
+        $user->refresh()->markEmailAsVerified();
+        $this->withSession([RevocarAccesoService::SESSION_KEY => $user->version_acceso]);
         $assertOwnRecord();
         $this->assertSame($user->id, $postulante->fresh()->user_id);
         $this->assertNull($other->fresh()->user_id);

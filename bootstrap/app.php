@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureAccountAccess;
 use App\Http\Middleware\EnsureAdministrativeAccess;
 use App\Http\Middleware\EnsureStudentAccess;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -28,7 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
             SubstituteBindings::class,
             EnsureStudentAccess::class,
         );
+        $middleware->prependToPriorityList(EnsureStudentAccess::class, EnsureAccountAccess::class);
         $middleware->web(append: [
+            EnsureAccountAccess::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);

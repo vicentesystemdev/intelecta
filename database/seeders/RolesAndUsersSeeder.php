@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Domains\Seguridad\Enums\EstadoCuenta;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -189,6 +190,8 @@ class RolesAndUsersSeeder extends Seeder
                 'name' => $name,
                 'password' => Hash::make('Avalancha#2026'),
                 'email_verified_at' => now(),
+                // Explicit operative DEMO fixture, not the real invitation flow. No notifications.
+                'estado_cuenta' => EstadoCuenta::ACTIVA,
             ],
         );
 

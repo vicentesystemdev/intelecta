@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Domains\Seguridad\Enums\EstadoCuenta;
 use App\Http\Requests\NormalizedFormRequest;
 use App\Support\Validation\InputRules;
 use Illuminate\Auth\Events\Lockout;
@@ -44,7 +45,10 @@ class LoginRequest extends NormalizedFormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (! Auth::attempt([
+            ...$this->only('email', 'password'),
+            fn ($query) => $query->where('estado_cuenta', '!=', EstadoCuenta::BLOQUEADA->value),
+        ], $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

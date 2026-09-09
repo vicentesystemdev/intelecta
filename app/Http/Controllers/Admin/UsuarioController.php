@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Seguridad\Services\BitacoraService;
+use App\Domains\Seguridad\Services\CuentaService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\OperacionCuentaRequest;
 use App\Http\Requests\Admin\StoreUsuarioRequest;
 use App\Http\Requests\Admin\UpdateUsuarioRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
@@ -62,8 +58,9 @@ class UsuarioController extends Controller
                 'estudiantes' => User::role('Estudiante')->count(),
             ],
             'permisos' => [
-                'crear' => $request->user()->can('usuarios.crear'),
-                'editar' => $request->user()->can('usuarios.editar'),
+                'crear' => $request->user()->canChangeLoginEmail(),
+                'editar' => $request->user()->canChangeLoginEmail(),
+                'seguridad' => $request->user()->canChangeLoginEmail(),
                 'asignarSuperAdministrador' => $request->user()->hasRole('Super Administrador'),
                 'cambiarCorreoAcceso' => $request->user()->canChangeLoginEmail(),
             ],
@@ -71,147 +68,38 @@ class UsuarioController extends Controller
         ]);
     }
 
-    public function store(StoreUsuarioRequest $request, BitacoraService $bitacora): RedirectResponse
+    public function store(StoreUsuarioRequest $request, CuentaService $accounts): RedirectResponse
     {
-        $data = $request->validated();
-        $this->ensureRoleCanBeAssigned($request, $data['role']);
+        $accounts->create($request->user(), $request->validated());
 
-        $createdUser = DB::transaction(function () use ($data): User {
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-            ]);
-
-            $user->forceFill(['email_verified_at' => now()])->save();
-            $user->syncRoles([$data['role']]);
-
-            return $user;
-        });
-
-        $bitacora->registrar([
-            'accion' => 'crear',
-            'modulo' => 'Usuarios',
-            'entidad' => 'users',
-            'entidad_id' => $createdUser->id,
-            'descripcion' => 'Se registró un nuevo usuario institucional.',
-            'valores_nuevos' => [
-                'name' => $createdUser->name,
-                'email' => $createdUser->email,
-                'role' => $data['role'],
-            ],
-            'severidad' => 'seguridad',
-        ]);
-
-        return back()->with('success', 'Usuario institucional registrado correctamente.');
+        return back()->with('success', 'Cuenta pendiente creada. Se envió un enlace para que el titular establezca su contraseña.');
     }
 
-    public function update(
-        UpdateUsuarioRequest $request,
-        User $usuario,
-        BitacoraService $bitacora,
-    ): RedirectResponse {
-        $data = $request->validated();
-        $this->ensureSuperAdministratorCanBeEdited($request, $usuario);
-        $this->ensureRoleCanBeAssigned($request, $data['role']);
-        $this->protectLastSuperAdministrator($usuario, $data['role']);
-        $anteriores = [
-            'name' => $usuario->name,
-            'email' => $usuario->email,
-            'roles' => $usuario->getRoleNames()->values()->all(),
-        ];
-
-        DB::transaction(function () use ($request, $usuario, $data): void {
-            $usuario = User::query()->lockForUpdate()->findOrFail($usuario->id);
-            $emailChanged = $usuario->email !== $data['email'];
-            if ($emailChanged && ! $request->user()->canChangeLoginEmail()) {
-                throw ValidationException::withMessages([
-                    'email' => 'Solo un Super Administrador (TI) puede cambiar el correo de acceso.',
-                ]);
-            }
-
-            $attributes = [
-                'name' => $data['name'],
-            ];
-
-            if ($emailChanged) {
-                Password::broker()->deleteToken($usuario);
-                $usuario->forceFill([
-                    'email' => $data['email'],
-                    'email_verified_at' => null,
-                    'remember_token' => Str::random(60),
-                ]);
-                Password::broker()->deleteToken($usuario);
-                if (config('session.driver') === 'database') {
-                    DB::connection(config('session.connection'))
-                        ->table(config('session.table', 'sessions'))
-                        ->where('user_id', $usuario->id)->delete();
-                }
-            }
-
-            if (! empty($data['password'])) {
-                $attributes['password'] = Hash::make($data['password']);
-            }
-
-            $usuario->update($attributes);
-            $usuario->syncRoles([$data['role']]);
-        });
-
-        $usuario->refresh();
-        $bitacora->registrar([
-            'accion' => 'editar',
-            'modulo' => 'Usuarios',
-            'entidad' => 'users',
-            'entidad_id' => $usuario->id,
-            'descripcion' => 'Se actualizó información de un usuario institucional.',
-            'valores_anteriores' => $anteriores,
-            'valores_nuevos' => [
-                'name' => $usuario->name,
-                'email' => $usuario->email,
-                'roles' => $usuario->getRoleNames()->values()->all(),
-            ],
-            'severidad' => 'seguridad',
-        ]);
-
-        return back()->with('success', 'Información del usuario actualizada correctamente.');
-    }
-
-    private function ensureRoleCanBeAssigned(Request $request, string $role): void
+    public function update(UpdateUsuarioRequest $request, User $usuario, CuentaService $accounts): RedirectResponse
     {
-        if (
-            $role === 'Super Administrador'
-            && ! $request->user()->hasRole('Super Administrador')
-        ) {
-            throw ValidationException::withMessages([
-                'role' => 'Solo un Super Administrador puede asignar este rol.',
-            ]);
-        }
+        $accounts->update($request->user(), $usuario->id, $request->validated());
+
+        return back()->with('success', 'Cuenta actualizada. Los cambios de correo requieren una nueva verificación.');
     }
 
-    private function ensureSuperAdministratorCanBeEdited(
-        Request $request,
-        User $usuario,
-    ): void {
-        if (
-            $usuario->hasRole('Super Administrador')
-            && ! $request->user()->hasRole('Super Administrador')
-        ) {
-            throw ValidationException::withMessages([
-                'role' => 'Solo un Super Administrador puede modificar esta cuenta.',
-            ]);
-        }
-    }
-
-    private function protectLastSuperAdministrator(User $usuario, string $newRole): void
+    public function bloquear(OperacionCuentaRequest $request, User $usuario, CuentaService $accounts): RedirectResponse
     {
-        if (
-            $usuario->hasRole('Super Administrador')
-            && $newRole !== 'Super Administrador'
-            && User::role('Super Administrador')->count() <= 1
-        ) {
-            throw ValidationException::withMessages([
-                'role' => 'No es posible degradar al último Super Administrador.',
-            ]);
-        }
+        $accounts->block($request->user(), $usuario->id, $request->validated('motivo'));
+
+        return back()->with('success', 'Cuenta bloqueada y acceso revocado.');
+    }
+
+    public function desbloquear(OperacionCuentaRequest $request, User $usuario, CuentaService $accounts): RedirectResponse
+    {
+        $accounts->unblock($request->user(), $usuario->id);
+
+        return back()->with('success', 'Cuenta desbloqueada según su verificación de correo.');
+    }
+
+    public function reenviarActivacion(OperacionCuentaRequest $request, User $usuario, CuentaService $accounts): RedirectResponse
+    {
+        $accounts->sendAccess($request->user(), $usuario->id);
+
+        return back()->with('success', 'Se envió un nuevo enlace de establecimiento de contraseña.');
     }
 }

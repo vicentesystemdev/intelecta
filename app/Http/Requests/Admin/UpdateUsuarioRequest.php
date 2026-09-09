@@ -11,7 +11,7 @@ class UpdateUsuarioRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('usuarios.editar') ?? false;
+        return $this->user()?->canChangeLoginEmail() ?? false;
     }
 
     /**
@@ -29,8 +29,10 @@ class UpdateUsuarioRequest extends NormalizedFormRequest
                 ...InputRules::email(),
                 Rule::unique('users', 'email')->ignore($usuario->getKey()),
             ],
-            'password' => ['nullable', ...InputRules::password()],
-            'password_confirmation' => ['nullable', 'required_with:password', 'string'],
+            'password' => ['prohibited'],
+            'password_confirmation' => ['prohibited'],
+            'estado_cuenta' => ['prohibited'],
+            'email_verified_at' => ['prohibited'],
             'role' => [
                 'required',
                 'string',

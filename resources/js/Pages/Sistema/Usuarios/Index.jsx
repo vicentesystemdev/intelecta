@@ -1,6 +1,7 @@
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import Pagination from '@/Components/Pagination';
 import UsuarioForm from '@/Components/Sistema/UsuarioForm';
+import InputError from '@/Components/InputError';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -15,7 +16,7 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import {
     Eye,
     GraduationCap,
@@ -62,6 +63,15 @@ export default function Index({
     usuarioActualId,
 }) {
     const { flash } = usePage().props;
+    const [securityAction, setSecurityAction] = useState(null);
+    const security = useForm({ motivo: '' });
+    const executeSecurityAction = (event) => {
+        event.preventDefault();
+        security.post(route(`admin.sistema.usuarios.${securityAction.action}`, securityAction.usuario.id), {
+            preserveScroll: true,
+            onSuccess: () => { setSecurityAction(null); security.reset(); },
+        });
+    };
     const [filters, setFilters] = useState({
         buscar: filtros.buscar || '',
         role: filtros.role || '',
@@ -229,7 +239,8 @@ export default function Index({
                         <TableHeader>
                             <TableRow className="bg-slate-50/80 dark:bg-slate-900">
                                 <TableHead className="pl-5">Nombre</TableHead>
-                                <TableHead>Correo electrónico</TableHead>
+                                <TableHead>Correo de acceso / verificación</TableHead>
+                                <TableHead>Estado de cuenta</TableHead>
                                 <TableHead>Rol</TableHead>
                                 <TableHead>Fecha de creación</TableHead>
                                 <TableHead className="pr-5 text-right">
@@ -265,6 +276,10 @@ export default function Index({
                                     </TableCell>
                                     <TableCell className="text-slate-600 dark:text-slate-300">
                                         {usuario.email}
+                                        <p className="text-xs">{usuario.email_verified_at ? 'Verificado' : 'Por verificar'}</p>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline">{{ pendiente: 'Por activar', activa: 'Activa', bloqueada: 'Bloqueada' }[usuario.estado_cuenta]}</Badge>
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex flex-wrap gap-1.5">
@@ -314,6 +329,17 @@ export default function Index({
                                                     <Pencil className="h-4 w-4" />
                                                 </Button>
                                             )}
+                                            {permisos.seguridad && (
+                                                <div className="flex flex-wrap gap-1">
+                                                    {(usuario.estado_cuenta === 'bloqueada' ? ['desbloquear'] : usuario.estado_cuenta === 'pendiente' ? ['reenviar-activacion', 'bloquear'] : ['bloquear']).map((action) => (
+                                                        <Button key={action} size="sm" variant="outline" onClick={() => {
+                                                            security.reset(); security.clearErrors(); setSecurityAction({ action, usuario });
+                                                        }}>
+                                                            {{ bloquear: 'Bloquear', desbloquear: 'Desbloquear', 'reenviar-activacion': 'Reenviar activación' }[action]}
+                                                        </Button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -325,6 +351,18 @@ export default function Index({
 
             <Pagination links={usuarios.links} />
 
+            <ModalInstitucional open={Boolean(securityAction)} onOpenChange={(open) => !open && setSecurityAction(null)} title="Confirmar operación de cuenta" description="Esta operación afecta el acceso digital; no elimina roles ni expedientes.">
+                {securityAction && (
+                    <form onSubmit={executeSecurityAction} className="space-y-4">
+                        <p>{securityAction.usuario.name} — {securityAction.usuario.email}</p>
+                        <p>{{ bloquear: 'Se bloqueará la cuenta y se revocarán sus sesiones.', desbloquear: 'Se habilitará según su verificación de correo.', 'reenviar-activacion': 'Se enviará un enlace nuevo. El anterior dejará de servir.' }[securityAction.action]}</p>
+                        {securityAction.action === 'bloquear' && <Input aria-label="Motivo del bloqueo" placeholder="Motivo del bloqueo" value={security.data.motivo} minLength={10} maxLength={500} required onChange={(event) => security.setData('motivo', event.target.value)} />}
+                        {Object.entries(security.errors).map(([key, message]) => <InputError key={key} message={message} />)}
+                        <Button type="submit" disabled={security.processing}>Confirmar</Button>
+                    </form>
+                )}
+            </ModalInstitucional>
+
             <ModalInstitucional
                 open={formModal.open}
                 onOpenChange={(open) =>
@@ -335,7 +373,7 @@ export default function Index({
                 }
                 description={
                     formModal.usuario
-                        ? 'Actualice el acceso institucional, rol o credenciales de la cuenta.'
+                        ? 'Actualice el correo de acceso o rol. La contraseña la administra su titular.'
                         : 'Cree una cuenta institucional y asigne su perfil de acceso.'
                 }
                 size="lg"

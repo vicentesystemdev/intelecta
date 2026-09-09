@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Domains\Seguridad\Services\RevocarAccesoService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
@@ -34,6 +35,10 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
+        $request->session()->put(RevocarAccesoService::SESSION_KEY, $user->version_acceso);
+        if (! $user->cuentaActiva()) {
+            return redirect()->route('verification.notice');
+        }
         if ($user) {
             if ($user->hasAnyRole(['Super Administrador', 'Administrador', 'Docente'])) {
                 return redirect()->intended(route('dashboard', absolute: false));

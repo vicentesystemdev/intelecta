@@ -80,7 +80,7 @@ class StableIdentityTest extends TestCase
                 $postulante->delete();
             }
             $this->actingAs($user)->deleteJson('/profile', ['password' => 'password'])
-                ->assertUnprocessable()->assertJsonValidationErrors('password');
+                ->assertMethodNotAllowed();
             $this->assertAuthenticatedAs($user);
             $this->assertDatabaseHas('users', ['id' => $user->id]);
             $this->assertDatabaseHas('postulantes', ['id_post' => $postulante->id_post]);

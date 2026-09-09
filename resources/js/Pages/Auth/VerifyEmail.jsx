@@ -13,26 +13,24 @@ export default function VerifyEmail({ status }) {
 
     return (
         <GuestLayout>
-            <Head title="Email Verification" />
+            <Head title="Activar mi cuenta" />
 
             <div className="mb-4 text-sm text-gray-600">
-                Thanks for signing up! Before getting started, could you verify
-                your email address by clicking on the link we just emailed to
-                you? If you didn't receive the email, we will gladly send you
-                another.
+                Tu cuenta necesita verificar el correo de acceso antes de entrar
+                a los módulos de INTELECTA. Solicita el enlace y abre el mensaje
+                recibido en tu correo. Verificarlo no asigna roles ni expedientes.
             </div>
 
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
+                    Se envió un enlace de verificación a tu correo de acceso.
                 </div>
             )}
 
             <form onSubmit={submit}>
                 <div className="mt-4 flex items-center justify-between">
                     <PrimaryButton disabled={processing}>
-                        Resend Verification Email
+                        Enviar enlace de verificación
                     </PrimaryButton>
 
                     <Link
@@ -41,7 +39,7 @@ export default function VerifyEmail({ status }) {
                         as="button"
                         className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
-                        Log Out
+                        Cerrar sesión
                     </Link>
                 </div>
             </form>

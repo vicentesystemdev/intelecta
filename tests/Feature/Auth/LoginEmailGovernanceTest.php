@@ -34,18 +34,18 @@ class LoginEmailGovernanceTest extends TestCase
         }
     }
 
-    public function test_admin_cannot_change_email_but_can_keep_updating_other_fields(): void
+    public function test_admin_cannot_change_email_or_other_identity_fields(): void
     {
         $admin = User::role('Administrador')->firstOrFail();
         $user = User::role('Estudiante')->firstOrFail();
         $data = ['name' => 'Nombre Permitido', 'email' => 'no.autorizado@example.com', 'role' => 'Estudiante'];
         $oldEmail = $user->email;
-        $this->actingAs($admin)->putJson(route('admin.sistema.usuarios.update', $user), $data)->assertUnprocessable()->assertJsonValidationErrors('email');
+        $this->actingAs($admin)->putJson(route('admin.sistema.usuarios.update', $user), $data)->assertForbidden();
         $this->assertSame($oldEmail, $user->fresh()->email);
         $this->assertNotSame('Nombre Permitido', $user->fresh()->name);
         $data['email'] = $oldEmail;
-        $this->putJson(route('admin.sistema.usuarios.update', $user), $data)->assertRedirect();
-        $this->assertSame('Nombre Permitido', $user->fresh()->name);
+        $this->putJson(route('admin.sistema.usuarios.update', $user), $data)->assertForbidden();
+        $this->assertNotSame('Nombre Permitido', $user->fresh()->name);
         $this->assertNotNull($user->fresh()->email_verified_at);
     }
 
@@ -75,7 +75,7 @@ class LoginEmailGovernanceTest extends TestCase
         $this->assertDatabaseMissing('sessions', ['id' => 'identity-session-test']);
         $this->assertFalse(Password::broker()->tokenExists($user, $reset));
         $this->assertSame($postulante->id_post, $user->postulante->id_post);
-        $this->assertDatabaseHas('bitacora_sistema', ['accion' => 'editar', 'entidad' => 'users', 'entidad_id' => (string) $user->id]);
+        $this->assertDatabaseHas('bitacora_sistema', ['accion' => 'cambiar_correo_acceso', 'entidad' => 'users', 'entidad_id' => (string) $user->id]);
         $this->post('/logout');
         $this->post('/login', ['email' => $oldEmail, 'password' => 'password'])->assertSessionHasErrors('email');
         $this->post('/login', ['email' => 'nuevo.acceso@example.com', 'password' => 'password'])->assertRedirect();

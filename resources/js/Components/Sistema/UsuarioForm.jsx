@@ -26,8 +26,6 @@ export default function UsuarioForm({
         name: usuario?.name || '',
         email: usuario?.email || '',
         role: usuario?.roles?.[0]?.name || '',
-        password: '',
-        password_confirmation: '',
     });
 
     const persist = () => {
@@ -53,7 +51,7 @@ export default function UsuarioForm({
         const originalRole = usuario?.roles?.[0]?.name || '';
         const sensitiveUpdate =
             usuario &&
-            (data.role !== originalRole || Boolean(data.password) || data.email !== usuario.email);
+            (data.role !== originalRole || data.email !== usuario.email);
 
         if (sensitiveUpdate) {
             setConfirmOpen(true);
@@ -66,6 +64,8 @@ export default function UsuarioForm({
     return (
         <>
             <form onSubmit={submit} className="space-y-6">
+                <InputError message={errors.ultimo_sa || errors.activacion} />
+                <p className="text-sm text-slate-500">La contraseña la establece el titular mediante un enlace seguro. TI no define ni conoce contraseñas iniciales.</p>
                 <div className="grid gap-5 sm:grid-cols-2">
                     <div>
                         <Label htmlFor="name">Nombre completo *</Label>
@@ -124,50 +124,6 @@ export default function UsuarioForm({
                         <InputError className="mt-1.5" message={errors.role} />
                     </div>
 
-                    <div>
-                        <Label htmlFor="password">
-                            {usuario ? 'Nueva contraseña' : 'Contraseña *'}
-                        </Label>
-                        <Input {...validationProps('password', { minLength: 8, maxLength: 72, required: !usuario })}
-                            id="password"
-                            type="password"
-                            className={fieldClass}
-                            value={data.password}
-                            onChange={(event) =>
-                                setData('password', event.target.value)
-                            }
-                            autoComplete="new-password"
-                        />
-                        {usuario && (
-                            <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
-                                Déjela vacía para conservar la contraseña actual.
-                            </p>
-                        )}
-                        <InputError
-                            className="mt-1.5"
-                            message={errors.password}
-                        />
-                    </div>
-
-                    <div>
-                        <Label htmlFor="password_confirmation">
-                            Confirmar contraseña{usuario ? '' : ' *'}
-                        </Label>
-                        <Input {...validationProps('password_confirmation', { required: Boolean(data.password) })}
-                            id="password_confirmation"
-                            type="password"
-                            className={fieldClass}
-                            value={data.password_confirmation}
-                            onChange={(event) =>
-                                setData(
-                                    'password_confirmation',
-                                    event.target.value,
-                                )
-                            }
-                            autoComplete="new-password"
-                        />
-                        <InputError className="mt-1" message={errors.password_confirmation} />
-                    </div>
                 </div>
 
                 <div className="flex flex-col-reverse gap-2 border-t border-slate-200 pt-5 dark:border-slate-800 sm:flex-row sm:justify-end">
@@ -195,7 +151,7 @@ export default function UsuarioForm({
                 open={confirmOpen}
                 onOpenChange={setConfirmOpen}
                 title="Confirmar actualización sensible"
-                message="Se modificará el rol, la contraseña o el correo de acceso de esta cuenta."
+                message="Se modificará el rol o el correo de acceso de esta cuenta."
                 confirmLabel="Confirmar cambios"
                 processing={processing}
                 supportingText="Verifique que el perfil asignado corresponde a las responsabilidades del usuario."

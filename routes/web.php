@@ -37,7 +37,6 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
@@ -384,6 +383,12 @@ Route::middleware('auth')->group(function () {
                 Route::put('/usuarios/{usuario}', [UsuarioController::class, 'update'])
                     ->middleware('permission:usuarios.editar')
                     ->name('admin.sistema.usuarios.update');
+                Route::post('/usuarios/{usuario}/bloquear', [UsuarioController::class, 'bloquear'])
+                    ->name('admin.sistema.usuarios.bloquear');
+                Route::post('/usuarios/{usuario}/desbloquear', [UsuarioController::class, 'desbloquear'])
+                    ->name('admin.sistema.usuarios.desbloquear');
+                Route::post('/usuarios/{usuario}/reenviar-activacion', [UsuarioController::class, 'reenviarActivacion'])
+                    ->middleware('throttle:6,1')->name('admin.sistema.usuarios.reenviar-activacion');
 
                 Route::get('/roles-permisos', [RolPermisoController::class, 'index'])
                     ->middleware('permission:roles-permisos.ver')
@@ -429,7 +434,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';

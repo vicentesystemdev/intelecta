@@ -17,7 +17,7 @@ class VincularUsuarioPostulanteAction
 
     public function execute(int $userId, int $postulanteId, User $actor, string $motivo): Postulante
     {
-        if (! $actor->hasRole('Super Administrador')) {
+        if (! $actor->canChangeLoginEmail()) {
             throw new AuthorizationException('Solo TI puede confirmar un vínculo de identidad.');
         }
         $motivo = trim($motivo);

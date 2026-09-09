@@ -28,7 +28,7 @@ class VincularPostulante extends Command
             }
         }
         $actor = User::find((int) $this->option('actor'));
-        if (! $actor?->hasRole('Super Administrador')) {
+        if (! $actor?->canChangeLoginEmail()) {
             $this->error('El actor debe ser un Super Administrador existente.');
 
             return self::FAILURE;

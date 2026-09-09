@@ -10,7 +10,7 @@ class StoreUsuarioRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('usuarios.crear') ?? false;
+        return $this->user()?->canChangeLoginEmail() ?? false;
     }
 
     /**
@@ -21,8 +21,10 @@ class StoreUsuarioRequest extends NormalizedFormRequest
         return [
             'name' => ['required', ...InputRules::person(255)],
             'email' => ['required', ...InputRules::email(254), 'unique:users,email'],
-            'password' => ['required', ...InputRules::password()],
-            'password_confirmation' => ['nullable', 'required_with:password', 'string'],
+            'password' => ['prohibited'],
+            'password_confirmation' => ['prohibited'],
+            'estado_cuenta' => ['prohibited'],
+            'email_verified_at' => ['prohibited'],
             'role' => [
                 'required',
                 'string',
