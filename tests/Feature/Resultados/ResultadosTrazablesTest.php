@@ -42,10 +42,11 @@ class ResultadosTrazablesTest extends TestCase
         $this->postulante = Postulante::create([
             'nombres_post' => 'María Elena',
             'apellidos_post' => 'Quispe Choque',
-            'email_post' => $this->student->email,
+            'email_post' => 'contacto.evaluaciones@example.com',
             'gestion_post' => 2026,
             'estado_post' => 'activo',
         ]);
+        $this->postulante->user()->associate($this->student)->save();
 
         $materia = Materia::create([
             'codigo_mat' => 'MAT',
@@ -175,6 +176,35 @@ class ResultadosTrazablesTest extends TestCase
             ->assertSessionHasErrors('respuestas');
 
         $this->assertSame('en_progreso', $evaluacion->refresh()->estado_eval_apl);
+    }
+
+    public function test_student_cannot_read_or_submit_another_students_evaluation(): void
+    {
+        $otherUser = User::factory()->create()->assignRole('Estudiante');
+        $otherPostulante = Postulante::factory()->withUser($otherUser)->create(['email_post' => $this->student->email]);
+        $evaluation = $this->createOpenEvaluation();
+        $evaluation->update(['id_post' => $otherPostulante->id_post]);
+
+        $this->actingAs($this->student)->get(route('estudiante.evaluaciones', ['evaluacion' => $evaluation->id_eval_apl]))
+            ->assertOk()->assertInertia(fn (Assert $page) => $page->where('evaluacionActiva', null)->has('historial', 0));
+        $this->postJson(route('estudiante.evaluaciones.enviar', $evaluation), [
+            'id_post' => $otherPostulante->id_post,
+            'respuestas' => [['id_preg' => $this->pregunta->id_preg, 'id_alt' => $this->correcta->id_alt]],
+        ])->assertNotFound();
+        $this->assertSame('en_progreso', $evaluation->fresh()->estado_eval_apl);
+        $this->assertDatabaseCount('respuestas_evaluacion', 0);
+        $evaluation->update(['estado_eval_apl' => 'finalizada', 'fecha_fin_eval_apl' => now()]);
+        $this->get(route('estudiante.evaluaciones', ['resultado' => $evaluation->id_eval_apl]))
+            ->assertOk()->assertInertia(fn (Assert $page) => $page->where('resultado', null)->has('historial', 0));
+    }
+
+    public function test_start_ignores_a_forged_postulante_id(): void
+    {
+        $other = Postulante::factory()->create(['email_post' => $this->student->email]);
+        $this->actingAs($this->student)->postJson(route('estudiante.evaluaciones.iniciar', $this->plantilla), ['id_post' => $other->id_post])
+            ->assertRedirect();
+        $this->assertDatabaseHas('evaluaciones_aplicadas', ['id_post' => $this->postulante->id_post]);
+        $this->assertDatabaseMissing('evaluaciones_aplicadas', ['id_post' => $other->id_post]);
     }
 
     private function createOpenEvaluation(): EvaluacionAplicada

@@ -8,7 +8,7 @@ class IniciarEvaluacionAplicadaRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->hasAnyRole(['Estudiante', 'Postulante']) ?? false;
+        return $this->user()?->hasRole('Estudiante') ?? false;
     }
 
     public function rules(): array

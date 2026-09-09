@@ -21,11 +21,10 @@ class DashboardController extends Controller
     public function __invoke(
         CoberturaCurricularService $cobertura,
         AcademicoService $academico,
-    ): Response|RedirectResponse
-    {
+    ): Response|RedirectResponse {
         $user = request()->user();
 
-        if ($user->hasAnyRole(['Estudiante', 'Postulante'])) {
+        if ($user->hasRole('Estudiante')) {
             return to_route('estudiante.evaluaciones');
         }
 

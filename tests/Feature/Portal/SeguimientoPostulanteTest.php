@@ -36,10 +36,11 @@ class SeguimientoPostulanteTest extends TestCase
         $this->postulante = Postulante::create([
             'nombres_post' => 'Valeria Nina',
             'apellidos_post' => 'Choque',
-            'email_post' => $this->student->email,
+            'email_post' => 'contacto.academico@example.com',
             'gestion_post' => 2026,
             'estado_post' => 'activo',
         ]);
+        $this->postulante->user()->associate($this->student)->save();
     }
 
     public function test_super_administrator_can_access_roles_and_permissions(): void
@@ -75,7 +76,7 @@ class SeguimientoPostulanteTest extends TestCase
                 ->component('Estudiante/MiFicha')
                 ->where('postulanteVinculado', true)
                 ->where('postulante.id_post', $this->postulante->id_post)
-                ->where('postulante.email_post', $this->student->email));
+                ->where('postulante.email_post', 'contacto.academico@example.com'));
     }
 
     public function test_student_can_access_privacy_aware_ranking(): void

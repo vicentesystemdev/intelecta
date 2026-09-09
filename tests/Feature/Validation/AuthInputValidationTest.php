@@ -38,10 +38,10 @@ class AuthInputValidationTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    public function test_profile_normalization_unique_ignore_and_password_shapes(): void
+    public function test_profile_normalization_and_password_shapes(): void
     {
         $user = User::factory()->create(['email' => 'test@example.com']);
-        $this->actingAs($user)->patchJson('/profile', ['name' => '  José   Álvarez ', 'email' => ' TEST@EXAMPLE.COM '])->assertRedirect();
+        $this->actingAs($user)->patchJson('/profile', ['name' => '  José   Álvarez '])->assertRedirect();
         $this->assertSame('José Álvarez', $user->fresh()->name);
         $this->patchJson('/profile', ['name' => 'Vicente123', 'email' => 'test@example.com'])->assertUnprocessable()->assertJsonValidationErrors('name');
         $this->putJson('/password', ['current_password' => ['bad'], 'password' => ['bad'], 'password_confirmation' => ['bad']])->assertUnprocessable()->assertJsonValidationErrors(['current_password', 'password', 'password_confirmation']);

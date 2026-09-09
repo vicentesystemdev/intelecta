@@ -4,7 +4,7 @@ import InputError from '@/Components/InputError';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { Save, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
@@ -19,6 +19,8 @@ export default function UsuarioForm({
     submitLabel,
     onCancel,
 }) {
+    const { permisos } = usePage().props;
+    const canChangeLoginEmail = !usuario || permisos?.cambiarCorreoAcceso === true;
     const [confirmOpen, setConfirmOpen] = useState(false);
     const { data, setData, post, put, processing, errors } = useForm({
         name: usuario?.name || '',
@@ -51,7 +53,7 @@ export default function UsuarioForm({
         const originalRole = usuario?.roles?.[0]?.name || '';
         const sensitiveUpdate =
             usuario &&
-            (data.role !== originalRole || Boolean(data.password));
+            (data.role !== originalRole || Boolean(data.password) || data.email !== usuario.email);
 
         if (sensitiveUpdate) {
             setConfirmOpen(true);
@@ -80,17 +82,23 @@ export default function UsuarioForm({
                     </div>
 
                     <div>
-                        <Label htmlFor="email">Correo electrónico *</Label>
+                        <Label htmlFor="email">Correo de acceso *</Label>
                         <Input {...validationProps('email')}
                             id="email"
                             type="email"
                             className={fieldClass}
                             value={data.email}
+                            readOnly={!canChangeLoginEmail}
                             onChange={(event) =>
                                 setData('email', event.target.value)
                             }
                         />
                         <InputError className="mt-1.5" message={errors.email} />
+                        {usuario && (
+                            <p className="mt-1.5 text-xs text-slate-500">
+                                Solo TI puede cambiar este correo. El cambio invalida su verificación y los enlaces de recuperación anteriores.
+                            </p>
+                        )}
                     </div>
 
                     <div className="sm:col-span-2">
@@ -187,7 +195,7 @@ export default function UsuarioForm({
                 open={confirmOpen}
                 onOpenChange={setConfirmOpen}
                 title="Confirmar actualización sensible"
-                message="Se modificará el rol institucional o la contraseña de esta cuenta."
+                message="Se modificará el rol, la contraseña o el correo de acceso de esta cuenta."
                 confirmLabel="Confirmar cambios"
                 processing={processing}
                 supportingText="Verifique que el perfil asignado corresponde a las responsabilidades del usuario."

@@ -198,8 +198,8 @@ export default function Evaluaciones({
                             Cuenta pendiente de vinculación académica
                         </p>
                         <p className="mt-1 text-sm text-text-muted">
-                            No se encontró un postulante con el correo de esta
-                            cuenta. Administración debe verificar la vinculación
+                            Esta cuenta todavía no tiene un expediente académico
+                            vinculado. Administración debe verificar la identidad
                             antes de iniciar una evaluación.
                         </p>
                     </div>

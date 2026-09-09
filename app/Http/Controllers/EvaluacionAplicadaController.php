@@ -25,12 +25,8 @@ class EvaluacionAplicadaController extends Controller
     public function index(
         Request $request,
         EvaluacionAplicadaRepository $repository,
-    ): Response|RedirectResponse {
-        if ($request->user()->hasAnyRole(['Super Administrador', 'Administrador', 'Docente'])) {
-            return to_route('dashboard');
-        }
-
-        $postulante = $this->postulante($request);
+    ): Response {
+        $postulante = $request->user()->postulante;
         $habilitacion = $this->habilitacion($postulante);
         $schemaReady = Schema::hasTable('evaluaciones_aplicadas')
             && Schema::hasTable('respuestas_evaluacion');
@@ -86,7 +82,7 @@ class EvaluacionAplicadaController extends Controller
         BitacoraService $bitacora,
     ): RedirectResponse {
         $this->ensureResultsSchema();
-        $postulante = $this->requirePostulante($request);
+        $postulante = $request->user()->postulante;
         $this->ensureEnabled($postulante);
         $evaluacion = $action->execute(
             postulante: $postulante,
@@ -120,9 +116,9 @@ class EvaluacionAplicadaController extends Controller
         BitacoraService $bitacora,
     ): RedirectResponse {
         $this->ensureResultsSchema();
-        $postulante = $this->requirePostulante($request);
+        $postulante = $request->user()->postulante;
         $this->ensureEnabled($postulante);
-        $evaluacion = EvaluacionAplicada::findOrFail($evaluacion);
+        $evaluacion = $postulante->evaluacionesAplicadas()->findOrFail($evaluacion);
         $evaluacion = $action->execute(
             $evaluacion,
             $postulante,
@@ -147,20 +143,6 @@ class EvaluacionAplicadaController extends Controller
         return to_route('estudiante.evaluaciones', [
             'resultado' => $evaluacion->id_eval_apl,
         ])->with('success', 'La evaluación fue finalizada y calificada correctamente.');
-    }
-
-    private function postulante(Request $request): ?Postulante
-    {
-        return Postulante::query()
-            ->where('email_post', $request->user()->email)
-            ->first();
-    }
-
-    private function requirePostulante(Request $request): Postulante
-    {
-        return $this->postulante($request) ?? throw ValidationException::withMessages([
-            'postulante' => 'No existe un postulante vinculado al correo de la cuenta autenticada.',
-        ]);
     }
 
     private function habilitacion(?Postulante $postulante): ?HabilitacionAcademica

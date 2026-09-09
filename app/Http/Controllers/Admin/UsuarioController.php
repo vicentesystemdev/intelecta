@@ -11,6 +11,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -63,6 +65,7 @@ class UsuarioController extends Controller
                 'crear' => $request->user()->can('usuarios.crear'),
                 'editar' => $request->user()->can('usuarios.editar'),
                 'asignarSuperAdministrador' => $request->user()->hasRole('Super Administrador'),
+                'cambiarCorreoAcceso' => $request->user()->canChangeLoginEmail(),
             ],
             'usuarioActualId' => $request->user()->getKey(),
         ]);
@@ -118,11 +121,33 @@ class UsuarioController extends Controller
             'roles' => $usuario->getRoleNames()->values()->all(),
         ];
 
-        DB::transaction(function () use ($usuario, $data): void {
+        DB::transaction(function () use ($request, $usuario, $data): void {
+            $usuario = User::query()->lockForUpdate()->findOrFail($usuario->id);
+            $emailChanged = $usuario->email !== $data['email'];
+            if ($emailChanged && ! $request->user()->canChangeLoginEmail()) {
+                throw ValidationException::withMessages([
+                    'email' => 'Solo un Super Administrador (TI) puede cambiar el correo de acceso.',
+                ]);
+            }
+
             $attributes = [
                 'name' => $data['name'],
-                'email' => $data['email'],
             ];
+
+            if ($emailChanged) {
+                Password::broker()->deleteToken($usuario);
+                $usuario->forceFill([
+                    'email' => $data['email'],
+                    'email_verified_at' => null,
+                    'remember_token' => Str::random(60),
+                ]);
+                Password::broker()->deleteToken($usuario);
+                if (config('session.driver') === 'database') {
+                    DB::connection(config('session.connection'))
+                        ->table(config('session.table', 'sessions'))
+                        ->where('user_id', $usuario->id)->delete();
+                }
+            }
 
             if (! empty($data['password'])) {
                 $attributes['password'] = Hash::make($data['password']);

@@ -11,6 +11,8 @@ class PostulantesSeeder extends Seeder
 {
     public function run(): void
     {
+        // Standalone academic fixtures intentionally have no digital account.
+        // Never infer user_id from contact data or overwrite an existing explicit link.
         $colegios = Colegio::pluck('id_col', 'nombre_col');
         $carreras = Carrera::query()
             ->with('universidad:id_uni,sigla_uni')

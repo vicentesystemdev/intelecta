@@ -38,14 +38,15 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call(RolesAndUsersSeeder::class);
+        $accounts = app(RolesAndUsersSeeder::class);
+        $accounts->run();
 
         [$universidades, $carreras, $colegios] = $this->seedInstitutionalCatalogs();
         [$materias, $preguntas] = $this->seedCurriculum();
         $plantillas = $this->seedTemplates($preguntas);
         [$programas, $grupos] = $this->seedProgramsAndGroups();
         $tutores = $this->seedTutorsAndAssignments($programas, $grupos);
-        $postulantes = $this->seedApplicants($carreras, $colegios);
+        $postulantes = $this->seedApplicants($carreras, $colegios, $accounts->studentUsers);
         $inscripciones = $this->seedEnrollments($postulantes, $grupos);
         $this->seedAdministrativeStatus($inscripciones);
         $this->seedAttendance($inscripciones, $tutores);
@@ -515,7 +516,7 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
         return $tutors;
     }
 
-    private function seedApplicants(Collection $careers, Collection $schools): Collection
+    private function seedApplicants(Collection $careers, Collection $schools, array $studentUsers): Collection
     {
         $givenNames = [
             'Valeria', 'Diego', 'Mariana', 'Alejandro', 'Camila', 'Santiago',
@@ -559,6 +560,11 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
                         : 'Preparación preuniversitaria en ciencias exactas.',
                 ],
             );
+            // Only NEW demo fixtures: never turn a seeder rerun into a legacy backfill.
+            if ($postulante->wasRecentlyCreated && isset($studentUsers[$index])) {
+                $postulante->user()->associate($studentUsers[$index]);
+                $postulante->save();
+            }
             $postulantes->push($postulante);
         }
 

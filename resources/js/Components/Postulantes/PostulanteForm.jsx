@@ -160,7 +160,7 @@ export default function PostulanteForm({
                         <InputError id="fecha_nacimiento_error" className="mt-1.5" message={errors.fecha_nacimiento_post} />
                     </div>
                     <div>
-                        <Label htmlFor="email_post">Correo electrónico</Label>
+                        <Label htmlFor="email_post">Correo de contacto académico</Label>
                         <Input {...validationProps('email_post')}
                             id="email_post"
                             type="email"

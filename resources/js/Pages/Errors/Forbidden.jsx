@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, ShieldAlert } from 'lucide-react';
 
-export default function Forbidden() {
+export default function Forbidden({ message }) {
     const { auth } = usePage().props;
     const canViewDashboard =
         auth?.roles?.includes('Super Administrador') ||
@@ -22,9 +22,7 @@ export default function Forbidden() {
                         Módulo no autorizado
                     </h1>
                     <p className="mt-3 text-sm leading-6 text-text-muted">
-                        No cuentas con permisos para acceder a este módulo. Consulta
-                        con la administración del sistema si necesitas ampliar tu
-                        acceso institucional.
+                        {message || 'No cuentas con permisos para acceder a este módulo. Consulta con la administración del sistema si necesitas ampliar tu acceso institucional.'}
                     </p>
                     <Link
                         href={canViewDashboard ? route('dashboard') : '/'}

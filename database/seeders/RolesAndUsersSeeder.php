@@ -17,8 +17,12 @@ class RolesAndUsersSeeder extends Seeder
 
     public const TEACHER_EMAIL = 'rodrigo.salazar@avalancha.edu.bo';
 
+    /** Objects keyed by the explicit applicant fixture index, never resolved from contact email. */
+    public array $studentUsers = [];
+
     public function run(): void
     {
+        $this->studentUsers = [];
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $permissions = [
@@ -161,17 +165,23 @@ class RolesAndUsersSeeder extends Seeder
             ['Carla Mendoza Rojas', 'carla.mendoza@avalancha.edu.bo', $docente],
             ['Luis Fernando Arce Huanca', 'luis.arce@avalancha.edu.bo', $docente],
             ['Patricia Vargas Choque', 'patricia.vargas@avalancha.edu.bo', $docente],
-            ['Valeria Nina Choque', self::STUDENT_EMAIL, $estudiante],
-            ['Diego Mamani Flores', 'diego.mamani@postulante.avalancha.edu.bo', $estudiante],
-            ['Mariana Quispe Rojas', 'mariana.quispe@postulante.avalancha.edu.bo', $estudiante],
         ] as [$name, $email, $role]) {
             $this->createUserWithRole($name, $email, $role);
+        }
+
+        // These keys explicitly identify applicant fixtures 0, 1 and 2 in the main seeder.
+        foreach ([
+            0 => ['Valeria Nina Choque', self::STUDENT_EMAIL],
+            1 => ['Diego Mamani Flores', 'diego.mamani@postulante.avalancha.edu.bo'],
+            2 => ['Mariana Quispe Rojas', 'mariana.quispe@postulante.avalancha.edu.bo'],
+        ] as $fixtureIndex => [$name, $email]) {
+            $this->studentUsers[$fixtureIndex] = $this->createUserWithRole($name, $email, $estudiante);
         }
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
-    private function createUserWithRole(string $name, string $email, Role $role): void
+    private function createUserWithRole(string $name, string $email, Role $role): User
     {
         $user = User::updateOrCreate(
             ['email' => $email],
@@ -183,5 +193,7 @@ class RolesAndUsersSeeder extends Seeder
         );
 
         $user->syncRoles([$role]);
+
+        return $user;
     }
 }

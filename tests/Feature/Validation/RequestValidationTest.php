@@ -64,6 +64,11 @@ class RequestValidationTest extends TestCase
                 {
                     return true;
                 }
+
+                public function hasRole($role): bool
+                {
+                    return true;
+                }
             });
             $request->validateResolved();
 

@@ -20,7 +20,7 @@ class EnsureAdministrativeAccess
             );
         }
 
-        if ($user->hasAnyRole(['Estudiante', 'Postulante'])) {
+        if ($user->hasRole('Estudiante')) {
             if ($request->routeIs('dashboard')) {
                 return to_route('estudiante.evaluaciones');
             }

@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
 use App\Support\Validation\InputRules;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends NormalizedFormRequest
 {
@@ -18,11 +16,12 @@ class ProfileUpdateRequest extends NormalizedFormRequest
     {
         return [
             'name' => ['required', ...InputRules::person(255)],
-            'email' => [
-                'required',
-                ...InputRules::email(),
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
+            'email' => ['prohibited'],
         ];
+    }
+
+    public function messages(): array
+    {
+        return ['email.prohibited' => 'El correo de acceso solo puede ser modificado por TI desde la administración de usuarios.'];
     }
 }

@@ -199,6 +199,20 @@ class PostulanteModuleTest extends TestCase
     /**
      * @return array<string, mixed>
      */
+    public function test_ordinary_academic_crud_cannot_assign_or_replace_user_id(): void
+    {
+        $user = User::role('Estudiante')->firstOrFail();
+        $this->actingAs($this->administrator)->postJson(route('postulantes.store'), [...$this->validData(), 'user_id' => $user->id])
+            ->assertRedirect();
+        $postulante = Postulante::where('ci_post', '8765432')->firstOrFail();
+        $this->assertNull($postulante->user_id);
+        $postulante->user()->associate($user)->save();
+        $this->putJson(route('postulantes.update', $postulante), [...$this->validData(), 'user_id' => null, 'email_post' => 'contacto.modificado@example.com'])
+            ->assertRedirect();
+        $this->assertSame($user->id, $postulante->fresh()->user_id);
+        $this->assertSame('contacto.modificado@example.com', $postulante->fresh()->email_post);
+    }
+
     private function validData(): array
     {
         return [
