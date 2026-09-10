@@ -27,7 +27,6 @@ use App\Domains\Resultados\Actions\IniciarEvaluacionAplicadaAction;
 use App\Domains\Resultados\DTOs\EnviarEvaluacionData;
 use App\Domains\Resultados\DTOs\RespuestaEvaluacionData;
 use App\Domains\Resultados\Models\EvaluacionAplicada;
-use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\Support\AvalanchaAcademicCatalog;
 use Illuminate\Database\Seeder;
@@ -41,11 +40,15 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
         $accounts = app(RolesAndUsersSeeder::class);
         $accounts->run();
 
+        $positions = app(CargosSeeder::class);
+        $positions->run();
+        app(PersonalInstitucionalSeeder::class)->run($accounts->staffUsers, $positions->cargos);
+
         [$universidades, $carreras, $colegios] = $this->seedInstitutionalCatalogs();
         [$materias, $preguntas] = $this->seedCurriculum();
         $plantillas = $this->seedTemplates($preguntas);
         [$programas, $grupos] = $this->seedProgramsAndGroups();
-        $tutores = $this->seedTutorsAndAssignments($programas, $grupos);
+        $tutores = $this->seedTutorsAndAssignments($programas, $grupos, $accounts->staffUsers);
         $postulantes = $this->seedApplicants($carreras, $colegios, $accounts->studentUsers);
         $inscripciones = $this->seedEnrollments($postulantes, $grupos);
         $this->seedAdministrativeStatus($inscripciones);
@@ -405,7 +408,7 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
         return [$programs, $groups];
     }
 
-    private function seedTutorsAndAssignments(Collection $programs, Collection $groups): Collection
+    private function seedTutorsAndAssignments(Collection $programs, Collection $groups, array $staffUsers): Collection
     {
         $rows = [
             [
@@ -444,7 +447,7 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
         $tutors = collect();
 
         foreach ($rows as $index => $row) {
-            $user = User::where('email', $row[0])->firstOrFail();
+            $user = $staffUsers['docente_'.($index + 1)];
             $tutor = TutorAcademico::updateOrCreate(
                 ['user_id' => $user->id],
                 [

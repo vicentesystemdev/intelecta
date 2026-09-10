@@ -4,6 +4,12 @@ export { options as inputOptions };
 
 // UX hints only. Laravel Form Requests remain authoritative.
 export const inputConstraints = {
+    "nombre_cargo": {"required":true,"minLength":2,"maxLength":160,"format":"denomination"},
+    "nombres": {"required":true,"minLength":2,"maxLength":120,"format":"person"},
+    "apellidos": {"required":true,"minLength":2,"maxLength":120,"format":"person"},
+    "ci": {"minLength":4,"maxLength":30,"format":"document"},
+    "celular": {"maxLength":32,"format":"phone","type":"tel","inputMode":"tel"},
+    "correo_contacto": {"maxLength":254,"format":"email","type":"email"},
     "id_sim": {"inputMode":"numeric","step":1},
     "tipo_eval_apl": {"maxLength":120},
     "id_preg": {"inputMode":"numeric","step":1},
@@ -146,6 +152,7 @@ export const inputConstraints = {
 };
 
 const patterns = {
+    denomination: String.raw`[\s\S]*\p{L}[\s\S]*`,
     person: String.raw`\s*[\p{L}\p{M}]+(?:[ '\u2019\-]+[\p{L}\p{M}]+)*\s*`,
     document: String.raw`\s*(?=.*[0-9])[A-Za-z0-9]+(?:[ .\/\-][A-Za-z0-9]+)*\s*`,
     phone: String.raw`\+?[0-9\s\(\)\-]+`,

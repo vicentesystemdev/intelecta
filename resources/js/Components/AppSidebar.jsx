@@ -39,6 +39,8 @@ const navigationGroups = [
     {
         label: 'GESTIÓN INSTITUCIONAL',
         items: [
+            { label: 'Personal Institucional', icon: Users, href: '/admin/institucional/personal', routeName: 'admin.institucional.personal.*', organization: 'personal' },
+            { label: 'Cargos', icon: BriefcaseBusiness, href: '/admin/institucional/cargos', routeName: 'admin.institucional.cargos.*', organization: 'cargos' },
             { label: 'Programas Académicos', icon: BookOpenCheck, href: '/admin/institucional/programas', routeName: 'admin.institucional.programas.*', permission: 'programas.ver' },
             { label: 'Grupos y Paralelos', icon: Layers3, href: '/admin/institucional/grupos', routeName: 'admin.institucional.grupos.*', permission: 'grupos.ver' },
             { label: 'Tutores Académicos', icon: UserRoundCheck, href: '/admin/institucional/tutores', routeName: 'admin.institucional.tutores.*', permission: 'tutores.ver' },
@@ -101,8 +103,9 @@ export default function AppSidebar({ open = false, onClose = () => {} }) {
         .map((group) => ({
             ...group,
             items: group.items.filter(
-                ({ permission }) =>
-                    isSuperAdministrator ||
+                ({ permission, organization }) => organization
+                    ? Boolean(auth.organization?.[organization])
+                    : isSuperAdministrator ||
                     !permission ||
                     permissions.includes(permission),
             ),

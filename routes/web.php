@@ -13,11 +13,13 @@ use App\Http\Controllers\Estudiante\SeguimientoAcademicoController;
 use App\Http\Controllers\EvaluacionAplicadaController;
 use App\Http\Controllers\Institucional\AsignacionTutorController;
 use App\Http\Controllers\Institucional\AsistenciaAcademicaController;
+use App\Http\Controllers\Institucional\CargoController;
 use App\Http\Controllers\Institucional\FichaAcademicaController;
 use App\Http\Controllers\Institucional\GrupoAcademicoController;
 use App\Http\Controllers\Institucional\HabilitacionAcademicaController;
 use App\Http\Controllers\Institucional\InscripcionAcademicaController;
 use App\Http\Controllers\Institucional\MatriculaCuotaController;
+use App\Http\Controllers\Institucional\PersonalInstitucionalController;
 use App\Http\Controllers\Institucional\ProgramaAcademicoController;
 use App\Http\Controllers\Institucional\RankingAcademicoController;
 use App\Http\Controllers\Institucional\SimulacroProgramadoController;
@@ -143,6 +145,17 @@ Route::middleware('auth')->group(function () {
             Route::prefix('institucional')
                 ->name('admin.institucional.')
                 ->group(function () {
+                    Route::get('/cargos', [CargoController::class, 'index'])->middleware('organization:cargos.ver')->name('cargos.index');
+                    Route::post('/cargos', [CargoController::class, 'store'])->middleware('organization:cargos.crear')->name('cargos.store');
+                    Route::put('/cargos/{cargo}', [CargoController::class, 'update'])->middleware('organization:cargos.editar')->name('cargos.update');
+                    Route::patch('/cargos/{cargo}/estado', [CargoController::class, 'cambiarEstado'])->middleware('organization:cargos.cambiar_estado')->name('cargos.estado');
+                    Route::get('/personal', [PersonalInstitucionalController::class, 'index'])->middleware('organization:personal.ver')->name('personal.index');
+                    Route::get('/personal/usuarios-elegibles', [PersonalInstitucionalController::class, 'usuariosElegibles'])->middleware('organization:personal.ver')->name('personal.usuarios-elegibles');
+                    Route::post('/personal', [PersonalInstitucionalController::class, 'store'])->middleware('organization:personal.crear')->name('personal.store');
+                    Route::put('/personal/{personal}', [PersonalInstitucionalController::class, 'update'])->middleware('organization:personal.editar')->name('personal.update');
+                    Route::patch('/personal/{personal}/estado', [PersonalInstitucionalController::class, 'cambiarEstado'])->middleware('organization:personal.cambiar_estado')->name('personal.estado');
+                    Route::post('/personal/{personal}/vincular', [PersonalInstitucionalController::class, 'vincular'])->middleware('organization:personal.ver')->name('personal.vincular');
+
                     Route::get('/programas', [ProgramaAcademicoController::class, 'index'])
                         ->middleware('permission:programas.ver')
                         ->name('programas.index');

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domains\Institucional\Models\PersonalInstitucional;
 use App\Domains\Postulantes\Models\Postulante;
 use App\Domains\Seguridad\Enums\EstadoCuenta;
 use App\Domains\Seguridad\Services\CuentaService;
@@ -25,6 +26,19 @@ class User extends Authenticatable implements MustVerifyEmail
     public function postulante(): HasOne
     {
         return $this->hasOne(Postulante::class, 'user_id');
+    }
+
+    public function personalInstitucional(): HasOne
+    {
+        return $this->hasOne(PersonalInstitucional::class, 'user_id');
+    }
+
+    public function canManageOrganization(string $permission): bool
+    {
+        return $this->cuentaActiva()
+            && ! $this->hasRole('Estudiante')
+            && $this->hasAnyRole(['Administrador', 'Super Administrador'])
+            && $this->can($permission);
     }
 
     // Transitional TI authorization, independent of the shared CRUD permissions.

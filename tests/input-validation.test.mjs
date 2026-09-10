@@ -7,6 +7,16 @@ const source = fs.readFileSync(new URL('../resources/js/lib/inputValidation.js',
     .replace(/^import options.*$/m, 'const options = {};');
 const { validationProps, inputConstraints } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 
+test('organization fields reuse shared constraints and cargo names require letters', () => {
+    const re = new RegExp('^(?:' + validationProps('nombre_cargo').pattern + ')$', 'v');
+    for (const name of ['Secretaría', 'Director de Carrera', 'Coordinador Académico', 'Docente 2']) assert.ok(re.test(name));
+    for (const name of ['123456', '@@', '']) assert.equal(re.test(name), false);
+    assert.equal(validationProps('nombres').pattern, validationProps('nombres_post').pattern);
+    assert.equal(validationProps('ci').pattern, validationProps('ci_post').pattern);
+    assert.equal(validationProps('celular').pattern, validationProps('celular_post').pattern);
+    assert.equal(validationProps('correo_contacto').type, 'email');
+});
+
 test('HTML v-mode patterns accept Unicode names and reject digits/symbols', () => {
     const re = new RegExp('^(?:' + validationProps('nombres_post').pattern + ')$', 'v');
     for (const name of ['Vicente', 'José Luis', 'María José', 'Ana-María', "O'Connor", 'Muñoz', 'Álvarez', 'Peña', 'D’Angelo', ' José   Ángel ']) assert.ok(re.test(name), name);

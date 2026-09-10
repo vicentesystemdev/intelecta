@@ -29,6 +29,11 @@ final class InputRules
         return ['string', 'min:2', 'max:'.$max, new InputFormat('person')];
     }
 
+    public static function denomination(int $max = 160): array
+    {
+        return ['string', 'min:2', 'max:'.$max, new InputFormat('denomination')];
+    }
+
     public static function dateOrder(string $rule, mixed $reference, string $format = 'Y-m-d'): array
     {
         // A malformed companion field is reported by its own rule, never passed to DateTime.

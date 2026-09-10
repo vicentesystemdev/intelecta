@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Domains\Institucional\Support\PermisosOrganizacion;
 use App\Domains\Seguridad\Enums\EstadoCuenta;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -21,12 +22,17 @@ class RolesAndUsersSeeder extends Seeder
     /** Objects keyed by the explicit applicant fixture index, never resolved from contact email. */
     public array $studentUsers = [];
 
+    /** Explicit scenario keys, passed as objects to Personal fixtures (not resolved by contact). */
+    public array $staffUsers = [];
+
     public function run(): void
     {
         $this->studentUsers = [];
+        $this->staffUsers = [];
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $permissions = [
+            ...PermisosOrganizacion::ALL,
             'dashboard.ver',
 
             'programas.ver',
@@ -160,14 +166,14 @@ class RolesAndUsersSeeder extends Seeder
         $estudiante->syncPermissions([]);
 
         foreach ([
-            ['Adriana Choque Mamani', 'adriana.choque@avalancha.edu.bo', $superAdmin],
-            ['Marco Antonio Torrez Quispe', self::ADMIN_EMAIL, $administrador],
-            ['Rodrigo Salazar Condori', self::TEACHER_EMAIL, $docente],
-            ['Carla Mendoza Rojas', 'carla.mendoza@avalancha.edu.bo', $docente],
-            ['Luis Fernando Arce Huanca', 'luis.arce@avalancha.edu.bo', $docente],
-            ['Patricia Vargas Choque', 'patricia.vargas@avalancha.edu.bo', $docente],
-        ] as [$name, $email, $role]) {
-            $this->createUserWithRole($name, $email, $role);
+            'ti' => ['Adriana Choque Mamani', 'adriana.choque@avalancha.edu.bo', $superAdmin],
+            'coordinacion' => ['Marco Antonio Torrez Quispe', self::ADMIN_EMAIL, $administrador],
+            'docente_1' => ['Rodrigo Salazar Condori', self::TEACHER_EMAIL, $docente],
+            'docente_2' => ['Carla Mendoza Rojas', 'carla.mendoza@avalancha.edu.bo', $docente],
+            'docente_3' => ['Luis Fernando Arce Huanca', 'luis.arce@avalancha.edu.bo', $docente],
+            'docente_4' => ['Patricia Vargas Choque', 'patricia.vargas@avalancha.edu.bo', $docente],
+        ] as $fixtureKey => [$name, $email, $role]) {
+            $this->staffUsers[$fixtureKey] = $this->createUserWithRole($name, $email, $role);
         }
 
         // These keys explicitly identify applicant fixtures 0, 1 and 2 in the main seeder.
