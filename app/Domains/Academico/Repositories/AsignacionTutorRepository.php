@@ -16,7 +16,7 @@ class AsignacionTutorRepository
     {
         return AsignacionTutor::query()
             ->with([
-                'tutor:id_tutor,nombres_tutor,apellidos_tutor,especialidad_tutor,estado_tutor',
+                'tutor:id_tutor,personal_id,especialidad_tutor,estado_tutor',
                 'programa:id_prog,nombre_prog,codigo_prog',
                 'grupo:id_grupo,id_prog,nombre_grupo,codigo_grupo',
             ])

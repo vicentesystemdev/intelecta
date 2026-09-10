@@ -48,6 +48,6 @@ class AsistenciaAcademica extends Model
 
     public function tutor(): BelongsTo
     {
-        return $this->belongsTo(TutorAcademico::class, 'id_tutor', 'id_tutor');
+        return $this->belongsTo(TutorAcademico::class, 'id_tutor', 'id_tutor')->withTrashed();
     }
 }

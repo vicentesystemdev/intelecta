@@ -45,8 +45,8 @@ $assert = function (bool $ok, string $message) use (&$passed): void {
 Notification::fake();
 $assert(Artisan::call('migrate:fresh', ['--force' => true]) === 0, 'Migración aislada.');
 $assert(Schema::hasTable('cargos') && Schema::hasTable('personal_institucional'), 'Tablas nuevas.');
-// Exercise only the last two migrations, on empty TEST tables, never the live database.
-$assert(Artisan::call('migrate:rollback', ['--step' => 2, '--force' => true]) === 0, 'Rollback aislado.');
+// Roll back Block 4 dependencies and then Block 3, only on empty TEST tables.
+$assert(Artisan::call('migrate:rollback', ['--step' => 4, '--force' => true]) === 0, 'Rollback aislado.');
 $assert(! Schema::hasTable('cargos') && ! Schema::hasTable('personal_institucional'), 'Rollback retira solo estructura del bloque.');
 $assert(Schema::hasColumn('postulantes', 'user_id') && Schema::hasColumn('users', 'estado_cuenta'), 'Bloques previos conservados.');
 $assert(Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]) === 0, 'Instalación limpia con seed.');
@@ -59,7 +59,7 @@ $admin = User::role('Administrador')->sole();
 $assert($admin->personalInstitucional->cargo->nombre_cargo === 'Coordinador Académico', 'Cargo explícito del fixture administrativo.');
 $assert(User::role('Estudiante')->whereHas('personalInstitucional')->count() === 0, 'Estudiantes no convertidos en Personal.');
 $assert(Postulante::count() === 72 && Postulante::whereNotNull('user_id')->count() === 3 && Postulante::whereNull('user_id')->count() === 69, 'Bloque 1 intacto.');
-$assert(TutorAcademico::count() === 4 && ! Schema::hasColumn('tutores_academicos', 'personal_id'), 'Tutor mantiene esquema anterior.');
+$assert(TutorAcademico::count() === 4 && Schema::hasColumn('tutores_academicos', 'personal_id') && ! Schema::hasColumn('tutores_academicos', 'user_id'), 'Tutor extiende Personal en Bloque 4.');
 $assert(! Route::has('register') && ! Route::has('profile.destroy'), 'Registro y autoeliminación siguen cerrados.');
 foreach (PermisosOrganizacion::ALL as $permission) {
     $assert(Role::findByName('Administrador')->hasPermissionTo($permission) && ! Role::findByName('Docente')->hasPermissionTo($permission), 'Permiso organizacional limitado: '.$permission);

@@ -64,19 +64,19 @@ export default function Show({ tutor }) {
                     <div className="mt-5 grid gap-4 sm:grid-cols-2">
                         {detail('Especialidad', tutor.especialidad_tutor)}
                         {detail('Formación', tutor.formacion_tutor)}
-                        {detail('C.I.', tutor.ci_tutor)}
-                        {detail('Usuario vinculado', tutor.user?.email)}
+                        {detail('C.I.', tutor.personal?.ci)}
+                        {Object.hasOwn(tutor.personal ?? {}, 'user') && detail('Correo de acceso (referencia)', tutor.personal?.user?.email)}
                     </div>
                     <div className="mt-5 grid gap-3 sm:grid-cols-2">
                         <p className="flex items-center gap-3 rounded-xl bg-brand-bg p-4 text-sm text-text-main">
                             <AtSign className="h-4 w-4 shrink-0 text-brand-secondary" />
                             <span className="break-all">
-                                {tutor.correo_tutor || 'Correo no registrado'}
+                                {tutor.personal?.correo_contacto || 'Correo no registrado'}
                             </span>
                         </p>
                         <p className="flex items-center gap-3 rounded-xl bg-brand-bg p-4 text-sm text-text-main">
                             <Phone className="h-4 w-4 shrink-0 text-brand-secondary" />
-                            {tutor.celular_tutor || 'Celular no registrado'}
+                            {tutor.personal?.celular || 'Celular no registrado'}
                         </p>
                     </div>
                     <div className="mt-5 rounded-2xl border border-brand-border p-5">

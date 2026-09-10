@@ -36,7 +36,7 @@ class OrganizacionSeederTest extends TestCase
         $this->assertNull(User::role('Super Administrador')->sole()->personalInstitucional);
         foreach (User::role('Docente')->get() as $user) {
             $this->assertSame('Docente', $user->personalInstitucional->cargo->nombre_cargo);
-            $this->assertTrue(TutorAcademico::where('user_id', $user->id)->exists());
+            $this->assertTrue(TutorAcademico::whereHas('personal', fn ($query) => $query->where('user_id', $user->id))->exists());
             foreach (PermisosOrganizacion::ALL as $permission) {
                 $this->assertFalse($user->can($permission));
             }
@@ -45,7 +45,8 @@ class OrganizacionSeederTest extends TestCase
             $this->assertNull($user->personalInstitucional);
             $this->assertNotNull($user->postulante);
         }
-        $this->assertFalse(Schema::hasColumn('tutores_academicos', 'personal_id'));
+        $this->assertTrue(Schema::hasColumn('tutores_academicos', 'personal_id'));
+        $this->assertFalse(Schema::hasColumn('tutores_academicos', 'user_id'));
         $this->assertSame(9, User::where('estado_cuenta', 'activa')->whereNotNull('email_verified_at')->count());
         $this->assertSame(3, Postulante::whereNotNull('user_id')->count());
         $this->assertSame(69, Postulante::whereNull('user_id')->count());

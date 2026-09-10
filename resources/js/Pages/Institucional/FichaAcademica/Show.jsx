@@ -122,7 +122,7 @@ export default function Show({
                                     'Tutor responsable',
                                     tutorAsignado?.nombre_completo ||
                                         (tutorAsignado
-                                            ? `${tutorAsignado.nombres_tutor} ${tutorAsignado.apellidos_tutor}`.trim()
+                                            ? `${tutorAsignado.personal?.nombres} ${tutorAsignado.personal?.apellidos}`.trim()
                                             : null) ||
                                         inscripcion?.grupo?.tutor_responsable_grupo ||
                                         'Sin tutor asignado',

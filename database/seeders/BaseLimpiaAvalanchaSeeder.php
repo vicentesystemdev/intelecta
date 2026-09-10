@@ -42,13 +42,14 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
 
         $positions = app(CargosSeeder::class);
         $positions->run();
-        app(PersonalInstitucionalSeeder::class)->run($accounts->staffUsers, $positions->cargos);
+        $people = app(PersonalInstitucionalSeeder::class);
+        $people->run($accounts->staffUsers, $positions->cargos);
 
         [$universidades, $carreras, $colegios] = $this->seedInstitutionalCatalogs();
         [$materias, $preguntas] = $this->seedCurriculum();
         $plantillas = $this->seedTemplates($preguntas);
         [$programas, $grupos] = $this->seedProgramsAndGroups();
-        $tutores = $this->seedTutorsAndAssignments($programas, $grupos, $accounts->staffUsers);
+        $tutores = $this->seedTutorsAndAssignments($programas, $grupos, $people->personal);
         $postulantes = $this->seedApplicants($carreras, $colegios, $accounts->studentUsers);
         $inscripciones = $this->seedEnrollments($postulantes, $grupos);
         $this->seedAdministrativeStatus($inscripciones);
@@ -408,38 +409,22 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
         return [$programs, $groups];
     }
 
-    private function seedTutorsAndAssignments(Collection $programs, Collection $groups, array $staffUsers): Collection
+    private function seedTutorsAndAssignments(Collection $programs, Collection $groups, array $personal): Collection
     {
         $rows = [
             [
-                'rodrigo.salazar@avalancha.edu.bo',
-                'Rodrigo',
-                'Salazar Condori',
-                '7300101',
                 'Matemática',
                 'Licenciatura en Matemática',
             ],
             [
-                'carla.mendoza@avalancha.edu.bo',
-                'Carla',
-                'Mendoza Rojas',
-                '7300102',
                 'Física',
                 'Ingeniería Física',
             ],
             [
-                'luis.arce@avalancha.edu.bo',
-                'Luis Fernando',
-                'Arce Huanca',
-                '7300103',
                 'Química',
                 'Licenciatura en Química',
             ],
             [
-                'patricia.vargas@avalancha.edu.bo',
-                'Patricia',
-                'Vargas Choque',
-                '7300104',
                 'Razonamiento Lógico / Coordinación Académica',
                 'Ciencias de la Educación',
             ],
@@ -447,23 +432,18 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
         $tutors = collect();
 
         foreach ($rows as $index => $row) {
-            $user = $staffUsers['docente_'.($index + 1)];
+            $person = $personal['docente_'.($index + 1)];
             $tutor = TutorAcademico::updateOrCreate(
-                ['user_id' => $user->id],
+                ['personal_id' => $person->id_personal],
                 [
-                    'nombres_tutor' => $row[1],
-                    'apellidos_tutor' => $row[2],
-                    'ci_tutor' => $row[3],
-                    'celular_tutor' => '72010'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
-                    'correo_tutor' => $row[0],
-                    'especialidad_tutor' => $row[4],
-                    'formacion_tutor' => $row[5],
+                    'especialidad_tutor' => $row[0],
+                    'formacion_tutor' => $row[1],
                     'experiencia_tutor' => 'Experiencia en preparación preuniversitaria y acompañamiento académico para Ingeniería.',
                     'estado_tutor' => 'activo',
                     'observacion_tutor' => 'Personal académico de Academia Universitaria Avalancha.',
                 ],
             );
-            $tutors->put($row[4], $tutor);
+            $tutors->put($row[0], $tutor);
         }
 
         $subjectTutors = [

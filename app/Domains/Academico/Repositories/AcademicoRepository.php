@@ -8,6 +8,7 @@ use App\Domains\Academico\DTOs\ProgramaAcademicoData;
 use App\Domains\Academico\DTOs\SimulacroProgramadoData;
 use App\Domains\Academico\Models\AsignacionTutor;
 use App\Domains\Academico\Models\AsistenciaAcademica;
+use App\Domains\Academico\Models\CuotaAcademica;
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Models\HabilitacionAcademica;
 use App\Domains\Academico\Models\InscripcionAcademica;
@@ -63,7 +64,7 @@ class AcademicoRepository
             ]);
 
         if (Schema::hasTable('asignaciones_tutores')) {
-            $query->with('asignacionTutorActiva.tutor:id_tutor,nombres_tutor,apellidos_tutor,especialidad_tutor');
+            $query->with('asignacionTutorActiva.tutor:id_tutor,personal_id,especialidad_tutor');
         }
 
         return $query
@@ -462,7 +463,7 @@ class AcademicoRepository
             && Schema::hasTable('tutores_academicos')
         ) {
             $asignacion = AsignacionTutor::query()
-                ->with('tutor:id_tutor,nombres_tutor,apellidos_tutor,especialidad_tutor,celular_tutor,correo_tutor')
+                ->with('tutor:id_tutor,personal_id,especialidad_tutor')
                 ->where('estado_asig', 'activo')
                 ->where(function (Builder $query) use ($inscripcion) {
                     if ($inscripcion?->id_grupo) {
@@ -528,7 +529,7 @@ class AcademicoRepository
             $registrosAsistencia = AsistenciaAcademica::query()
                 ->with([
                     'grupo:id_grupo,nombre_grupo,codigo_grupo',
-                    'tutor:id_tutor,nombres_tutor,apellidos_tutor',
+                    'tutor:id_tutor,personal_id',
                 ])
                 ->where('id_post', $postulante->id_post)
                 ->latest('fecha_asist')
@@ -621,10 +622,10 @@ class AcademicoRepository
                 ? MatriculaAcademica::where('estado_matricula_mat', 'activa')->count()
                 : 0,
             'cuotasPendientes' => Schema::hasTable('cuotas_academicas')
-                ? \App\Domains\Academico\Models\CuotaAcademica::where('estado_cuota', 'pendiente')->count()
+                ? CuotaAcademica::where('estado_cuota', 'pendiente')->count()
                 : 0,
             'cuotasVencidas' => Schema::hasTable('cuotas_academicas')
-                ? \App\Domains\Academico\Models\CuotaAcademica::where('estado_cuota', 'vencida')->count()
+                ? CuotaAcademica::where('estado_cuota', 'vencida')->count()
                 : 0,
             'postulantesHabilitados' => Schema::hasTable('habilitaciones_academicas')
                 ? HabilitacionAcademica::where('estado_hab', 'habilitado')->count()

@@ -4,18 +4,18 @@ namespace App\Domains\Academico\Repositories;
 
 use App\Domains\Academico\DTOs\TutorAcademicoData;
 use App\Domains\Academico\Models\TutorAcademico;
-use App\Models\User;
+use App\Domains\Institucional\Models\PersonalInstitucional;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class TutorAcademicoRepository
 {
-    public function paginate(array $filters, int $perPage = 12): LengthAwarePaginator
+    public function paginate(array $filters, int $perPage = 12, bool $withAccount = false): LengthAwarePaginator
     {
         return TutorAcademico::query()
             ->with([
-                'user:id,name,email',
+                ...$this->identityRelations($withAccount),
                 'asignaciones' => fn ($query) => $query
                     ->where('estado_asig', 'activo')
                     ->with([
@@ -31,11 +31,12 @@ class TutorAcademicoRepository
             ])
             ->when($filters['buscar'] ?? null, function (Builder $query, string $search) {
                 $pattern = '%'.mb_strtolower($search).'%';
-                $query->where(function (Builder $query) use ($pattern) {
-                    $query->whereRaw('LOWER(nombres_tutor) LIKE ?', [$pattern])
-                        ->orWhereRaw('LOWER(apellidos_tutor) LIKE ?', [$pattern])
-                        ->orWhereRaw("LOWER(COALESCE(ci_tutor, '')) LIKE ?", [$pattern])
-                        ->orWhereRaw("LOWER(COALESCE(correo_tutor, '')) LIKE ?", [$pattern]);
+                $query->whereHas('personal', function (Builder $query) use ($pattern) {
+                    $query->whereRaw('LOWER(nombres) LIKE ?', [$pattern])
+                        ->orWhereRaw('LOWER(apellidos) LIKE ?', [$pattern])
+                        ->orWhereRaw("LOWER(COALESCE(ci, '')) LIKE ?", [$pattern])
+                        ->orWhereRaw("LOWER(COALESCE(correo_contacto, '')) LIKE ?", [$pattern])
+                        ->orWhereRaw("LOWER(COALESCE(celular, '')) LIKE ?", [$pattern]);
                 });
             })
             ->when(
@@ -46,8 +47,9 @@ class TutorAcademicoRepository
                 $filters['estado_tutor'] ?? null,
                 fn (Builder $query, string $value) => $query->where('estado_tutor', $value),
             )
-            ->orderBy('apellidos_tutor')
-            ->orderBy('nombres_tutor')
+            ->orderBy(PersonalInstitucional::select('apellidos')->whereColumn('id_personal', 'tutores_academicos.personal_id'))
+            ->orderBy(PersonalInstitucional::select('nombres')->whereColumn('id_personal', 'tutores_academicos.personal_id'))
+            ->orderBy('id_tutor')
             ->paginate($perPage)
             ->withQueryString();
     }
@@ -64,10 +66,10 @@ class TutorAcademicoRepository
         return $tutor->refresh();
     }
 
-    public function findForDetail(TutorAcademico $tutor): TutorAcademico
+    public function findForDetail(TutorAcademico $tutor, bool $withAccount = false): TutorAcademico
     {
         return $tutor->load([
-            'user:id,name,email',
+            ...$this->identityRelations($withAccount),
             'asignaciones' => fn ($query) => $query
                 ->with([
                     'programa:id_prog,nombre_prog,codigo_prog',
@@ -82,12 +84,11 @@ class TutorAcademicoRepository
     {
         return TutorAcademico::query()
             ->when($onlyActive, fn (Builder $query) => $query->where('estado_tutor', 'activo'))
-            ->orderBy('apellidos_tutor')
-            ->orderBy('nombres_tutor')
+            ->orderBy(PersonalInstitucional::select('apellidos')->whereColumn('id_personal', 'tutores_academicos.personal_id'))
+            ->orderBy('id_tutor')
             ->get([
                 'id_tutor',
-                'nombres_tutor',
-                'apellidos_tutor',
+                'personal_id',
                 'especialidad_tutor',
                 'estado_tutor',
             ]);
@@ -102,10 +103,17 @@ class TutorAcademicoRepository
             ->pluck('especialidad_tutor');
     }
 
-    public function usuariosOptions(): Collection
+    public function personalOptions(): Collection
     {
-        return User::query()
-            ->orderBy('name')
-            ->get(['id', 'name', 'email']);
+        return PersonalInstitucional::query()->whereIn('estado', ['activo', 'pendiente'])
+            ->whereDoesntHave('tutorAcademico')->orderBy('apellidos')->orderBy('nombres')
+            ->get(['id_personal', 'nombres', 'apellidos', 'estado']);
+    }
+
+    private function identityRelations(bool $withAccount): array
+    {
+        return $withAccount
+            ? ['personal', 'personal.cargo:id_cargo,nombre_cargo,estado', 'personal.user:id,name,email']
+            : ['personal:id_personal,nombres,apellidos,ci,celular,correo_contacto,cargo_id,estado', 'personal.cargo:id_cargo,nombre_cargo,estado'];
     }
 }

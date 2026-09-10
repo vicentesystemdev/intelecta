@@ -32,12 +32,7 @@ import {
 import { useState } from 'react';
 
 const emptyTutor = {
-    user_id: '',
-    nombres_tutor: '',
-    apellidos_tutor: '',
-    ci_tutor: '',
-    celular_tutor: '',
-    correo_tutor: '',
+    personal_id: '',
     especialidad_tutor: '',
     formacion_tutor: '',
     experiencia_tutor: '',
@@ -48,7 +43,8 @@ const emptyTutor = {
 export default function Index({
     tutores,
     especialidades = [],
-    usuarios = [],
+    personas = [],
+    capacidades = {},
     filtros = {},
 }) {
     const { flash } = usePage().props;
@@ -67,8 +63,8 @@ export default function Index({
             tutor
                 ? {
                       ...emptyTutor,
-                      ...tutor,
-                      user_id: tutor.user_id ? String(tutor.user_id) : '',
+                      ...Object.fromEntries(Object.keys(emptyTutor).map((key) => [key, tutor[key] ?? emptyTutor[key]])),
+                      personal_id: String(tutor.personal_id),
                   }
                 : emptyTutor,
         );
@@ -110,7 +106,7 @@ export default function Index({
                 title="Tutores Académicos"
                 description="Administre la especialidad, formación y disponibilidad del equipo tutorial sin duplicar las funciones de acceso, roles o permisos."
                 icon={UserRoundCheck}
-                action={
+                action={capacidades.crear &&
                     <button className={primaryButtonClass} onClick={() => openForm()}>
                         <Plus className="h-4 w-4" />
                         Nuevo tutor
@@ -188,19 +184,19 @@ export default function Index({
                                 <p className="flex items-center gap-2 text-text-muted">
                                     <AtSign className="h-4 w-4 shrink-0 text-brand-secondary" />
                                     <span className="break-all">
-                                        {tutor.correo_tutor || 'Correo no registrado'}
+                                        {tutor.personal?.correo_contacto || 'Correo no registrado'}
                                     </span>
                                 </p>
                                 <p className="flex items-center gap-2 text-text-muted">
                                     <Phone className="h-4 w-4 shrink-0 text-brand-secondary" />
-                                    {tutor.celular_tutor || 'Celular no registrado'}
+                                    {tutor.personal?.celular || 'Celular no registrado'}
                                 </p>
-                                <p className="flex items-center gap-2 text-text-muted">
+                                {capacidades.verPersonal && <p className="flex items-center gap-2 text-text-muted">
                                     <Link2 className="h-4 w-4 shrink-0 text-brand-secondary" />
-                                    {tutor.user
-                                        ? `Acceso vinculado a ${tutor.user.email}`
+                                    {tutor.personal?.user
+                                        ? `Acceso vinculado a ${tutor.personal.user.email}`
                                         : 'Sin cuenta de acceso vinculada'}
-                                </p>
+                                </p>}
                             </div>
 
                             <div className="mt-5 flex items-center justify-between border-t border-brand-border pt-4">
@@ -216,13 +212,13 @@ export default function Index({
                                     >
                                         <Eye className="h-4 w-4" />
                                     </button>
-                                    <button
+                                    {capacidades.editar && <button
                                         className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30"
                                         onClick={() => openForm(tutor)}
                                         aria-label={`Editar a ${tutor.nombre_completo}`}
                                     >
                                         <Pencil className="h-4 w-4" />
-                                    </button>
+                                    </button>}
                                 </div>
                             </div>
                         </article>
@@ -240,49 +236,52 @@ export default function Index({
                 open={modal.open}
                 onOpenChange={(open) => setModal((current) => ({ ...current, open }))}
                 title={modal.tutor ? 'Editar tutor académico' : 'Nuevo tutor académico'}
-                description="El vínculo con un usuario es opcional y solo habilita la relación con una cuenta de acceso existente."
+                description="El perfil académico utiliza una identidad institucional existente. Los estados de Personal, Tutor y cuenta son independientes."
                 size="xl"
             >
                 <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-                    <Field {...validationProps('nombres_tutor')}
-                        label="Nombres"
-                        value={form.data.nombres_tutor}
-                        onChange={(event) =>
-                            form.setData('nombres_tutor', event.target.value)
-                        }
-                        error={form.errors.nombres_tutor}
-                    />
-                    <Field {...validationProps('apellidos_tutor')}
-                        label="Apellidos"
-                        value={form.data.apellidos_tutor}
-                        onChange={(event) =>
-                            form.setData('apellidos_tutor', event.target.value)
-                        }
-                        error={form.errors.apellidos_tutor}
-                    />
-                    <Field {...validationProps('ci_tutor')}
-                        label="C.I."
-                        value={form.data.ci_tutor}
-                        onChange={(event) => form.setData('ci_tutor', event.target.value)}
-                        error={form.errors.ci_tutor}
-                    />
-                    <Field {...validationProps('celular_tutor')}
-                        label="Celular"
-                        value={form.data.celular_tutor}
-                        onChange={(event) =>
-                            form.setData('celular_tutor', event.target.value)
-                        }
-                        error={form.errors.celular_tutor}
-                    />
-                    <Field {...validationProps('correo_tutor')}
-                        type="email"
-                        label="Correo de contacto"
-                        value={form.data.correo_tutor}
-                        onChange={(event) =>
-                            form.setData('correo_tutor', event.target.value)
-                        }
-                        error={form.errors.correo_tutor}
-                    />
+                    <div className="sm:col-span-2 space-y-3">
+                        {modal.tutor ? (
+                            <div className="rounded-xl border border-brand-border p-4 text-sm text-text-main">
+                                <p className="font-bold">{modal.tutor.nombre_completo}</p>
+                                <p>Personal #{modal.tutor.personal_id} · {modal.tutor.personal?.estado}</p>
+                                <p>Cargo: {modal.tutor.personal?.cargo?.nombre_cargo || 'Sin cargo acreditado'}</p>
+                                <p>Correo de contacto: {modal.tutor.personal?.correo_contacto || 'No registrado'}</p>
+                                {capacidades.verPersonal && <p>Correo de acceso (solo referencia): {modal.tutor.personal?.user?.email || 'Sin cuenta'}</p>}
+                            </div>
+                        ) : (
+                            <SelectField label="Personal institucional" required value={form.data.personal_id}
+                                error={form.errors.personal_id} onChange={(event) => form.setData('personal_id', event.target.value)}>
+                                <option value="">Selecciona una persona sin perfil tutor</option>
+                                {personas.map((person) => <option key={person.id_personal} value={person.id_personal}>
+                                    {person.apellidos}, {person.nombres} · #{person.id_personal} · {person.estado}
+                                </option>)}
+                            </SelectField>
+                        )}
+                        {form.errors.personal_id && modal.tutor && <p className="text-sm text-red-600">{form.errors.personal_id}</p>}
+                        {capacidades.verPersonal && <a className="text-sm underline text-brand-secondary" href={route('admin.institucional.personal.index')}>
+                            Gestionar Personal o vincular una cuenta desde Organización institucional
+                        </a>}
+                        {modal.tutor && capacidades.editarPersonal && <label className="flex items-center gap-2 text-sm text-text-main">
+                            <input type="checkbox" checked={Boolean(form.data.personal)} onChange={(event) => {
+                                if (event.target.checked) {
+                                    form.setData('personal', Object.fromEntries(['nombres', 'apellidos', 'ci', 'celular', 'correo_contacto']
+                                        .map((key) => [key, modal.tutor.personal?.[key] ?? ''])));
+                                } else {
+                                    const { personal, ...professional } = form.data;
+                                    form.setData(professional);
+                                }
+                            }} />
+                            Editar identidad y contacto en Personal institucional
+                        </label>}
+                        {form.errors.personal && <p className="text-sm text-red-600">{form.errors.personal}</p>}
+                    </div>
+                    {form.data.personal && [['nombres', 'Nombres'], ['apellidos', 'Apellidos'], ['ci', 'C.I.'],
+                        ['celular', 'Celular'], ['correo_contacto', 'Correo de contacto']].map(([key, label]) => (
+                        <Field key={key} {...validationProps(key)} label={label} value={form.data.personal[key]}
+                            onChange={(event) => form.setData('personal', { ...form.data.personal, [key]: event.target.value })}
+                            error={form.errors[`personal.${key}`]} />
+                    ))}
                     <Field {...validationProps('especialidad_tutor')}
                         label="Especialidad"
                         value={form.data.especialidad_tutor}
@@ -300,19 +299,6 @@ export default function Index({
                         error={form.errors.formacion_tutor}
                         className="sm:col-span-2"
                     />
-                    <SelectField {...validationProps('user_id')}
-                        label="Cuenta de acceso vinculada"
-                        value={form.data.user_id}
-                        onChange={(event) => form.setData('user_id', event.target.value)}
-                        error={form.errors.user_id}
-                    >
-                        <option value="">Sin usuario vinculado</option>
-                        {usuarios.map((usuario) => (
-                            <option key={usuario.id} value={usuario.id}>
-                                {usuario.name} · {usuario.email}
-                            </option>
-                        ))}
-                    </SelectField>
                     <SelectField {...validationProps('estado_tutor')}
                         label="Estado"
                         value={form.data.estado_tutor}
@@ -382,10 +368,10 @@ export default function Index({
                             </div>
                             <div className="grid gap-3 sm:grid-cols-2">
                                 {[
-                                    ['C.I.', detail.ci_tutor],
-                                    ['Celular', detail.celular_tutor],
-                                    ['Correo de contacto', detail.correo_tutor],
-                                    ['Usuario asociado', detail.user?.email],
+                                    ['C.I.', detail.personal?.ci],
+                                    ['Celular', detail.personal?.celular],
+                                    ['Correo de contacto', detail.personal?.correo_contacto],
+                                    ...(capacidades.verPersonal ? [['Correo de acceso (referencia)', detail.personal?.user?.email]] : []),
                                 ].map(([label, value]) => (
                                     <div key={label} className="rounded-xl border border-brand-border bg-brand-card p-4">
                                         <p className="text-xs text-text-muted">{label}</p>

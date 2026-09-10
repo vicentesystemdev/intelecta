@@ -1,0 +1,743 @@
+{
+  "backup": {
+    "backup": "C:/laragon/tmp/intelecta-identity-backups/intelecta-before-block4-20260910_032445.dump",
+    "bytes": 204223,
+    "sha256": "5c5441530e656061d02f6ab6bf81bdaa7a457c203b7050b5595e90266c2d274a",
+    "database": "intelecta_tutor_test_20260910_032445",
+    "restoration_matches_all_original_tables": true
+  },
+  "before": {
+    "database": "intelecta",
+    "tables": {
+      "alternativas": {
+        "count": 625,
+        "fingerprint": "52b80cea8f591ca6c216a99c6fa2376b"
+      },
+      "areas_conocimiento": {
+        "count": 16,
+        "fingerprint": "ce90cc36495f55d848b67299f1c1db20"
+      },
+      "asignaciones_tutores": {
+        "count": 16,
+        "fingerprint": "b6cec632eaa67e21c3aab6093bcd0c3e"
+      },
+      "asistencias_academicas": {
+        "count": 544,
+        "fingerprint": "904c0a41eb773d9912efc5668d7e0bf7"
+      },
+      "bitacora_sistema": {
+        "count": 5,
+        "fingerprint": "eb2c757f894ed5a32ae52266eebef6f6"
+      },
+      "cache": {
+        "count": 1,
+        "fingerprint": "fd2c1d62c69935fa03895563770561ee"
+      },
+      "cache_locks": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "cargos": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "carreras": {
+        "count": 26,
+        "fingerprint": "b8b8aa6a3d8f5462bb6e1eb7cbf786a8"
+      },
+      "colegios": {
+        "count": 10,
+        "fingerprint": "7f74ccd962ec8651f9d71957a98b7d61"
+      },
+      "cuotas_academicas": {
+        "count": 180,
+        "fingerprint": "1e2518ba6cc9cb0765f7a4317e39f8ab"
+      },
+      "evaluaciones_aplicadas": {
+        "count": 208,
+        "fingerprint": "082c0cbef7b2eed4904a05af297d0979"
+      },
+      "failed_jobs": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "grupos_academicos": {
+        "count": 6,
+        "fingerprint": "45d86c2acdaad66c400c6dbeccd8fff6"
+      },
+      "habilitaciones_academicas": {
+        "count": 72,
+        "fingerprint": "d97f9f1fbfee27c5cabe4f709e4de14e"
+      },
+      "inscripciones_academicas": {
+        "count": 72,
+        "fingerprint": "1e67b5bbb9404b92059ccabd3f04f568"
+      },
+      "job_batches": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "jobs": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "materias": {
+        "count": 4,
+        "fingerprint": "bf4ab2a02c0020b051612257bc5fba31"
+      },
+      "matriculas_academicas": {
+        "count": 72,
+        "fingerprint": "47403c1ecb6bdb6f3cfe1799037a9c2a"
+      },
+      "migrations": {
+        "count": 36,
+        "fingerprint": "2667bf23d7f63a44c918b388833238a8"
+      },
+      "model_has_permissions": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "model_has_roles": {
+        "count": 9,
+        "fingerprint": "fd825680f2a997b2bad3a405aa964751"
+      },
+      "password_reset_tokens": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "permissions": {
+        "count": 80,
+        "fingerprint": "6a71e112727260396ece08e279a6e994"
+      },
+      "personal_institucional": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "plantilla_preguntas": {
+        "count": 165,
+        "fingerprint": "9ca7c6f3677e0d18c26df027d4fe0621"
+      },
+      "plantillas_evaluacion": {
+        "count": 13,
+        "fingerprint": "650340e7e657b56fae1ede818c7c89c6"
+      },
+      "postulantes": {
+        "count": 72,
+        "fingerprint": "182ff9a29604e75b0ed1cbe39258a9d4"
+      },
+      "preguntas": {
+        "count": 125,
+        "fingerprint": "d90801879f2eaa5eb08c955fb2bda554"
+      },
+      "programas_academicos": {
+        "count": 4,
+        "fingerprint": "9a6c665162ec5843aae7d58f7e064e21"
+      },
+      "rendimientos_postulante": {
+        "count": 61,
+        "fingerprint": "4ec1e51585b285583f8d96f82c77448b"
+      },
+      "respuestas_evaluacion": {
+        "count": 2290,
+        "fingerprint": "5769fc48c48bcf10ea2b50a52fd018c7"
+      },
+      "role_has_permissions": {
+        "count": 179,
+        "fingerprint": "e884ea05cb06434ee4be10b4761a3684"
+      },
+      "roles": {
+        "count": 4,
+        "fingerprint": "d048b5d11bb304f8126812a01fe07ae2"
+      },
+      "sessions": {
+        "count": 3,
+        "fingerprint": "088fd972acc3e6f9b184d2dcc97f5415"
+      },
+      "simulacros_programados": {
+        "count": 12,
+        "fingerprint": "8168ea1838fc5e598947528222df850c"
+      },
+      "temas": {
+        "count": 51,
+        "fingerprint": "0fc51fe8e2f02dd7d747a1e32ffc74be"
+      },
+      "tutores_academicos": {
+        "count": 4,
+        "fingerprint": "178161374958b546f55a893a10181496"
+      },
+      "universidades": {
+        "count": 5,
+        "fingerprint": "c9ee2e2a4f9deb79d7c3a86900bbb492"
+      },
+      "users": {
+        "count": 9,
+        "fingerprint": "238b3df93bc5ed7f4280e17f35c019cb"
+      }
+    },
+    "professional_fingerprint": "d6fb183650bff34d9e9c215be2953928",
+    "legacy": true,
+    "map": [
+      {
+        "id_tutor": 1,
+        "user_id": 3,
+        "estado_tutor": "activo",
+        "deleted_at": null
+      },
+      {
+        "id_tutor": 2,
+        "user_id": 4,
+        "estado_tutor": "activo",
+        "deleted_at": null
+      },
+      {
+        "id_tutor": 3,
+        "user_id": 5,
+        "estado_tutor": "activo",
+        "deleted_at": null
+      },
+      {
+        "id_tutor": 4,
+        "user_id": 6,
+        "estado_tutor": "activo",
+        "deleted_at": null
+      }
+    ],
+    "incoming_fks": [
+      {
+        "tabla": "asignaciones_tutores",
+        "conname": "asignaciones_tutores_id_tutor_foreign",
+        "definition": "FOREIGN KEY (id_tutor) REFERENCES tutores_academicos(id_tutor) ON UPDATE CASCADE ON DELETE CASCADE"
+      },
+      {
+        "tabla": "asistencias_academicas",
+        "conname": "asistencias_academicas_id_tutor_foreign",
+        "definition": "FOREIGN KEY (id_tutor) REFERENCES tutores_academicos(id_tutor) ON UPDATE CASCADE ON DELETE SET NULL"
+      }
+    ],
+    "tutor_constraints": [
+      {
+        "conname": "tutores_academicos_ci_tutor_unique",
+        "definition": "UNIQUE (ci_tutor)"
+      },
+      {
+        "conname": "tutores_academicos_pkey",
+        "definition": "PRIMARY KEY (id_tutor)"
+      },
+      {
+        "conname": "tutores_academicos_user_id_foreign",
+        "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL"
+      },
+      {
+        "conname": "tutores_academicos_user_id_unique",
+        "definition": "UNIQUE (user_id)"
+      }
+    ]
+  },
+  "transition": {
+    "database": "intelecta",
+    "tables": {
+      "alternativas": {
+        "count": 625,
+        "fingerprint": "52b80cea8f591ca6c216a99c6fa2376b"
+      },
+      "areas_conocimiento": {
+        "count": 16,
+        "fingerprint": "ce90cc36495f55d848b67299f1c1db20"
+      },
+      "asignaciones_tutores": {
+        "count": 16,
+        "fingerprint": "b6cec632eaa67e21c3aab6093bcd0c3e"
+      },
+      "asistencias_academicas": {
+        "count": 544,
+        "fingerprint": "904c0a41eb773d9912efc5668d7e0bf7"
+      },
+      "bitacora_sistema": {
+        "count": 5,
+        "fingerprint": "eb2c757f894ed5a32ae52266eebef6f6"
+      },
+      "cache": {
+        "count": 1,
+        "fingerprint": "fd2c1d62c69935fa03895563770561ee"
+      },
+      "cache_locks": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "cargos": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "carreras": {
+        "count": 26,
+        "fingerprint": "b8b8aa6a3d8f5462bb6e1eb7cbf786a8"
+      },
+      "colegios": {
+        "count": 10,
+        "fingerprint": "7f74ccd962ec8651f9d71957a98b7d61"
+      },
+      "cuotas_academicas": {
+        "count": 180,
+        "fingerprint": "1e2518ba6cc9cb0765f7a4317e39f8ab"
+      },
+      "evaluaciones_aplicadas": {
+        "count": 208,
+        "fingerprint": "082c0cbef7b2eed4904a05af297d0979"
+      },
+      "failed_jobs": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "grupos_academicos": {
+        "count": 6,
+        "fingerprint": "45d86c2acdaad66c400c6dbeccd8fff6"
+      },
+      "habilitaciones_academicas": {
+        "count": 72,
+        "fingerprint": "d97f9f1fbfee27c5cabe4f709e4de14e"
+      },
+      "inscripciones_academicas": {
+        "count": 72,
+        "fingerprint": "1e67b5bbb9404b92059ccabd3f04f568"
+      },
+      "job_batches": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "jobs": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "materias": {
+        "count": 4,
+        "fingerprint": "bf4ab2a02c0020b051612257bc5fba31"
+      },
+      "matriculas_academicas": {
+        "count": 72,
+        "fingerprint": "47403c1ecb6bdb6f3cfe1799037a9c2a"
+      },
+      "migrations": {
+        "count": 37,
+        "fingerprint": "50f6607dcf397ae3eb5bdc4fc3313ca3"
+      },
+      "model_has_permissions": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "model_has_roles": {
+        "count": 9,
+        "fingerprint": "fd825680f2a997b2bad3a405aa964751"
+      },
+      "password_reset_tokens": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "permissions": {
+        "count": 80,
+        "fingerprint": "6a71e112727260396ece08e279a6e994"
+      },
+      "personal_institucional": {
+        "count": 4,
+        "fingerprint": "e5bc3f683d9681524c4487c021364b50"
+      },
+      "plantilla_preguntas": {
+        "count": 165,
+        "fingerprint": "9ca7c6f3677e0d18c26df027d4fe0621"
+      },
+      "plantillas_evaluacion": {
+        "count": 13,
+        "fingerprint": "650340e7e657b56fae1ede818c7c89c6"
+      },
+      "postulantes": {
+        "count": 72,
+        "fingerprint": "182ff9a29604e75b0ed1cbe39258a9d4"
+      },
+      "preguntas": {
+        "count": 125,
+        "fingerprint": "d90801879f2eaa5eb08c955fb2bda554"
+      },
+      "programas_academicos": {
+        "count": 4,
+        "fingerprint": "9a6c665162ec5843aae7d58f7e064e21"
+      },
+      "rendimientos_postulante": {
+        "count": 61,
+        "fingerprint": "4ec1e51585b285583f8d96f82c77448b"
+      },
+      "respuestas_evaluacion": {
+        "count": 2290,
+        "fingerprint": "5769fc48c48bcf10ea2b50a52fd018c7"
+      },
+      "role_has_permissions": {
+        "count": 179,
+        "fingerprint": "e884ea05cb06434ee4be10b4761a3684"
+      },
+      "roles": {
+        "count": 4,
+        "fingerprint": "d048b5d11bb304f8126812a01fe07ae2"
+      },
+      "sessions": {
+        "count": 3,
+        "fingerprint": "088fd972acc3e6f9b184d2dcc97f5415"
+      },
+      "simulacros_programados": {
+        "count": 12,
+        "fingerprint": "8168ea1838fc5e598947528222df850c"
+      },
+      "temas": {
+        "count": 51,
+        "fingerprint": "0fc51fe8e2f02dd7d747a1e32ffc74be"
+      },
+      "tutores_academicos": {
+        "count": 4,
+        "fingerprint": "201e0b70110c5c3fca3439dfa9086885"
+      },
+      "universidades": {
+        "count": 5,
+        "fingerprint": "c9ee2e2a4f9deb79d7c3a86900bbb492"
+      },
+      "users": {
+        "count": 9,
+        "fingerprint": "238b3df93bc5ed7f4280e17f35c019cb"
+      }
+    },
+    "professional_fingerprint": "d6fb183650bff34d9e9c215be2953928",
+    "legacy": true,
+    "map": [
+      {
+        "id_tutor": 1,
+        "personal_id": 1,
+        "user_id": 3,
+        "estado_tutor": "activo",
+        "deleted_at": null,
+        "cargo_id": null,
+        "estado_personal": "pendiente"
+      },
+      {
+        "id_tutor": 2,
+        "personal_id": 2,
+        "user_id": 4,
+        "estado_tutor": "activo",
+        "deleted_at": null,
+        "cargo_id": null,
+        "estado_personal": "pendiente"
+      },
+      {
+        "id_tutor": 3,
+        "personal_id": 3,
+        "user_id": 5,
+        "estado_tutor": "activo",
+        "deleted_at": null,
+        "cargo_id": null,
+        "estado_personal": "pendiente"
+      },
+      {
+        "id_tutor": 4,
+        "personal_id": 4,
+        "user_id": 6,
+        "estado_tutor": "activo",
+        "deleted_at": null,
+        "cargo_id": null,
+        "estado_personal": "pendiente"
+      }
+    ],
+    "incoming_fks": [
+      {
+        "tabla": "asignaciones_tutores",
+        "conname": "asignaciones_tutores_id_tutor_foreign",
+        "definition": "FOREIGN KEY (id_tutor) REFERENCES tutores_academicos(id_tutor) ON UPDATE CASCADE ON DELETE CASCADE"
+      },
+      {
+        "tabla": "asistencias_academicas",
+        "conname": "asistencias_academicas_id_tutor_foreign",
+        "definition": "FOREIGN KEY (id_tutor) REFERENCES tutores_academicos(id_tutor) ON UPDATE CASCADE ON DELETE SET NULL"
+      }
+    ],
+    "tutor_constraints": [
+      {
+        "conname": "tutores_academicos_ci_tutor_unique",
+        "definition": "UNIQUE (ci_tutor)"
+      },
+      {
+        "conname": "tutores_academicos_personal_id_foreign",
+        "definition": "FOREIGN KEY (personal_id) REFERENCES personal_institucional(id_personal) ON DELETE RESTRICT"
+      },
+      {
+        "conname": "tutores_academicos_personal_id_unique",
+        "definition": "UNIQUE (personal_id)"
+      },
+      {
+        "conname": "tutores_academicos_pkey",
+        "definition": "PRIMARY KEY (id_tutor)"
+      },
+      {
+        "conname": "tutores_academicos_user_id_foreign",
+        "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL"
+      },
+      {
+        "conname": "tutores_academicos_user_id_unique",
+        "definition": "UNIQUE (user_id)"
+      }
+    ],
+    "missing_personal": 0,
+    "nullable": "YES",
+    "copy_mismatches": 0
+  },
+  "after": {
+    "database": "intelecta",
+    "tables": {
+      "alternativas": {
+        "count": 625,
+        "fingerprint": "52b80cea8f591ca6c216a99c6fa2376b"
+      },
+      "areas_conocimiento": {
+        "count": 16,
+        "fingerprint": "ce90cc36495f55d848b67299f1c1db20"
+      },
+      "asignaciones_tutores": {
+        "count": 16,
+        "fingerprint": "b6cec632eaa67e21c3aab6093bcd0c3e"
+      },
+      "asistencias_academicas": {
+        "count": 544,
+        "fingerprint": "904c0a41eb773d9912efc5668d7e0bf7"
+      },
+      "bitacora_sistema": {
+        "count": 5,
+        "fingerprint": "eb2c757f894ed5a32ae52266eebef6f6"
+      },
+      "cache": {
+        "count": 1,
+        "fingerprint": "fd2c1d62c69935fa03895563770561ee"
+      },
+      "cache_locks": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "cargos": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "carreras": {
+        "count": 26,
+        "fingerprint": "b8b8aa6a3d8f5462bb6e1eb7cbf786a8"
+      },
+      "colegios": {
+        "count": 10,
+        "fingerprint": "7f74ccd962ec8651f9d71957a98b7d61"
+      },
+      "cuotas_academicas": {
+        "count": 180,
+        "fingerprint": "1e2518ba6cc9cb0765f7a4317e39f8ab"
+      },
+      "evaluaciones_aplicadas": {
+        "count": 208,
+        "fingerprint": "082c0cbef7b2eed4904a05af297d0979"
+      },
+      "failed_jobs": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "grupos_academicos": {
+        "count": 6,
+        "fingerprint": "45d86c2acdaad66c400c6dbeccd8fff6"
+      },
+      "habilitaciones_academicas": {
+        "count": 72,
+        "fingerprint": "d97f9f1fbfee27c5cabe4f709e4de14e"
+      },
+      "inscripciones_academicas": {
+        "count": 72,
+        "fingerprint": "1e67b5bbb9404b92059ccabd3f04f568"
+      },
+      "job_batches": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "jobs": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "materias": {
+        "count": 4,
+        "fingerprint": "bf4ab2a02c0020b051612257bc5fba31"
+      },
+      "matriculas_academicas": {
+        "count": 72,
+        "fingerprint": "47403c1ecb6bdb6f3cfe1799037a9c2a"
+      },
+      "migrations": {
+        "count": 38,
+        "fingerprint": "34118f1cd3409e38e52da85a4208a71a"
+      },
+      "model_has_permissions": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "model_has_roles": {
+        "count": 9,
+        "fingerprint": "fd825680f2a997b2bad3a405aa964751"
+      },
+      "password_reset_tokens": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "permissions": {
+        "count": 80,
+        "fingerprint": "6a71e112727260396ece08e279a6e994"
+      },
+      "personal_institucional": {
+        "count": 4,
+        "fingerprint": "e5bc3f683d9681524c4487c021364b50"
+      },
+      "plantilla_preguntas": {
+        "count": 165,
+        "fingerprint": "9ca7c6f3677e0d18c26df027d4fe0621"
+      },
+      "plantillas_evaluacion": {
+        "count": 13,
+        "fingerprint": "650340e7e657b56fae1ede818c7c89c6"
+      },
+      "postulantes": {
+        "count": 72,
+        "fingerprint": "182ff9a29604e75b0ed1cbe39258a9d4"
+      },
+      "preguntas": {
+        "count": 125,
+        "fingerprint": "d90801879f2eaa5eb08c955fb2bda554"
+      },
+      "programas_academicos": {
+        "count": 4,
+        "fingerprint": "9a6c665162ec5843aae7d58f7e064e21"
+      },
+      "rendimientos_postulante": {
+        "count": 61,
+        "fingerprint": "4ec1e51585b285583f8d96f82c77448b"
+      },
+      "respuestas_evaluacion": {
+        "count": 2290,
+        "fingerprint": "5769fc48c48bcf10ea2b50a52fd018c7"
+      },
+      "role_has_permissions": {
+        "count": 179,
+        "fingerprint": "e884ea05cb06434ee4be10b4761a3684"
+      },
+      "roles": {
+        "count": 4,
+        "fingerprint": "d048b5d11bb304f8126812a01fe07ae2"
+      },
+      "sessions": {
+        "count": 3,
+        "fingerprint": "088fd972acc3e6f9b184d2dcc97f5415"
+      },
+      "simulacros_programados": {
+        "count": 12,
+        "fingerprint": "8168ea1838fc5e598947528222df850c"
+      },
+      "temas": {
+        "count": 51,
+        "fingerprint": "0fc51fe8e2f02dd7d747a1e32ffc74be"
+      },
+      "tutores_academicos": {
+        "count": 4,
+        "fingerprint": "7e19cf9f391ad7e870738a1368804d37"
+      },
+      "universidades": {
+        "count": 5,
+        "fingerprint": "c9ee2e2a4f9deb79d7c3a86900bbb492"
+      },
+      "users": {
+        "count": 9,
+        "fingerprint": "238b3df93bc5ed7f4280e17f35c019cb"
+      }
+    },
+    "professional_fingerprint": "d6fb183650bff34d9e9c215be2953928",
+    "legacy": false,
+    "map": [
+      {
+        "id_tutor": 1,
+        "personal_id": 1,
+        "user_id": 3,
+        "estado_tutor": "activo",
+        "deleted_at": null,
+        "cargo_id": null,
+        "estado_personal": "pendiente"
+      },
+      {
+        "id_tutor": 2,
+        "personal_id": 2,
+        "user_id": 4,
+        "estado_tutor": "activo",
+        "deleted_at": null,
+        "cargo_id": null,
+        "estado_personal": "pendiente"
+      },
+      {
+        "id_tutor": 3,
+        "personal_id": 3,
+        "user_id": 5,
+        "estado_tutor": "activo",
+        "deleted_at": null,
+        "cargo_id": null,
+        "estado_personal": "pendiente"
+      },
+      {
+        "id_tutor": 4,
+        "personal_id": 4,
+        "user_id": 6,
+        "estado_tutor": "activo",
+        "deleted_at": null,
+        "cargo_id": null,
+        "estado_personal": "pendiente"
+      }
+    ],
+    "incoming_fks": [
+      {
+        "tabla": "asignaciones_tutores",
+        "conname": "asignaciones_tutores_id_tutor_foreign",
+        "definition": "FOREIGN KEY (id_tutor) REFERENCES tutores_academicos(id_tutor) ON UPDATE CASCADE ON DELETE CASCADE"
+      },
+      {
+        "tabla": "asistencias_academicas",
+        "conname": "asistencias_academicas_id_tutor_foreign",
+        "definition": "FOREIGN KEY (id_tutor) REFERENCES tutores_academicos(id_tutor) ON UPDATE CASCADE ON DELETE SET NULL"
+      }
+    ],
+    "tutor_constraints": [
+      {
+        "conname": "tutores_academicos_personal_id_foreign",
+        "definition": "FOREIGN KEY (personal_id) REFERENCES personal_institucional(id_personal) ON DELETE RESTRICT"
+      },
+      {
+        "conname": "tutores_academicos_personal_id_unique",
+        "definition": "UNIQUE (personal_id)"
+      },
+      {
+        "conname": "tutores_academicos_pkey",
+        "definition": "PRIMARY KEY (id_tutor)"
+      }
+    ],
+    "missing_personal": 0,
+    "nullable": "NO"
+  },
+  "preflight": {
+    "duplicate_user": [],
+    "duplicate_ci": [],
+    "without_user": 0,
+    "archived": 0,
+    "null_identity_or_contact_fields": 0,
+    "without_teacher_role": []
+  },
+  "verification": {
+    "phpunit": {"passed": 327, "failed": 0, "assertions": 2025},
+    "node": {"passed": 9, "failed": 0},
+    "postgres_phpunit": {"passed": 122, "failed": 0, "assertions": 950},
+    "postgres_scripts": {"passed": 290, "failed": 0},
+    "build_modules": 3449,
+    "build_seconds": 4.87,
+    "pint": "passed",
+    "git_diff_check": "passed",
+    "maintenance": false,
+    "git_add_commit_push": false
+  }
+}

@@ -69,7 +69,7 @@ const formatDate = (value) =>
         : 'Sin fecha';
 
 const tutorName = (tutor) =>
-    `${tutor?.nombres_tutor || ''} ${tutor?.apellidos_tutor || ''}`.trim();
+    `${tutor?.personal?.nombres || ''} ${tutor?.personal?.apellidos || ''}`.trim();
 
 const studentName = (postulante) =>
     `${postulante?.nombres_post || ''} ${postulante?.apellidos_post || ''}`.trim();

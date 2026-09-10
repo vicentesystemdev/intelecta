@@ -24,7 +24,7 @@ class TutorAcademicoController extends Controller
         ]);
 
         return Inertia::render('Institucional/Tutores/Index', [
-            ...$service->index($filters),
+            ...$service->index($filters, $request->user()),
             'filtros' => $filters,
         ]);
     }
@@ -33,7 +33,7 @@ class TutorAcademicoController extends Controller
         TutorAcademicoRequest $request,
         GuardarTutorAcademicoAction $action,
     ): RedirectResponse {
-        $action->execute(TutorAcademicoData::fromArray($request->validated()));
+        $action->execute(TutorAcademicoData::fromArray($request->validated()), $request->user());
 
         return back()->with('success', 'Tutor académico registrado correctamente.');
     }
@@ -43,15 +43,15 @@ class TutorAcademicoController extends Controller
         TutorAcademico $tutor,
         GuardarTutorAcademicoAction $action,
     ): RedirectResponse {
-        $action->execute(TutorAcademicoData::fromArray($request->validated()), $tutor);
+        $action->execute(TutorAcademicoData::fromArray($request->validated()), $request->user(), $tutor);
 
         return back()->with('success', 'Perfil del tutor actualizado correctamente.');
     }
 
-    public function show(TutorAcademico $tutor, TutorAcademicoService $service): Response
+    public function show(Request $request, TutorAcademico $tutor, TutorAcademicoService $service): Response
     {
         return Inertia::render('Institucional/Tutores/Show', [
-            'tutor' => $service->show($tutor),
+            'tutor' => $service->show($tutor, $request->user()),
         ]);
     }
 }

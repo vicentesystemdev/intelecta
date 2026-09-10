@@ -40,7 +40,7 @@ const emptyAssignment = {
 
 const tutorName = (tutor) =>
     tutor?.nombre_completo ||
-    `${tutor?.nombres_tutor || ''} ${tutor?.apellidos_tutor || ''}`.trim();
+    `${tutor?.personal?.nombres || ''} ${tutor?.personal?.apellidos || ''}`.trim();
 
 const formatDate = (value) =>
     value

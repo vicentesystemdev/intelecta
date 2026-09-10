@@ -2,6 +2,7 @@
 
 namespace App\Domains\Institucional\Models;
 
+use App\Domains\Academico\Models\TutorAcademico;
 use App\Domains\Institucional\Enums\EstadoPersonal;
 use App\Models\User;
 use Database\Factories\PersonalInstitucionalFactory;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['cargo_id', 'nombres', 'apellidos', 'ci', 'celular', 'correo_contacto'])]
 #[UseFactory(PersonalInstitucionalFactory::class)]
@@ -29,6 +31,11 @@ class PersonalInstitucional extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function tutorAcademico(): HasOne
+    {
+        return $this->hasOne(TutorAcademico::class, 'personal_id', 'id_personal')->withTrashed();
     }
 
     public function cargo(): BelongsTo

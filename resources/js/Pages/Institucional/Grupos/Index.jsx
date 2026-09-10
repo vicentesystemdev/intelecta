@@ -33,7 +33,7 @@ const assignedTutorName = (grupo) => {
     const tutor = grupo?.asignacion_tutor_activa?.tutor;
 
     return tutor
-        ? `${tutor.nombres_tutor} ${tutor.apellidos_tutor}`.trim()
+        ? `${tutor.personal?.nombres} ${tutor.personal?.apellidos}`.trim()
         : grupo?.tutor_responsable_grupo || 'Sin tutor asignado';
 };
 

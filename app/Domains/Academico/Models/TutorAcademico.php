@@ -2,28 +2,28 @@
 
 namespace App\Domains\Academico\Models;
 
-use App\Models\User;
+use App\Domains\Institucional\Models\PersonalInstitucional;
+use Database\Factories\TutorAcademicoFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
-    'user_id',
-    'nombres_tutor',
-    'apellidos_tutor',
-    'ci_tutor',
-    'celular_tutor',
-    'correo_tutor',
+    'personal_id',
     'especialidad_tutor',
     'formacion_tutor',
     'experiencia_tutor',
     'estado_tutor',
     'observacion_tutor',
 ])]
+#[UseFactory(TutorAcademicoFactory::class)]
 class TutorAcademico extends Model
 {
+    use HasFactory;
     use SoftDeletes;
 
     protected $table = 'tutores_academicos';
@@ -32,9 +32,12 @@ class TutorAcademico extends Model
 
     protected $appends = ['nombre_completo'];
 
-    public function user(): BelongsTo
+    // Identity is needed by all academic serializers, including reduced-column selects.
+    protected $with = ['personal:id_personal,user_id,nombres,apellidos,celular,correo_contacto'];
+
+    public function personal(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(PersonalInstitucional::class, 'personal_id', 'id_personal');
     }
 
     public function asignaciones(): HasMany
@@ -49,6 +52,6 @@ class TutorAcademico extends Model
 
     public function getNombreCompletoAttribute(): string
     {
-        return trim("{$this->nombres_tutor} {$this->apellidos_tutor}");
+        return trim(($this->personal?->nombres ?? '').' '.($this->personal?->apellidos ?? ''));
     }
 }

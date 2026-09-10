@@ -6,74 +6,59 @@ use App\Domains\Academico\Models\AsignacionTutor;
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Models\ProgramaAcademico;
 use App\Domains\Academico\Models\TutorAcademico;
+use App\Domains\Institucional\Models\PersonalInstitucional;
 use Illuminate\Database\Seeder;
+use LogicException;
 
 class TutoresAcademicosSeeder extends Seeder
 {
-    public function run(): void
+    public function run(array $personal = []): void
     {
+        foreach (['matematica', 'fisica', 'quimica', 'razonamiento', 'paa'] as $key) {
+            if (! ($personal[$key] ?? null) instanceof PersonalInstitucional || ! $personal[$key]->exists) {
+                throw new LogicException('El fixture alternativo requiere cinco objetos Personal explícitos; no resuelve identidad por texto.');
+            }
+        }
+        if (count(array_unique(array_map(fn ($person) => $person->id_personal, $personal))) !== count($personal)) {
+            throw new LogicException('Cada tutor demo requiere un Personal diferente.');
+        }
         $tutores = collect([
             [
                 'clave' => 'matematica',
-                'nombres_tutor' => 'Daniela',
-                'apellidos_tutor' => 'Vargas Flores',
-                'ci_tutor' => 'TUT-1001',
-                'celular_tutor' => '72001001',
-                'correo_tutor' => 'daniela.vargas@avalancha.edu.bo',
                 'especialidad_tutor' => 'Matemática',
                 'formacion_tutor' => 'Licenciatura en Matemática y formación preuniversitaria',
                 'experiencia_tutor' => 'Acompañamiento en álgebra, trigonometría y resolución de problemas para admisión universitaria.',
             ],
             [
                 'clave' => 'fisica',
-                'nombres_tutor' => 'Marcelo',
-                'apellidos_tutor' => 'Quispe Mamani',
-                'ci_tutor' => 'TUT-1002',
-                'celular_tutor' => '72001002',
-                'correo_tutor' => 'marcelo.quispe@avalancha.edu.bo',
                 'especialidad_tutor' => 'Física',
                 'formacion_tutor' => 'Ingeniería y docencia en ciencias exactas',
                 'experiencia_tutor' => 'Tutoría de mecánica, cinemática y razonamiento físico aplicado a simulacros.',
             ],
             [
                 'clave' => 'quimica',
-                'nombres_tutor' => 'Paola',
-                'apellidos_tutor' => 'Rojas Choque',
-                'ci_tutor' => 'TUT-1003',
-                'celular_tutor' => '72001003',
-                'correo_tutor' => 'paola.rojas@avalancha.edu.bo',
                 'especialidad_tutor' => 'Química',
                 'formacion_tutor' => 'Licenciatura en Química',
                 'experiencia_tutor' => 'Nivelación en química general, estequiometría y lectura cuantitativa de problemas.',
             ],
             [
                 'clave' => 'razonamiento',
-                'nombres_tutor' => 'Álvaro',
-                'apellidos_tutor' => 'Mendoza Apaza',
-                'ci_tutor' => 'TUT-1004',
-                'celular_tutor' => '72001004',
-                'correo_tutor' => 'alvaro.mendoza@avalancha.edu.bo',
                 'especialidad_tutor' => 'Razonamiento Lógico',
                 'formacion_tutor' => 'Psicopedagogía y evaluación de aptitudes',
                 'experiencia_tutor' => 'Orientación en razonamiento cuantitativo, interpretación y estrategias de resolución.',
             ],
             [
                 'clave' => 'paa',
-                'nombres_tutor' => 'Natalia',
-                'apellidos_tutor' => 'Condori Lima',
-                'ci_tutor' => 'TUT-1005',
-                'celular_tutor' => '72001005',
-                'correo_tutor' => 'natalia.condori@avalancha.edu.bo',
                 'especialidad_tutor' => 'PAA',
                 'formacion_tutor' => 'Ingeniería y preparación en pruebas de aptitud académica',
                 'experiencia_tutor' => 'Seguimiento de preparación PAA y fortalecimiento de habilidades cuantitativas.',
             ],
-        ])->mapWithKeys(function (array $data) {
+        ])->mapWithKeys(function (array $data) use ($personal) {
             $key = $data['clave'];
             unset($data['clave']);
 
             $tutor = TutorAcademico::updateOrCreate(
-                ['ci_tutor' => $data['ci_tutor']],
+                ['personal_id' => $personal[$key]->id_personal],
                 [
                     ...$data,
                     'estado_tutor' => 'activo',

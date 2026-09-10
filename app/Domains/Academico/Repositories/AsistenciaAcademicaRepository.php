@@ -7,7 +7,6 @@ use App\Domains\Academico\Models\AsistenciaAcademica;
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Models\InscripcionAcademica;
 use App\Domains\Academico\Models\ProgramaAcademico;
-use App\Domains\Academico\Models\TutorAcademico;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -21,7 +20,7 @@ class AsistenciaAcademicaRepository
                 'programa:id_prog,nombre_prog,codigo_prog',
                 'grupo:id_grupo,id_prog,nombre_grupo,codigo_grupo',
                 'postulante:id_post,nombres_post,apellidos_post',
-                'tutor:id_tutor,nombres_tutor,apellidos_tutor,especialidad_tutor',
+                'tutor:id_tutor,personal_id,especialidad_tutor',
             ])
             ->latest('fecha_asist')
             ->latest('id_asist')
@@ -126,11 +125,7 @@ class AsistenciaAcademicaRepository
 
     public function tutoresOptions(): Collection
     {
-        return TutorAcademico::query()
-            ->where('estado_tutor', 'activo')
-            ->orderBy('apellidos_tutor')
-            ->orderBy('nombres_tutor')
-            ->get(['id_tutor', 'nombres_tutor', 'apellidos_tutor', 'especialidad_tutor']);
+        return app(TutorAcademicoRepository::class)->options(true);
     }
 
     public function enrolledOptions(): Collection
@@ -149,7 +144,7 @@ class AsistenciaAcademicaRepository
         $records = AsistenciaAcademica::query()
             ->with([
                 'grupo:id_grupo,nombre_grupo,codigo_grupo',
-                'tutor:id_tutor,nombres_tutor,apellidos_tutor',
+                'tutor:id_tutor,personal_id',
             ])
             ->where('id_post', $postulanteId)
             ->latest('fecha_asist')

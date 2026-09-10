@@ -7,6 +7,19 @@ const source = fs.readFileSync(new URL('../resources/js/lib/inputValidation.js',
     .replace(/^import options.*$/m, 'const options = {};');
 const { validationProps, inputConstraints } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 
+test('tutor uses explicit Personal and a separate opt-in identity edit, never legacy identity fields', () => {
+    assert.equal(validationProps('personal_id').required, true);
+    for (const field of ['nombres_tutor', 'apellidos_tutor', 'ci_tutor', 'celular_tutor', 'correo_tutor']) {
+        assert.equal(inputConstraints[field], undefined);
+    }
+    const ui = fs.readFileSync(new URL('../resources/js/Pages/Institucional/Tutores/Index.jsx', import.meta.url), 'utf8');
+    assert.match(ui, /capacidades\.editarPersonal/);
+    assert.match(ui, /form\.setData\('personal'/);
+    assert.match(ui, /personal_id: String\(tutor\.personal_id\)/);
+    assert.doesNotMatch(ui, /form\.setData\('user_id'/);
+    assert.doesNotMatch(ui, /nombres_tutor|apellidos_tutor|ci_tutor|celular_tutor|correo_tutor/);
+});
+
 test('organization fields reuse shared constraints and cargo names require letters', () => {
     const re = new RegExp('^(?:' + validationProps('nombre_cargo').pattern + ')$', 'v');
     for (const name of ['Secretaría', 'Director de Carrera', 'Coordinador Académico', 'Docente 2']) assert.ok(re.test(name));
