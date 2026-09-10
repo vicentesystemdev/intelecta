@@ -87,8 +87,7 @@ function PermissionEditor({ role, grupos, onClose }) {
                         {role.name}
                     </p>
                     <p className="mt-1 text-xs leading-5 text-slate-600 dark:text-slate-400">
-                        Seleccione las capacidades que corresponden a este perfil
-                        institucional.
+                        Seleccione capacidades dentro del techo de este rol. Seguridad solo para SA; Docente no accede a información global de alumnos.
                     </p>
                 </div>
 
@@ -111,6 +110,7 @@ function PermissionEditor({ role, grupos, onClose }) {
                                     >
                                         <input
                                             type="checkbox"
+                                            disabled={!role.allowed_permissions.includes(permission.name)}
                                             className="rounded border-slate-300 text-brand-secondary focus:ring-brand-secondary dark:border-slate-700 dark:bg-slate-950"
                                             checked={selected.includes(
                                                 permission.name,

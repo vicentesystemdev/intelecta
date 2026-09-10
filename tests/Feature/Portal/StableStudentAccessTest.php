@@ -89,7 +89,7 @@ class StableStudentAccessTest extends TestCase
         $assertOwnRecord();
         $sa = User::role('Super Administrador')->firstOrFail();
         $this->actingAs($sa)->putJson(route('admin.sistema.usuarios.update', $user), [
-            'name' => $user->name, 'email' => ' NUEVO.ACCESO@EXAMPLE.COM ', 'role' => 'Estudiante',
+            'name' => $user->name, 'email' => ' NUEVO.ACCESO@EXAMPLE.COM ',
         ])->assertRedirect()->assertSessionHasNoErrors();
         $this->assertSame('nuevo.acceso@example.com', $user->fresh()->email);
         $this->assertNull($user->fresh()->email_verified_at);

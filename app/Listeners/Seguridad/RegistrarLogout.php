@@ -7,15 +7,13 @@ use Illuminate\Auth\Events\Logout;
 
 class RegistrarLogout
 {
-    public function __construct(private readonly BitacoraService $bitacora)
-    {
-    }
+    public function __construct(private readonly BitacoraService $bitacora) {}
 
     public function handle(Logout $event): void
     {
         $user = $event->user;
-        $role = $user && method_exists($user, 'getRoleNames')
-            ? $user->getRoleNames()->first()
+        $role = $user && method_exists($user, 'rolesLabel')
+            ? $user->rolesLabel()
             : null;
 
         $this->bitacora->registrar([

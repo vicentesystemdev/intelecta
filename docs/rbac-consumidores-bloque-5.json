@@ -1,0 +1,648 @@
+{
+  "areas.crear": [
+    {
+      "uri": "areas-conocimiento",
+      "method": "POST",
+      "name": "areas-conocimiento.store"
+    },
+    {
+      "uri": "areas-conocimiento/crear",
+      "method": "GET|HEAD",
+      "name": "areas-conocimiento.create"
+    }
+  ],
+  "areas.editar": [
+    {
+      "uri": "areas-conocimiento/{area}",
+      "method": "PUT",
+      "name": "areas-conocimiento.update"
+    },
+    {
+      "uri": "areas-conocimiento/{area}/editar",
+      "method": "GET|HEAD",
+      "name": "areas-conocimiento.edit"
+    }
+  ],
+  "areas.ver": [
+    {
+      "uri": "admin/evaluaciones/areas",
+      "method": "GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS",
+      "name": "admin.evaluaciones.areas"
+    },
+    {
+      "uri": "areas-conocimiento",
+      "method": "GET|HEAD",
+      "name": "areas-conocimiento.index"
+    }
+  ],
+  "asignaciones-tutores.crear": [
+    {
+      "uri": "admin/institucional/asignacion-tutores",
+      "method": "POST",
+      "name": "admin.institucional.asignacion-tutores.store"
+    }
+  ],
+  "asignaciones-tutores.editar": [
+    {
+      "uri": "admin/institucional/asignacion-tutores/{asignacion}",
+      "method": "PATCH",
+      "name": "admin.institucional.asignacion-tutores.update"
+    }
+  ],
+  "asignaciones-tutores.ver": [
+    {
+      "uri": "admin/institucional/asignacion-tutores",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.asignacion-tutores.index"
+    }
+  ],
+  "asistencia.crear": [
+    {
+      "uri": "admin/institucional/asistencia",
+      "method": "POST",
+      "name": "admin.institucional.asistencia.store"
+    },
+    {
+      "uri": "admin/institucional/asistencia/grupo",
+      "method": "POST",
+      "name": "admin.institucional.asistencia.store-grupo"
+    }
+  ],
+  "asistencia.editar": [
+    {
+      "uri": "admin/institucional/asistencia/{asistencia}",
+      "method": "PATCH",
+      "name": "admin.institucional.asistencia.update"
+    }
+  ],
+  "asistencia.ver": [
+    {
+      "uri": "admin/institucional/asistencia",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.asistencia.index"
+    }
+  ],
+  "bitacora.exportar": [
+    {
+      "uri": "admin/sistema/bitacora/exportar",
+      "method": "GET|HEAD",
+      "name": "admin.sistema.bitacora.exportar"
+    }
+  ],
+  "bitacora.ver": [
+    {
+      "uri": "admin/sistema/bitacora",
+      "method": "GET|HEAD",
+      "name": "admin.sistema.bitacora.index"
+    }
+  ],
+  "cargos.cambiar_estado": [
+    {
+      "uri": "admin/institucional/cargos/{cargo}/estado",
+      "method": "PATCH",
+      "name": "admin.institucional.cargos.estado"
+    }
+  ],
+  "cargos.crear": [
+    {
+      "uri": "admin/institucional/cargos",
+      "method": "POST",
+      "name": "admin.institucional.cargos.store"
+    }
+  ],
+  "cargos.editar": [
+    {
+      "uri": "admin/institucional/cargos/{cargo}",
+      "method": "PUT",
+      "name": "admin.institucional.cargos.update"
+    }
+  ],
+  "cargos.ver": [
+    {
+      "uri": "admin/institucional/cargos",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.cargos.index"
+    }
+  ],
+  "configuracion.ver": [
+    {
+      "uri": "admin/sistema/configuracion",
+      "method": "GET|HEAD",
+      "name": "admin.sistema.configuracion"
+    }
+  ],
+  "dashboard.ver": [
+    {
+      "uri": "dashboard",
+      "method": "GET|HEAD",
+      "name": "dashboard"
+    }
+  ],
+  "docentes.crear": [],
+  "docentes.editar": [],
+  "docentes.eliminar": [],
+  "docentes.ver": [],
+  "evaluaciones.cerrar": [],
+  "evaluaciones.crear": [],
+  "evaluaciones.editar": [],
+  "evaluaciones.ver": [
+    {
+      "uri": "admin/evaluaciones",
+      "method": "GET|HEAD",
+      "name": "admin.evaluaciones.index"
+    }
+  ],
+  "ficha-academica.ver": [
+    {
+      "uri": "admin/institucional/ficha-academica",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.ficha.index"
+    },
+    {
+      "uri": "admin/institucional/ficha-academica/{postulante}",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.ficha.postulante"
+    }
+  ],
+  "grupos.crear": [
+    {
+      "uri": "admin/institucional/grupos",
+      "method": "POST",
+      "name": "admin.institucional.grupos.store"
+    }
+  ],
+  "grupos.editar": [
+    {
+      "uri": "admin/institucional/grupos/{grupo}",
+      "method": "PUT",
+      "name": "admin.institucional.grupos.update"
+    }
+  ],
+  "grupos.ver": [
+    {
+      "uri": "admin/institucional/grupos",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.grupos.index"
+    }
+  ],
+  "habilitacion-academica.editar": [
+    {
+      "uri": "admin/institucional/habilitacion-academica/{habilitacion}",
+      "method": "PATCH",
+      "name": "admin.institucional.habilitacion.update"
+    }
+  ],
+  "habilitacion-academica.ver": [
+    {
+      "uri": "admin/institucional/habilitacion-academica",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.habilitacion.index"
+    }
+  ],
+  "indicadores.ver": [
+    {
+      "uri": "admin/analisis/riesgo-academico",
+      "method": "GET|HEAD",
+      "name": "admin.analisis.riesgo-academico"
+    }
+  ],
+  "inscripciones.crear": [
+    {
+      "uri": "admin/institucional/inscripciones",
+      "method": "POST",
+      "name": "admin.institucional.inscripciones.store"
+    }
+  ],
+  "inscripciones.editar": [
+    {
+      "uri": "admin/institucional/inscripciones/{inscripcion}",
+      "method": "PATCH",
+      "name": "admin.institucional.inscripciones.update"
+    }
+  ],
+  "inscripciones.ver": [
+    {
+      "uri": "admin/institucional/inscripciones",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.inscripciones.index"
+    }
+  ],
+  "learning_analytics.ver": [
+    {
+      "uri": "admin/analisis/learning-analytics",
+      "method": "GET|HEAD",
+      "name": "admin.analisis.learning-analytics"
+    }
+  ],
+  "materias.ver": [
+    {
+      "uri": "admin/evaluaciones/materias",
+      "method": "GET|HEAD",
+      "name": "admin.evaluaciones.materias"
+    }
+  ],
+  "matriculas-cuotas.crear": [
+    {
+      "uri": "admin/institucional/cuotas",
+      "method": "POST",
+      "name": "admin.institucional.cuotas.store"
+    },
+    {
+      "uri": "admin/institucional/matriculas-cuotas",
+      "method": "POST",
+      "name": "admin.institucional.matriculas-cuotas.store"
+    }
+  ],
+  "matriculas-cuotas.editar": [
+    {
+      "uri": "admin/institucional/cuotas/{cuota}",
+      "method": "PATCH",
+      "name": "admin.institucional.cuotas.update"
+    },
+    {
+      "uri": "admin/institucional/matriculas-cuotas/{matricula}",
+      "method": "PATCH",
+      "name": "admin.institucional.matriculas-cuotas.update"
+    }
+  ],
+  "matriculas-cuotas.ver": [
+    {
+      "uri": "admin/institucional/matriculas-cuotas",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.matriculas-cuotas.index"
+    }
+  ],
+  "personal.cambiar_estado": [
+    {
+      "uri": "admin/institucional/personal/{personal}/estado",
+      "method": "PATCH",
+      "name": "admin.institucional.personal.estado"
+    }
+  ],
+  "personal.crear": [
+    {
+      "uri": "admin/institucional/personal",
+      "method": "POST",
+      "name": "admin.institucional.personal.store"
+    }
+  ],
+  "personal.editar": [
+    {
+      "uri": "admin/institucional/personal/{personal}",
+      "method": "PUT",
+      "name": "admin.institucional.personal.update"
+    }
+  ],
+  "personal.ver": [
+    {
+      "uri": "admin/institucional/personal",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.personal.index"
+    },
+    {
+      "uri": "admin/institucional/personal/usuarios-elegibles",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.personal.usuarios-elegibles"
+    },
+    {
+      "uri": "admin/institucional/personal/{personal}/vincular",
+      "method": "POST",
+      "name": "admin.institucional.personal.vincular"
+    }
+  ],
+  "plantillas.crear": [
+    {
+      "uri": "plantillas-evaluacion",
+      "method": "POST",
+      "name": "plantillas-evaluacion.store"
+    },
+    {
+      "uri": "plantillas-evaluacion/crear",
+      "method": "GET|HEAD",
+      "name": "plantillas-evaluacion.create"
+    }
+  ],
+  "plantillas.editar": [
+    {
+      "uri": "plantillas-evaluacion/{plantilla}",
+      "method": "PUT",
+      "name": "plantillas-evaluacion.update"
+    },
+    {
+      "uri": "plantillas-evaluacion/{plantilla}/editar",
+      "method": "GET|HEAD",
+      "name": "plantillas-evaluacion.edit"
+    }
+  ],
+  "plantillas.eliminar": [
+    {
+      "uri": "plantillas-evaluacion/{plantilla}/estado",
+      "method": "PATCH",
+      "name": "plantillas-evaluacion.cambiar-estado"
+    }
+  ],
+  "plantillas.ver": [
+    {
+      "uri": "admin/evaluaciones/plantillas",
+      "method": "GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS",
+      "name": "admin.evaluaciones.plantillas"
+    },
+    {
+      "uri": "plantillas-evaluacion",
+      "method": "GET|HEAD",
+      "name": "plantillas-evaluacion.index"
+    },
+    {
+      "uri": "plantillas-evaluacion/{plantilla}",
+      "method": "GET|HEAD",
+      "name": "plantillas-evaluacion.show"
+    }
+  ],
+  "postulantes.crear": [
+    {
+      "uri": "postulantes",
+      "method": "POST",
+      "name": "postulantes.store"
+    },
+    {
+      "uri": "postulantes/crear",
+      "method": "GET|HEAD",
+      "name": "postulantes.create"
+    }
+  ],
+  "postulantes.editar": [
+    {
+      "uri": "postulantes/{postulante}",
+      "method": "PUT",
+      "name": "postulantes.update"
+    },
+    {
+      "uri": "postulantes/{postulante}/editar",
+      "method": "GET|HEAD",
+      "name": "postulantes.edit"
+    }
+  ],
+  "postulantes.eliminar": [
+    {
+      "uri": "postulantes/{postulante}/estado",
+      "method": "PATCH",
+      "name": "postulantes.cambiar-estado"
+    }
+  ],
+  "postulantes.ver": [
+    {
+      "uri": "admin/gestion-academica/carreras",
+      "method": "GET|HEAD",
+      "name": "admin.carreras"
+    },
+    {
+      "uri": "admin/gestion-academica/colegios",
+      "method": "GET|HEAD",
+      "name": "admin.colegios"
+    },
+    {
+      "uri": "postulantes",
+      "method": "GET|HEAD",
+      "name": "postulantes.index"
+    },
+    {
+      "uri": "postulantes/{postulante}",
+      "method": "GET|HEAD",
+      "name": "postulantes.show"
+    }
+  ],
+  "preguntas.crear": [
+    {
+      "uri": "preguntas",
+      "method": "POST",
+      "name": "preguntas.store"
+    },
+    {
+      "uri": "preguntas/crear",
+      "method": "GET|HEAD",
+      "name": "preguntas.create"
+    }
+  ],
+  "preguntas.editar": [
+    {
+      "uri": "preguntas/{pregunta}",
+      "method": "PUT",
+      "name": "preguntas.update"
+    },
+    {
+      "uri": "preguntas/{pregunta}/editar",
+      "method": "GET|HEAD",
+      "name": "preguntas.edit"
+    }
+  ],
+  "preguntas.eliminar": [
+    {
+      "uri": "preguntas/{pregunta}/estado",
+      "method": "PATCH",
+      "name": "preguntas.cambiar-estado"
+    }
+  ],
+  "preguntas.ver": [
+    {
+      "uri": "admin/evaluaciones/preguntas",
+      "method": "GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS",
+      "name": "admin.evaluaciones.preguntas"
+    },
+    {
+      "uri": "preguntas",
+      "method": "GET|HEAD",
+      "name": "preguntas.index"
+    },
+    {
+      "uri": "preguntas/{pregunta}",
+      "method": "GET|HEAD",
+      "name": "preguntas.show"
+    }
+  ],
+  "programas.crear": [
+    {
+      "uri": "admin/institucional/programas",
+      "method": "POST",
+      "name": "admin.institucional.programas.store"
+    }
+  ],
+  "programas.editar": [
+    {
+      "uri": "admin/institucional/programas/{programa}",
+      "method": "PUT",
+      "name": "admin.institucional.programas.update"
+    }
+  ],
+  "programas.ver": [
+    {
+      "uri": "admin/institucional/programas",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.programas.index"
+    }
+  ],
+  "ranking.ver": [
+    {
+      "uri": "admin/institucional/ranking",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.ranking.index"
+    }
+  ],
+  "reportes.ver": [
+    {
+      "uri": "reportes-academicos",
+      "method": "GET|HEAD",
+      "name": "reportes-academicos.index"
+    },
+    {
+      "uri": "reportes-academicos/excel/{tipo}",
+      "method": "GET|HEAD",
+      "name": "reportes.excel"
+    },
+    {
+      "uri": "reportes-academicos/pdf/{tipo}",
+      "method": "GET|HEAD",
+      "name": "reportes.pdf"
+    }
+  ],
+  "resultados.ver": [
+    {
+      "uri": "admin/evaluaciones/resultados",
+      "method": "GET|HEAD",
+      "name": "admin.evaluaciones.resultados"
+    }
+  ],
+  "roles-permisos.editar": [
+    {
+      "uri": "admin/sistema/roles-permisos/{rol}",
+      "method": "PUT",
+      "name": "admin.sistema.roles-permisos.update"
+    }
+  ],
+  "roles-permisos.ver": [
+    {
+      "uri": "admin/sistema/roles-permisos",
+      "method": "GET|HEAD",
+      "name": "admin.sistema.roles-permisos"
+    }
+  ],
+  "roles.crear": [],
+  "roles.editar": [],
+  "roles.ver": [],
+  "simulacros.crear": [
+    {
+      "uri": "admin/institucional/simulacros",
+      "method": "POST",
+      "name": "admin.institucional.simulacros.store"
+    }
+  ],
+  "simulacros.editar": [
+    {
+      "uri": "admin/institucional/simulacros/{simulacro}",
+      "method": "PUT",
+      "name": "admin.institucional.simulacros.update"
+    }
+  ],
+  "simulacros.ver": [
+    {
+      "uri": "admin/institucional/simulacros",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.simulacros.index"
+    }
+  ],
+  "temas.crear": [
+    {
+      "uri": "temas",
+      "method": "POST",
+      "name": "temas.store"
+    },
+    {
+      "uri": "temas/crear",
+      "method": "GET|HEAD",
+      "name": "temas.create"
+    }
+  ],
+  "temas.editar": [
+    {
+      "uri": "temas/{tema}",
+      "method": "PUT",
+      "name": "temas.update"
+    },
+    {
+      "uri": "temas/{tema}/editar",
+      "method": "GET|HEAD",
+      "name": "temas.edit"
+    }
+  ],
+  "temas.ver": [
+    {
+      "uri": "admin/evaluaciones/temas",
+      "method": "GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS",
+      "name": "admin.evaluaciones.temas"
+    },
+    {
+      "uri": "temas",
+      "method": "GET|HEAD",
+      "name": "temas.index"
+    }
+  ],
+  "tutores.crear": [
+    {
+      "uri": "admin/institucional/tutores",
+      "method": "POST",
+      "name": "admin.institucional.tutores.store"
+    }
+  ],
+  "tutores.editar": [
+    {
+      "uri": "admin/institucional/tutores/{tutor}",
+      "method": "PATCH",
+      "name": "admin.institucional.tutores.update"
+    }
+  ],
+  "tutores.ver": [
+    {
+      "uri": "admin/gestion-academica/docentes",
+      "method": "GET|HEAD",
+      "name": "admin.docentes"
+    },
+    {
+      "uri": "admin/institucional/tutores",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.tutores.index"
+    },
+    {
+      "uri": "admin/institucional/tutores/{tutor}",
+      "method": "GET|HEAD",
+      "name": "admin.institucional.tutores.show"
+    }
+  ],
+  "usuarios.asignar_roles": [
+    {
+      "uri": "admin/sistema/usuarios/{usuario}/roles",
+      "method": "PUT",
+      "name": "admin.sistema.usuarios.roles"
+    }
+  ],
+  "usuarios.crear": [
+    {
+      "uri": "admin/sistema/usuarios",
+      "method": "POST",
+      "name": "admin.sistema.usuarios.store"
+    }
+  ],
+  "usuarios.editar": [
+    {
+      "uri": "admin/sistema/usuarios/{usuario}",
+      "method": "PUT",
+      "name": "admin.sistema.usuarios.update"
+    }
+  ],
+  "usuarios.eliminar": [],
+  "usuarios.ver": [
+    {
+      "uri": "admin/sistema/usuarios",
+      "method": "GET|HEAD",
+      "name": "admin.sistema.usuarios"
+    }
+  ]
+}

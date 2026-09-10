@@ -96,10 +96,9 @@ const groupIsActive = (group) =>
 export default function AppSidebar({ open = false, onClose = () => {} }) {
     const auth = usePage().props.auth || {};
     const permissions = auth.permissions || [];
-    const isSuperAdministrator =
-        auth.isSuperAdministrator ||
-        (auth.roles || []).includes('Super Administrador');
+    const isSuperAdministrator = auth.isSuperAdministrator === true;
     const visibleGroups = navigationGroups
+        .filter((group) => group.label !== 'ADMINISTRACIÓN DEL SISTEMA' || auth.security === true)
         .map((group) => ({
             ...group,
             items: group.items.filter(

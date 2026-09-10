@@ -36,7 +36,6 @@ class User extends Authenticatable implements MustVerifyEmail
     public function canManageOrganization(string $permission): bool
     {
         return $this->cuentaActiva()
-            && ! $this->hasRole('Estudiante')
             && $this->hasAnyRole(['Administrador', 'Super Administrador'])
             && $this->can($permission);
     }
@@ -63,7 +62,39 @@ class User extends Authenticatable implements MustVerifyEmail
             return route('verification.notice');
         }
 
-        return $this->hasAnyRole(['Super Administrador', 'Administrador', 'Docente']) ? route('dashboard') : url('/');
+        if ($this->hasAnyRole(['Super Administrador', 'Administrador'])) {
+            return route('dashboard');
+        }
+        if ($this->hasRole('Docente')) {
+            foreach (['preguntas.ver' => 'preguntas.index', 'plantillas.ver' => 'plantillas-evaluacion.index', 'materias.ver' => 'admin.evaluaciones.materias', 'areas.ver' => 'areas-conocimiento.index', 'temas.ver' => 'temas.index', 'preguntas.crear' => 'preguntas.create'] as $permission => $route) {
+                if ($this->can($permission)) {
+                    return route($route);
+                }
+            }
+
+            return url('/');
+        }
+
+        return $this->hasRole('Estudiante') ? route('estudiante.evaluaciones') : url('/');
+    }
+
+    public function rolesLabel(): string
+    {
+        return $this->getRoleNames()->sort()->values()->implode(' + ');
+    }
+
+    public function accessContext(): string
+    {
+        if (! $this->cuentaActiva()) {
+            return 'account';
+        }
+
+        return match (true) {
+            $this->hasAnyRole(['Super Administrador', 'Administrador']) => 'academic',
+            $this->hasRole('Docente') => 'teacher',
+            $this->hasRole('Estudiante') => 'student',
+            default => 'account',
+        };
     }
 
     /**

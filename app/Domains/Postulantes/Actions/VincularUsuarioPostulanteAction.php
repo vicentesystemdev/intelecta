@@ -4,10 +4,10 @@ namespace App\Domains\Postulantes\Actions;
 
 use App\Domains\Postulantes\Models\Postulante;
 use App\Domains\Seguridad\Services\BitacoraService;
+use App\Domains\Seguridad\Services\CuentaService;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\UniqueConstraintViolationException;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -24,13 +24,17 @@ class VincularUsuarioPostulanteAction
         Validator::make(['motivo' => $motivo], ['motivo' => ['required', 'string', 'min:10', 'max:500']])->validate();
 
         try {
-            return DB::transaction(function () use ($userId, $postulanteId, $actor, $motivo): Postulante {
+            return app(CuentaService::class)->transaction(function () use ($userId, $postulanteId, $actor, $motivo): Postulante {
+                $actor = User::findOrFail($actor->id);
+                if (! $actor->canChangeLoginEmail()) {
+                    throw new AuthorizationException('Solo un SA activo puede confirmar el vínculo.');
+                }
                 // Consistent lock order with account deletion; UNIQUE is the final concurrent guard.
                 $user = User::query()->lockForUpdate()->find($userId);
                 $postulante = Postulante::withTrashed()->lockForUpdate()->find($postulanteId);
 
-                if (! $user || ! $user->hasRole('Estudiante')) {
-                    throw ValidationException::withMessages(['user_id' => 'Selecciona una cuenta existente con rol Estudiante.']);
+                if (! $user || $user->getRoleNames()->diff(['Estudiante'])->isNotEmpty()) {
+                    throw ValidationException::withMessages(['user_id' => 'Selecciona una cuenta sin roles o exclusivamente Estudiante.']);
                 }
                 if (! $postulante || $postulante->trashed()) {
                     throw ValidationException::withMessages(['id_post' => 'Selecciona un expediente existente no archivado.']);

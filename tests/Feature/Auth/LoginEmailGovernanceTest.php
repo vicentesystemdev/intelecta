@@ -38,7 +38,7 @@ class LoginEmailGovernanceTest extends TestCase
     {
         $admin = User::role('Administrador')->firstOrFail();
         $user = User::role('Estudiante')->firstOrFail();
-        $data = ['name' => 'Nombre Permitido', 'email' => 'no.autorizado@example.com', 'role' => 'Estudiante'];
+        $data = ['name' => 'Nombre Permitido', 'email' => 'no.autorizado@example.com'];
         $oldEmail = $user->email;
         $this->actingAs($admin)->putJson(route('admin.sistema.usuarios.update', $user), $data)->assertForbidden();
         $this->assertSame($oldEmail, $user->fresh()->email);
@@ -60,7 +60,7 @@ class LoginEmailGovernanceTest extends TestCase
         $reset = Password::broker()->createToken($user);
         config(['session.driver' => 'database']);
         DB::table('sessions')->insert(['id' => 'identity-session-test', 'user_id' => $user->id, 'payload' => '', 'last_activity' => time()]);
-        $data = ['name' => $user->name, 'email' => 'malformado@', 'role' => 'Estudiante'];
+        $data = ['name' => $user->name, 'email' => 'malformado@'];
         $url = route('admin.sistema.usuarios.update', $user);
         $this->actingAs($sa)->putJson($url, $data)->assertUnprocessable()->assertJsonValidationErrors('email');
         $data['email'] = $sa->email;

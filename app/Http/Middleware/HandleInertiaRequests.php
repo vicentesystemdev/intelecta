@@ -33,8 +33,11 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
-                'roles' => $request->user() ? $request->user()->getRoleNames() : [],
-                'isSuperAdministrator' => $request->user()?->hasRole('Super Administrador') ?? false,
+                'roles' => $request->user() ? $request->user()->getRoleNames()->sort()->values() : [],
+                'isSuperAdministrator' => $request->user()?->canChangeLoginEmail() ?? false,
+                'security' => $request->user()?->canChangeLoginEmail() ?? false,
+                'context' => $request->user()?->accessContext(),
+                'homeUrl' => $request->user()?->homeRoute(),
                 'organization' => [
                     'cargos' => $request->user()?->canManageOrganization('cargos.ver') ?? false,
                     'personal' => $request->user()?->canManageOrganization('personal.ver') ?? false,

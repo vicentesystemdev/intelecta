@@ -19,7 +19,7 @@ export default function AdminLayout({ title, subtitle, children, wide = false })
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { isDark, toggleTheme } = useTheme();
 
-    const role = auth?.roles?.[0] || 'Usuario institucional';
+    const role = auth?.roles?.join(' + ') || 'Usuario institucional';
 
     const containerClass = wide
         ? 'mx-auto max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8 xl:px-10'

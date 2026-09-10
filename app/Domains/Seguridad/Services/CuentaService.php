@@ -3,6 +3,7 @@
 namespace App\Domains\Seguridad\Services;
 
 use App\Domains\Seguridad\Enums\EstadoCuenta;
+use App\Domains\Seguridad\Support\MatrizRbac;
 use App\Models\User;
 use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -10,7 +11,9 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -74,6 +77,7 @@ class CuentaService
 
     public function create(User $actor, array $data): User
     {
+        $this->rejectEmbeddedRoles($data);
         try {
             $user = $this->transaction(function () use ($actor, $data): User {
                 $actor = $this->authorize($actor);
@@ -82,8 +86,7 @@ class CuentaService
                     'password' => Str::random(64), // Hashed by User; never returned or logged.
                 ]);
                 $user->forceFill(['estado_cuenta' => EstadoCuenta::PENDIENTE, 'email_verified_at' => null])->save();
-                $user->syncRoles([$data['role']]);
-                $this->audit('crear', $actor, $user->id, ['estado' => EstadoCuenta::PENDIENTE->value, 'rol' => $data['role']]);
+                $this->audit('crear', $actor, $user->id, ['estado' => EstadoCuenta::PENDIENTE->value, 'roles' => []]);
 
                 return $user;
             });
@@ -97,15 +100,16 @@ class CuentaService
 
     public function update(User $actor, int $id, array $data): User
     {
+        $this->rejectEmbeddedRoles($data);
+
         return $this->administrative($actor, $id, function (User $user, User $actor) use ($data): User {
             $emailChanged = $user->email !== $data['email'];
             $roles = $user->getRoleNames()->all();
-            $roleChanged = $roles !== [$data['role']];
             $state = $emailChanged && $user->estado_cuenta !== EstadoCuenta::BLOQUEADA
                 ? EstadoCuenta::PENDIENTE : $user->estado_cuenta;
-            $this->protectLast($user, $state, [$data['role']], $actor);
+            $this->protectLast($user, $state, $roles, $actor);
             $before = ['email' => $user->email, 'roles' => $roles, 'estado' => $user->estado_cuenta->value];
-            if ($emailChanged || $roleChanged) {
+            if ($emailChanged) {
                 $this->revoker->execute($user);
             }
             $user->name = $data['name'];
@@ -114,12 +118,51 @@ class CuentaService
                 Password::broker()->deleteToken($user); // Also discard any token under the new address.
             }
             $user->save();
-            if ($roleChanged) {
-                $user->syncRoles([$data['role']]);
-                $this->audit('cambiar_rol', $actor, $user->id, ['roles' => [$data['role']]], ['roles' => $roles]);
-            }
             $this->audit($emailChanged ? 'cambiar_correo_acceso' : 'editar', $actor, $user->id,
-                ['email' => $user->email, 'roles' => [$data['role']], 'estado' => $state->value], $before);
+                ['email' => $user->email, 'roles' => $roles, 'estado' => $state->value], $before);
+
+            return $user;
+        });
+    }
+
+    private function rejectEmbeddedRoles(array $data): void
+    {
+        Validator::make($data, ['role' => ['missing'], 'roles' => ['missing']])->validate();
+    }
+
+    public function assignRoles(User $actor, int $id, array $data): User
+    {
+        return $this->administrative($actor, $id, function (User $user, User $actor) use ($data): User {
+            $validated = Validator::make($data, [
+                'role' => ['missing'],
+                'roles' => ['bail', 'present', 'array', 'list', 'max:4'],
+                'roles.*' => ['bail', 'string', 'distinct:strict', Rule::in(MatrizRbac::ROLES), Rule::exists('roles', 'name')->where('guard_name', 'web')],
+            ])->validate();
+            $roles = $validated['roles'];
+            sort($roles);
+            $before = $user->getRoleNames()->sort()->values()->all();
+            // Check this before compatibility, including attempts to replace the last SA by several roles.
+            $this->protectLast($user, $user->estado_cuenta, $roles, $actor);
+            if (count($roles) > 1 && array_intersect($roles, ['Estudiante', 'Super Administrador'])) {
+                throw ValidationException::withMessages(['roles' => 'Estudiante y Super Administrador son roles exclusivos. Se permite Administrador + Docente.']);
+            }
+            foreach (array_diff($roles, $before) as $role) {
+                $personal = $user->personalInstitucional()->first();
+                $compatible = match ($role) {
+                    'Estudiante' => $user->postulante()->exists(),
+                    'Docente' => $personal && $personal->tutorAcademico()->withoutTrashed()->exists(),
+                    'Administrador' => $personal !== null,
+                    default => true,
+                };
+                if (! $compatible) {
+                    throw ValidationException::withMessages(['roles' => "No se puede asignar {$role}: acredita y vincula primero su perfil (Estudiante: Postulante; Docente: Personal + Tutor; Administrador: Personal). No se crean perfiles automáticamente."]);
+                }
+            }
+            if ($before !== $roles) {
+                $user->syncRoles($roles);
+                $this->revoker->execute($user);
+                $this->audit('asignar_roles', $actor, $user->id, ['roles' => $roles], ['roles' => $before]);
+            }
 
             return $user;
         });
@@ -226,7 +269,7 @@ class CuentaService
     {
         $this->bitacora->registrar([
             'user_id' => $actor->id, 'nombre_usuario' => $actor->name, 'correo_usuario' => $actor->email,
-            'rol_usuario' => $actor->getRoleNames()->first(), 'accion' => $action, 'modulo' => 'Usuarios',
+            'rol_usuario' => $actor->rolesLabel(), 'accion' => $action, 'modulo' => 'Usuarios',
             'entidad' => 'users', 'entidad_id' => $id, 'descripcion' => 'Operación de ciclo de vida de cuenta: '.$action,
             'valores_anteriores' => $before ?: null, 'valores_nuevos' => $after ?: null, 'severidad' => 'seguridad',
         ]);

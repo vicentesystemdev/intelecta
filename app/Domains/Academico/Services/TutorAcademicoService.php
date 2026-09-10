@@ -68,7 +68,7 @@ class TutorAcademicoService
                 $saved = $record ? $this->repository->update($record, $data) : $this->repository->create($data);
                 app(BitacoraService::class)->registrar([
                     'user_id' => $actor->id, 'nombre_usuario' => $actor->name, 'correo_usuario' => $actor->email,
-                    'rol_usuario' => $actor->getRoleNames()->first(), 'modulo' => 'Tutores académicos',
+                    'rol_usuario' => $actor->rolesLabel(), 'modulo' => 'Tutores académicos',
                     'accion' => $record ? 'editar_tutor' : 'crear_tutor', 'entidad' => 'tutores_academicos',
                     'entidad_id' => $saved->id_tutor, 'valores_nuevos' => ['personal_id' => $personal->id_personal, 'campos_modificados' => $fields],
                 ]);

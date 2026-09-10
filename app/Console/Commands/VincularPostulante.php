@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
 class VincularPostulante extends Command
 {
     protected $signature = 'intelecta:vincular-postulante
-        {user_id : ID explícito de la cuenta Estudiante}
+        {user_id : ID explícito de una cuenta sin roles o Estudiante}
         {id_post : ID explícito del expediente confirmado}
         {--actor= : ID del Super Administrador responsable}
         {--motivo= : Referencia de la revisión de identidad, sin PII innecesaria}';

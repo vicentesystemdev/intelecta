@@ -31,11 +31,11 @@ class BitacoraSistemaTest extends TestCase
         $this->student = User::where('email', RolesAndUsersSeeder::STUDENT_EMAIL)->firstOrFail();
     }
 
-    public function test_administrator_can_access_bitacora(): void
+    public function test_administrator_cannot_access_security_bitacora(): void
     {
         $this->actingAs($this->administrator)
             ->get(route('admin.sistema.bitacora.index'))
-            ->assertOk();
+            ->assertForbidden();
     }
 
     public function test_super_administrator_can_access_bitacora(): void
@@ -74,9 +74,12 @@ class BitacoraSistemaTest extends TestCase
         $this->assertSame('[dato protegido]', $evento->valores_nuevos['password']);
     }
 
-    public function test_bitacora_export_requires_export_permission(): void
+    public function test_bitacora_export_requires_active_super_admin(): void
     {
         $this->actingAs($this->administrator)
+            ->get(route('admin.sistema.bitacora.exportar'))
+            ->assertForbidden();
+        $this->actingAs($this->superAdministrator)
             ->get(route('admin.sistema.bitacora.exportar'))
             ->assertOk();
 

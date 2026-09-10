@@ -1,6 +1,8 @@
 <?php
 
 // Two independent PHP workers use the REAL service against an explicitly isolated TEST DB.
+use App\Domains\Academico\Models\TutorAcademico;
+use App\Domains\Institucional\Models\PersonalInstitucional;
 use App\Domains\Seguridad\Enums\EstadoCuenta;
 use App\Domains\Seguridad\Services\CuentaService;
 use App\Models\User;
@@ -30,8 +32,12 @@ if (($argv[2] ?? '') === 'worker') {
         $accounts = app(CuentaService::class);
         if ($argv[4] === 'block') {
             $accounts->block($user, $user->id, 'Prueba concurrente en base aislada');
+        } elseif ($argv[4] === 'demote') {
+            $accounts->assignRoles($user, $user->id, ['roles' => []]);
+        } elseif ($argv[4] === 'multi') {
+            $accounts->assignRoles($user, $user->id, ['roles' => ['Administrador', 'Docente']]);
         } else {
-            $accounts->update($user, $user->id, ['name' => 'Responsable Prueba', 'email' => $argv[4] === 'email' ? 'cambio.'.$user->id.'@example.com' : $user->email, 'role' => $argv[4] === 'demote' ? 'Administrador' : 'Super Administrador']);
+            $accounts->update($user, $user->id, ['name' => 'Responsable Prueba', 'email' => 'cambio.'.$user->id.'@example.com']);
         }
         echo "ACCEPTED\n";
     } catch (ValidationException $exception) {
@@ -46,8 +52,12 @@ $first = User::role('Super Administrador')->firstOrFail();
 $second = User::create(['name' => 'Responsable Concurrencia', 'email' => 'concurrencia.'.$first->id.'@example.com', 'password' => Str::random(64)]);
 $second->forceFill(['estado_cuenta' => EstadoCuenta::ACTIVA, 'email_verified_at' => now()])->save();
 $second->assignRole('Super Administrador');
+foreach ([$first, $second] as $user) {
+    $person = PersonalInstitucional::factory()->create(['user_id' => $user->id]);
+    TutorAcademico::factory()->create(['personal_id' => $person->id_personal]);
+}
 $passed = 0;
-foreach ([['block', 'block'], ['demote', 'demote'], ['block', 'demote'], ['email', 'email']] as $operations) {
+foreach ([['block', 'block'], ['demote', 'demote'], ['block', 'demote'], ['email', 'email'], ['multi', 'multi'], ['demote', 'multi']] as $operations) {
     foreach ([$first, $second] as $user) {
         $user->refresh()->forceFill(['estado_cuenta' => EstadoCuenta::ACTIVA, 'email_verified_at' => now()])->save();
         $user->syncRoles(['Super Administrador']);

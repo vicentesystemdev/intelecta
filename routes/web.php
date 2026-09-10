@@ -386,7 +386,7 @@ Route::middleware('auth')->group(function () {
                 })->middleware('permission:indicadores.ver')->name('admin.analisis.riesgo-academico');
             });
 
-            Route::prefix('sistema')->group(function () {
+            Route::prefix('sistema')->middleware('security')->group(function () {
                 Route::get('/usuarios', [UsuarioController::class, 'index'])
                     ->middleware('permission:usuarios.ver')
                     ->name('admin.sistema.usuarios');
@@ -398,6 +398,8 @@ Route::middleware('auth')->group(function () {
                     ->name('admin.sistema.usuarios.update');
                 Route::post('/usuarios/{usuario}/bloquear', [UsuarioController::class, 'bloquear'])
                     ->name('admin.sistema.usuarios.bloquear');
+                Route::put('/usuarios/{usuario}/roles', [UsuarioController::class, 'asignarRoles'])
+                    ->middleware('permission:usuarios.asignar_roles')->name('admin.sistema.usuarios.roles');
                 Route::post('/usuarios/{usuario}/desbloquear', [UsuarioController::class, 'desbloquear'])
                     ->name('admin.sistema.usuarios.desbloquear');
                 Route::post('/usuarios/{usuario}/reenviar-activacion', [UsuarioController::class, 'reenviarActivacion'])

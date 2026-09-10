@@ -102,7 +102,7 @@ class OrganizacionService
     {
         $this->bitacora->registrar([
             'user_id' => $actor->id, 'nombre_usuario' => $actor->name, 'correo_usuario' => $actor->email,
-            'rol_usuario' => $actor->getRoleNames()->first(), 'modulo' => 'Organización institucional',
+            'rol_usuario' => $actor->rolesLabel(), 'modulo' => 'Organización institucional',
             'accion' => $action, 'entidad' => $record->getTable(), 'entidad_id' => $record->getKey(),
             'valores_anteriores' => $before, 'valores_nuevos' => $after,
         ]);

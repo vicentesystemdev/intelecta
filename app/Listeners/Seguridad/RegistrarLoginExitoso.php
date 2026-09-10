@@ -7,15 +7,13 @@ use Illuminate\Auth\Events\Login;
 
 class RegistrarLoginExitoso
 {
-    public function __construct(private readonly BitacoraService $bitacora)
-    {
-    }
+    public function __construct(private readonly BitacoraService $bitacora) {}
 
     public function handle(Login $event): void
     {
         $user = $event->user;
-        $role = method_exists($user, 'getRoleNames')
-            ? $user->getRoleNames()->first()
+        $role = method_exists($user, 'rolesLabel')
+            ? $user->rolesLabel()
             : null;
 
         $this->bitacora->registrar([

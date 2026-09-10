@@ -31,9 +31,7 @@ class BitacoraService
         'private_key',
     ];
 
-    public function __construct(private readonly Request $request)
-    {
-    }
+    public function __construct(private readonly Request $request) {}
 
     public function registrar(array $data): void
     {
@@ -48,7 +46,7 @@ class BitacoraService
                 'user_id' => $data['user_id'] ?? $user?->getKey(),
                 'nombre_usuario' => $data['nombre_usuario'] ?? $user?->name,
                 'correo_usuario' => $data['correo_usuario'] ?? $user?->email,
-                'rol_usuario' => $data['rol_usuario'] ?? $user?->getRoleNames()->first(),
+                'rol_usuario' => $data['rol_usuario'] ?? $user?->rolesLabel(),
                 'accion' => $data['accion'] ?? 'accion_no_definida',
                 'modulo' => $data['modulo'] ?? null,
                 'entidad' => $data['entidad'] ?? null,
@@ -116,6 +114,7 @@ class BitacoraService
 
             if (is_string($keyString) && in_array($keyString, self::SENSITIVE_KEYS, true)) {
                 $clean[$key] = '[dato protegido]';
+
                 continue;
             }
 

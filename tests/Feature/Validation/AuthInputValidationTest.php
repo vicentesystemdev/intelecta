@@ -58,7 +58,7 @@ class AuthInputValidationTest extends TestCase
         $this->seed(RolesAndUsersSeeder::class);
         Notification::fake();
         $this->actingAs(User::role('Super Administrador')->firstOrFail());
-        $data = ['name' => '  José   Muñoz ', 'email' => ' NUEVO@EXAMPLE.COM ', 'role' => 'Estudiante'];
+        $data = ['name' => '  José   Muñoz ', 'email' => ' NUEVO@EXAMPLE.COM '];
         $this->postJson(route('admin.sistema.usuarios.store'), $data)->assertRedirect();
         $user = User::where('email', 'nuevo@example.com')->firstOrFail();
         $hash = $user->password;

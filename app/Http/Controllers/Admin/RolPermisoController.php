@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Domains\Seguridad\Services\BitacoraService;
+use App\Domains\Seguridad\Services\PermisosRolService;
+use App\Domains\Seguridad\Support\MatrizRbac;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateRolPermisosRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Permission;
@@ -50,11 +50,13 @@ class RolPermisoController extends Controller
                 'users_count' => $role->users_count,
                 'protected' => in_array($role->name, self::PROTECTED_ROLES, true),
                 'editable' => $role->name !== 'Super Administrador',
+                'allowed_permissions' => MatrizRbac::forRole($role->name),
                 'permissions' => $role->permissions->pluck('name')->values(),
                 'users' => $role->users,
             ]);
 
         $permissions = Permission::query()
+            ->whereIn('name', MatrizRbac::active())
             ->where('guard_name', 'web')
             ->orderBy('name')
             ->get(['id', 'name'])
@@ -69,35 +71,16 @@ class RolPermisoController extends Controller
         return Inertia::render('Sistema/RolesPermisos/Index', [
             'roles' => $roles,
             'permisosAgrupados' => $permissions,
-            'puedeEditar' => $request->user()->can('roles-permisos.editar'),
+            'puedeEditar' => $request->user()->canChangeLoginEmail(),
         ]);
     }
 
     public function update(
         UpdateRolPermisosRequest $request,
         Role $rol,
-        BitacoraService $bitacora,
+        PermisosRolService $service,
     ): RedirectResponse {
-        if ($rol->name === 'Super Administrador') {
-            throw ValidationException::withMessages([
-                'permissions' => 'Los permisos del rol Super Administrador están protegidos.',
-            ]);
-        }
-
-        $anteriores = $rol->permissions()->pluck('name')->values()->all();
-        $rol->syncPermissions($request->validated('permissions'));
-        $rol->load('permissions');
-
-        $bitacora->registrar([
-            'accion' => 'actualizar_permisos',
-            'modulo' => 'Roles y Permisos',
-            'entidad' => 'roles',
-            'entidad_id' => $rol->id,
-            'descripcion' => "Se actualizaron permisos del rol {$rol->name}.",
-            'valores_anteriores' => ['permissions' => $anteriores],
-            'valores_nuevos' => ['permissions' => $rol->permissions->pluck('name')->values()->all()],
-            'severidad' => 'seguridad',
-        ]);
+        $service->update($request->user(), $rol->id, $request->validated('permissions'));
 
         return back()->with('success', "Permisos del rol {$rol->name} actualizados correctamente.");
     }

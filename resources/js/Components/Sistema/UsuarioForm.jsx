@@ -5,7 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { useForm, usePage } from '@inertiajs/react';
-import { Save, ShieldCheck } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { useState } from 'react';
 
 const fieldClass =
@@ -13,7 +13,6 @@ const fieldClass =
 
 export default function UsuarioForm({
     usuario = null,
-    roles,
     submitRoute,
     method = 'post',
     submitLabel,
@@ -25,7 +24,6 @@ export default function UsuarioForm({
     const { data, setData, post, put, processing, errors } = useForm({
         name: usuario?.name || '',
         email: usuario?.email || '',
-        role: usuario?.roles?.[0]?.name || '',
     });
 
     const persist = () => {
@@ -48,10 +46,7 @@ export default function UsuarioForm({
     const submit = (event) => {
         event.preventDefault();
 
-        const originalRole = usuario?.roles?.[0]?.name || '';
-        const sensitiveUpdate =
-            usuario &&
-            (data.role !== originalRole || data.email !== usuario.email);
+        const sensitiveUpdate = usuario && data.email !== usuario.email;
 
         if (sensitiveUpdate) {
             setConfirmOpen(true);
@@ -101,28 +96,7 @@ export default function UsuarioForm({
                         )}
                     </div>
 
-                    <div className="sm:col-span-2">
-                        <Label htmlFor="role">Rol institucional *</Label>
-                        <div className="relative mt-1.5">
-                            <ShieldCheck className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                            <select {...validationProps('role')}
-                                id="role"
-                                className={`${fieldClass} mt-0 w-full rounded-lg pl-9 pr-3 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
-                                value={data.role}
-                                onChange={(event) =>
-                                    setData('role', event.target.value)
-                                }
-                            >
-                                <option value="">Seleccione un rol</option>
-                                {roles.map((role) => (
-                                    <option key={role.id} value={role.name}>
-                                        {role.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <InputError className="mt-1.5" message={errors.role} />
-                    </div>
+                    <p className="sm:col-span-2 text-sm text-slate-500">Los roles se gestionan en una acción independiente. Una cuenta nueva queda sin roles hasta acreditar y vincular su perfil.</p>
 
                 </div>
 
@@ -151,10 +125,10 @@ export default function UsuarioForm({
                 open={confirmOpen}
                 onOpenChange={setConfirmOpen}
                 title="Confirmar actualización sensible"
-                message="Se modificará el rol o el correo de acceso de esta cuenta."
+                message="Se modificará el correo de acceso de esta cuenta."
                 confirmLabel="Confirmar cambios"
                 processing={processing}
-                supportingText="Verifique que el perfil asignado corresponde a las responsabilidades del usuario."
+                supportingText="El cambio requiere verificar nuevamente el correo y revoca las sesiones anteriores."
                 onConfirm={persist}
             />
         </>

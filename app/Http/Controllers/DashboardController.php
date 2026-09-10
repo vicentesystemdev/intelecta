@@ -24,12 +24,12 @@ class DashboardController extends Controller
     ): Response|RedirectResponse {
         $user = request()->user();
 
-        if ($user->hasRole('Estudiante')) {
+        if ($user->hasRole('Estudiante') && ! $user->hasAnyRole(['Super Administrador', 'Administrador', 'Docente'])) {
             return to_route('estudiante.evaluaciones');
         }
 
         abort_unless(
-            $user->getRoleNames()->isNotEmpty() && $user->can('dashboard.ver'),
+            $user->cuentaActiva() && $user->hasAnyRole(['Super Administrador', 'Administrador']) && $user->can('dashboard.ver'),
             403,
             'No cuentas con permisos para acceder a este módulo.',
         );

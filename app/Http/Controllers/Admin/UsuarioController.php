@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Domains\Seguridad\Services\CuentaService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AsignarRolesUsuarioRequest;
 use App\Http\Requests\Admin\OperacionCuentaRequest;
 use App\Http\Requests\Admin\StoreUsuarioRequest;
 use App\Http\Requests\Admin\UpdateUsuarioRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
@@ -20,7 +22,7 @@ class UsuarioController extends Controller
     {
         $filters = $request->validate([
             'buscar' => ['nullable', 'string', 'max:120'],
-            'role' => ['nullable', 'string', 'exists:roles,name'],
+            'role' => ['nullable', 'string', Rule::exists('roles', 'name')->where('guard_name', 'web')],
         ]);
 
         $users = User::query()
@@ -61,7 +63,7 @@ class UsuarioController extends Controller
                 'crear' => $request->user()->canChangeLoginEmail(),
                 'editar' => $request->user()->canChangeLoginEmail(),
                 'seguridad' => $request->user()->canChangeLoginEmail(),
-                'asignarSuperAdministrador' => $request->user()->hasRole('Super Administrador'),
+                'asignarRoles' => $request->user()->canChangeLoginEmail(),
                 'cambiarCorreoAcceso' => $request->user()->canChangeLoginEmail(),
             ],
             'usuarioActualId' => $request->user()->getKey(),
@@ -87,6 +89,13 @@ class UsuarioController extends Controller
         $accounts->block($request->user(), $usuario->id, $request->validated('motivo'));
 
         return back()->with('success', 'Cuenta bloqueada y acceso revocado.');
+    }
+
+    public function asignarRoles(AsignarRolesUsuarioRequest $request, User $usuario, CuentaService $accounts): RedirectResponse
+    {
+        $accounts->assignRoles($request->user(), $usuario->id, $request->validated());
+
+        return back()->with('success', 'Roles actualizados. Si hubo cambios, se revocaron sesiones y enlaces anteriores; para una cuenta pendiente, reenvía la activación.');
     }
 
     public function desbloquear(OperacionCuentaRequest $request, User $usuario, CuentaService $accounts): RedirectResponse

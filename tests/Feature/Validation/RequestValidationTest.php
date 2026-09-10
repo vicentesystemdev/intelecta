@@ -55,6 +55,11 @@ class RequestValidationTest extends TestCase
             $request->setContainer(app())->setRedirector(app('redirect'));
             $request->setUserResolver(fn () => new class
             {
+                public function canChangeLoginEmail(): bool
+                {
+                    return true;
+                }
+
                 public function can($permission): bool
                 {
                     return true;

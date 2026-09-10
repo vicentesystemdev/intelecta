@@ -184,7 +184,7 @@ class OrganizacionTest extends TestCase
         $service->block($this->sa, $this->admin->id, 'Suspensión de prueba institucional');
         $this->assertSame($before, $record->fresh()->getRawOriginal());
         $service->unblock($this->sa, $this->admin->id);
-        $service->update($this->sa, $this->admin->id, ['name' => $this->admin->name, 'email' => 'acceso-nuevo@example.com', 'role' => 'Administrador']);
+        $service->update($this->sa, $this->admin->id, ['name' => $this->admin->name, 'email' => 'acceso-nuevo@example.com']);
         $this->assertSame($before, $record->fresh()->getRawOriginal());
         $this->assertSame(EstadoCuenta::PENDIENTE, $this->admin->fresh()->estado_cuenta);
     }
@@ -239,7 +239,7 @@ class OrganizacionTest extends TestCase
         $this->get($this->url('personal.index'))->assertInertia(fn (Assert $page) => $page->where('permisos.crear', true)->where('permisos.vincular', false)->where('auth.organization.personal', true));
         $this->postJson($this->url('personal.vincular', $record), ['user_id' => $this->sa->id, 'motivo' => 'Intento no autorizado'])->assertForbidden();
         $this->postJson(route('admin.sistema.usuarios.store'), ['name' => 'Persona Prueba', 'email' => 'prueba@example.com', 'role' => 'Docente'])->assertForbidden();
-        $this->putJson(route('admin.sistema.usuarios.update', $this->sa), ['name' => $this->sa->name, 'email' => 'new@example.com', 'role' => 'Administrador'])->assertForbidden();
+        $this->putJson(route('admin.sistema.usuarios.update', $this->sa), ['name' => $this->sa->name, 'email' => 'new@example.com'])->assertForbidden();
         foreach (['bloquear', 'desbloquear', 'reenviar-activacion'] as $operation) {
             $this->postJson(route('admin.sistema.usuarios.'.$operation, $this->sa), ['motivo' => 'Intento no autorizado'])->assertForbidden();
         }

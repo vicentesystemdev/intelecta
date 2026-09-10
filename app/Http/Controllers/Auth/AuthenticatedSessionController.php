@@ -36,19 +36,9 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
         $request->session()->put(RevocarAccesoService::SESSION_KEY, $user->version_acceso);
-        if (! $user->cuentaActiva()) {
-            return redirect()->route('verification.notice');
-        }
-        if ($user) {
-            if ($user->hasAnyRole(['Super Administrador', 'Administrador', 'Docente'])) {
-                return redirect()->intended(route('dashboard', absolute: false));
-            }
-            if ($user->hasRole('Estudiante')) {
-                return redirect()->intended('/');
-            }
-        }
+        $request->session()->forget('url.intended');
 
-        return redirect()->intended('/');
+        return redirect()->to($user->homeRoute());
     }
 
     /**

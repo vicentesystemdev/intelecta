@@ -42,7 +42,7 @@ class AccountLifecycleTest extends TestCase
     public function test_sa_creates_pending_account_with_unknown_password_and_native_invitation(): void
     {
         $this->actingAs($this->sa)->postJson(route('admin.sistema.usuarios.store'), [
-            'name' => ' Persona   Invitada ', 'email' => ' INVITADA@EXAMPLE.COM ', 'role' => 'Estudiante',
+            'name' => ' Persona   Invitada ', 'email' => ' INVITADA@EXAMPLE.COM ',
         ])->assertRedirect();
         $user = User::where('email', 'invitada@example.com')->firstOrFail();
         $this->assertSame(EstadoCuenta::PENDIENTE, $user->estado_cuenta);
@@ -58,7 +58,7 @@ class AccountLifecycleTest extends TestCase
     public function test_sa_cannot_supply_password_verified_flag_or_account_state(): void
     {
         $this->actingAs($this->sa)->postJson(route('admin.sistema.usuarios.store'), [
-            'name' => 'Persona Invitada', 'email' => 'invitada@example.com', 'role' => 'Estudiante',
+            'name' => 'Persona Invitada', 'email' => 'invitada@example.com',
             'password' => 'Conocida123', 'email_verified_at' => now(), 'estado_cuenta' => 'activa',
         ])->assertUnprocessable()->assertJsonValidationErrors(['password', 'email_verified_at', 'estado_cuenta']);
         $this->assertDatabaseCount('users', 1);
@@ -67,7 +67,7 @@ class AccountLifecycleTest extends TestCase
 
     public function test_native_invitation_is_single_use_and_does_not_activate_or_link(): void
     {
-        $user = app(CuentaService::class)->create($this->sa, ['name' => 'Persona Invitada', 'email' => 'invitada@example.com', 'role' => 'Estudiante']);
+        $user = app(CuentaService::class)->create($this->sa, ['name' => 'Persona Invitada', 'email' => 'invitada@example.com']);
         $token = Notification::sent($user, ResetPassword::class)->first()->token;
         $data = ['email' => $user->email, 'token' => $token, 'password' => '  Password123  ', 'password_confirmation' => '  Password123  '];
         $this->postJson('/reset-password', $data)->assertRedirect(route('login'));
@@ -75,7 +75,7 @@ class AccountLifecycleTest extends TestCase
         $this->assertSame(EstadoCuenta::PENDIENTE, $user->fresh()->estado_cuenta);
         $this->assertNull($user->fresh()->email_verified_at);
         $this->assertNull($user->fresh()->postulante);
-        $this->assertSame(['Estudiante'], $user->fresh()->getRoleNames()->all());
+        $this->assertSame([], $user->fresh()->getRoleNames()->all());
         $this->postJson('/reset-password', $data)->assertUnprocessable();
         $this->assertDatabaseMissing('password_reset_tokens', ['email' => $user->email]);
     }
@@ -177,7 +177,7 @@ class AccountLifecycleTest extends TestCase
     {
         $admin = User::factory()->active()->create()->assignRole('Administrador');
         $user = User::factory()->pending()->create()->assignRole('Estudiante');
-        $data = ['name' => 'Persona Prueba', 'email' => 'persona@example.com', 'role' => 'Super Administrador'];
+        $data = ['name' => 'Persona Prueba', 'email' => 'persona@example.com'];
         $this->actingAs($admin)->postJson(route('admin.sistema.usuarios.store'), $data)->assertForbidden();
         $this->putJson($this->accountUrl($user, 'update'), $data)->assertForbidden();
         foreach (['bloquear', 'desbloquear', 'reenviar-activacion'] as $operation) {
@@ -192,9 +192,9 @@ class AccountLifecycleTest extends TestCase
     {
         User::factory()->blocked()->create()->assignRole('Super Administrador');
         $this->actingAs($this->sa)->postJson($this->accountUrl($this->sa, 'bloquear'), ['motivo' => 'Bloqueo solicitado para prueba'])->assertUnprocessable()->assertJsonValidationErrors('ultimo_sa');
-        $this->putJson($this->accountUrl($this->sa, 'update'), ['name' => 'Persona Responsable', 'email' => $this->sa->email, 'role' => 'Administrador'])
+        $this->putJson($this->accountUrl($this->sa, 'roles'), ['roles' => []])
             ->assertUnprocessable()->assertJsonValidationErrors('ultimo_sa');
-        $this->putJson($this->accountUrl($this->sa, 'update'), ['name' => 'Persona Responsable', 'email' => 'nuevo.sa@example.com', 'role' => 'Super Administrador'])
+        $this->putJson($this->accountUrl($this->sa, 'update'), ['name' => 'Persona Responsable', 'email' => 'nuevo.sa@example.com'])
             ->assertUnprocessable()->assertJsonValidationErrors('ultimo_sa');
         $this->assertTrue($this->sa->fresh()->cuentaActiva());
         $this->assertTrue($this->sa->fresh()->hasRole('Super Administrador'));
@@ -209,8 +209,8 @@ class AccountLifecycleTest extends TestCase
         app(CuentaService::class)->block($this->sa, $other->id, 'Bloqueo de prueba documentado');
         $this->assertSame(EstadoCuenta::BLOQUEADA, $other->fresh()->estado_cuenta);
         app(CuentaService::class)->unblock($this->sa, $other->id);
-        app(CuentaService::class)->update($this->sa, $other->id, ['name' => 'Persona Responsable', 'email' => $other->email, 'role' => 'Administrador']);
-        $this->assertTrue($other->fresh()->hasRole('Administrador'));
+        app(CuentaService::class)->assignRoles($this->sa, $other->id, ['roles' => []]);
+        $this->assertCount(0, $other->fresh()->roles);
         $this->assertTrue($this->sa->fresh()->cuentaActiva());
     }
 
@@ -221,7 +221,7 @@ class AccountLifecycleTest extends TestCase
             $postulante = Postulante::factory()->withUser($user)->create();
             $oldEmail = $user->email;
             $token = Password::broker()->createToken($user);
-            app(CuentaService::class)->update($this->sa, $user->id, ['name' => 'Persona Prueba', 'email' => 'nuevo.'.$user->id.'@example.com', 'role' => 'Estudiante']);
+            app(CuentaService::class)->update($this->sa, $user->id, ['name' => 'Persona Prueba', 'email' => 'nuevo.'.$user->id.'@example.com']);
             $this->assertNull($user->fresh()->email_verified_at);
             $this->assertSame($blocked ? EstadoCuenta::BLOQUEADA : EstadoCuenta::PENDIENTE, $user->fresh()->estado_cuenta);
             $this->assertSame($postulante->id_post, $user->fresh()->postulante->id_post);
@@ -288,7 +288,7 @@ class AccountLifecycleTest extends TestCase
 
     public function test_audit_records_do_not_contain_invitation_tokens_or_password_hashes(): void
     {
-        $user = app(CuentaService::class)->create($this->sa, ['name' => 'Persona Invitada', 'email' => 'segura@example.com', 'role' => 'Estudiante']);
+        $user = app(CuentaService::class)->create($this->sa, ['name' => 'Persona Invitada', 'email' => 'segura@example.com']);
         $token = Notification::sent($user, ResetPassword::class)->first()->token;
         $audit = DB::table('bitacora_sistema')->get()->toJson();
         $this->assertStringNotContainsString($token, $audit);

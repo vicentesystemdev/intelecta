@@ -9,6 +9,7 @@ return [
     'birth_date_registration_max' => 'Para registrar un nuevo postulante, la edad máxima permitida es :max años.',
     'required' => 'El campo :attribute es obligatorio.',
     'present' => 'El campo :attribute debe estar presente.',
+    'missing' => 'No envíe el campo :attribute en esta operación. Los roles se gestionan mediante la acción independiente de asignación.',
     'required_with' => 'El campo :attribute es obligatorio cuando se proporciona :values.',
     'required_without' => 'El campo :attribute es obligatorio cuando no se proporciona :values.',
     'required_if' => 'El campo :attribute es obligatorio cuando :other es :value.',

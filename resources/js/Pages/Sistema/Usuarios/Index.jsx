@@ -1,6 +1,7 @@
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import Pagination from '@/Components/Pagination';
 import UsuarioForm from '@/Components/Sistema/UsuarioForm';
+import UsuarioRolesForm from '@/Components/Sistema/UsuarioRolesForm';
 import InputError from '@/Components/InputError';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
 import { Badge } from '@/Components/ui/badge';
@@ -28,7 +29,7 @@ import {
     UserCog,
     Users,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 const metricCards = [
     { key: 'total', label: 'Total usuarios', icon: Users, tone: 'primary' },
@@ -64,6 +65,7 @@ export default function Index({
 }) {
     const { flash } = usePage().props;
     const [securityAction, setSecurityAction] = useState(null);
+    const [roleUser, setRoleUser] = useState(null);
     const security = useForm({ motivo: '' });
     const executeSecurityAction = (event) => {
         event.preventDefault();
@@ -85,13 +87,6 @@ export default function Index({
         usuario: null,
     });
 
-    const rolesDisponibles = useMemo(
-        () =>
-            permisos.asignarSuperAdministrador
-                ? roles
-                : roles.filter((role) => role.name !== 'Super Administrador'),
-        [permisos.asignarSuperAdministrador, roles],
-    );
 
     const submitFilters = (event) => {
         event.preventDefault();
@@ -115,7 +110,7 @@ export default function Index({
 
     const canEditUser = (usuario) =>
         permisos.editar &&
-        (permisos.asignarSuperAdministrador ||
+        (permisos.asignarRoles ||
             !usuario.roles.some(
                 (role) => role.name === 'Super Administrador',
             ));
@@ -241,7 +236,7 @@ export default function Index({
                                 <TableHead className="pl-5">Nombre</TableHead>
                                 <TableHead>Correo de acceso / verificación</TableHead>
                                 <TableHead>Estado de cuenta</TableHead>
-                                <TableHead>Rol</TableHead>
+                                <TableHead>Roles</TableHead>
                                 <TableHead>Fecha de creación</TableHead>
                                 <TableHead className="pr-5 text-right">
                                     Acciones
@@ -329,6 +324,7 @@ export default function Index({
                                                     <Pencil className="h-4 w-4" />
                                                 </Button>
                                             )}
+                                            {permisos.asignarRoles && <Button size="sm" variant="outline" onClick={() => setRoleUser(usuario)}>Asignar roles</Button>}
                                             {permisos.seguridad && (
                                                 <div className="flex flex-wrap gap-1">
                                                     {(usuario.estado_cuenta === 'bloqueada' ? ['desbloquear'] : usuario.estado_cuenta === 'pendiente' ? ['reenviar-activacion', 'bloquear'] : ['bloquear']).map((action) => (
@@ -350,6 +346,9 @@ export default function Index({
             </Card>
 
             <Pagination links={usuarios.links} />
+            <ModalInstitucional open={Boolean(roleUser)} onOpenChange={(open) => !open && setRoleUser(null)} title="Asignar roles funcionales" description="Operación de seguridad independiente. No crea ni vincula perfiles.">
+                {roleUser && <UsuarioRolesForm key={roleUser.id} usuario={roleUser} roles={roles} onClose={() => setRoleUser(null)} />}
+            </ModalInstitucional>
 
             <ModalInstitucional open={Boolean(securityAction)} onOpenChange={(open) => !open && setSecurityAction(null)} title="Confirmar operación de cuenta" description="Esta operación afecta el acceso digital; no elimina roles ni expedientes.">
                 {securityAction && (
@@ -373,8 +372,8 @@ export default function Index({
                 }
                 description={
                     formModal.usuario
-                        ? 'Actualice el correo de acceso o rol. La contraseña la administra su titular.'
-                        : 'Cree una cuenta institucional y asigne su perfil de acceso.'
+                        ? 'Actualice nombre o correo. Esta edición conserva todos los roles.'
+                        : 'Cree una cuenta sin roles; acredite su perfil antes de asignarlos.'
                 }
                 size="lg"
             >
@@ -386,7 +385,6 @@ export default function Index({
                                 : 'create-user'
                         }
                         usuario={formModal.usuario}
-                        roles={rolesDisponibles}
                         submitRoute={
                             formModal.usuario
                                 ? route(
@@ -430,7 +428,7 @@ export default function Index({
                         <dl className="grid gap-4 sm:grid-cols-2">
                             <div>
                                 <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                                    Rol asignado
+                                    Roles asignados
                                 </dt>
                                 <dd className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
                                     {detailModal.usuario.roles

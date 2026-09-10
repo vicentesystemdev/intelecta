@@ -9,7 +9,7 @@ class UpdateRolPermisosRequest extends NormalizedFormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('roles-permisos.editar') ?? false;
+        return $this->user()?->canChangeLoginEmail() ?? false;
     }
 
     /**

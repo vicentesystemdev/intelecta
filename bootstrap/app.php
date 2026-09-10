@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureAccountAccess;
 use App\Http\Middleware\EnsureAdministrativeAccess;
 use App\Http\Middleware\EnsureOrganizationAccess;
+use App\Http\Middleware\EnsureSecurityAccess;
 use App\Http\Middleware\EnsureStudentAccess;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -39,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'administrative' => EnsureAdministrativeAccess::class,
+            'security' => EnsureSecurityAccess::class,
             'organization' => EnsureOrganizationAccess::class,
             'permission' => PermissionMiddleware::class,
             'role' => RoleMiddleware::class,

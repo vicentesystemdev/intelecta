@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Domains\Institucional\Support\PermisosOrganizacion;
 use App\Domains\Seguridad\Enums\EstadoCuenta;
+use App\Domains\Seguridad\Support\MatrizRbac;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -31,88 +31,7 @@ class RolesAndUsersSeeder extends Seeder
         $this->staffUsers = [];
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $permissions = [
-            ...PermisosOrganizacion::ALL,
-            'dashboard.ver',
-
-            'programas.ver',
-            'programas.crear',
-            'programas.editar',
-            'grupos.ver',
-            'grupos.crear',
-            'grupos.editar',
-            'tutores.ver',
-            'tutores.crear',
-            'tutores.editar',
-            'asignaciones-tutores.ver',
-            'asignaciones-tutores.crear',
-            'asignaciones-tutores.editar',
-            'inscripciones.ver',
-            'inscripciones.crear',
-            'inscripciones.editar',
-            'matriculas-cuotas.ver',
-            'matriculas-cuotas.crear',
-            'matriculas-cuotas.editar',
-            'habilitacion-academica.ver',
-            'habilitacion-academica.editar',
-            'asistencia.ver',
-            'asistencia.crear',
-            'asistencia.editar',
-            'simulacros.ver',
-            'simulacros.crear',
-            'simulacros.editar',
-
-            'postulantes.ver',
-            'postulantes.crear',
-            'postulantes.editar',
-            'postulantes.eliminar',
-            'ficha-academica.ver',
-            'ranking.ver',
-
-            'materias.ver',
-            'areas.ver',
-            'areas.crear',
-            'areas.editar',
-            'temas.ver',
-            'temas.crear',
-            'temas.editar',
-            'preguntas.ver',
-            'preguntas.crear',
-            'preguntas.editar',
-            'preguntas.eliminar',
-            'plantillas.ver',
-            'plantillas.crear',
-            'plantillas.editar',
-            'plantillas.eliminar',
-            'resultados.ver',
-
-            'reportes.ver',
-            'indicadores.ver',
-            'learning_analytics.ver',
-
-            'usuarios.ver',
-            'usuarios.crear',
-            'usuarios.editar',
-            'usuarios.eliminar',
-            'roles.ver',
-            'roles.crear',
-            'roles.editar',
-            'roles-permisos.ver',
-            'roles-permisos.editar',
-            'bitacora.ver',
-            'bitacora.exportar',
-            'configuracion.ver',
-
-            // Permisos heredados que siguen vinculados a rutas y roles existentes.
-            'docentes.ver',
-            'docentes.crear',
-            'docentes.editar',
-            'docentes.eliminar',
-            'evaluaciones.ver',
-            'evaluaciones.crear',
-            'evaluaciones.editar',
-            'evaluaciones.cerrar',
-        ];
+        $permissions = MatrizRbac::CATALOG;
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
@@ -138,32 +57,9 @@ class RolesAndUsersSeeder extends Seeder
             'guard_name' => 'web',
         ]);
 
-        $superAdmin->syncPermissions($permissions);
-        $administrador->syncPermissions($permissions);
-
-        $docente->syncPermissions([
-            'dashboard.ver',
-            'programas.ver',
-            'grupos.ver',
-            'postulantes.ver',
-            'ficha-academica.ver',
-            'ranking.ver',
-            'asistencia.ver',
-            'simulacros.ver',
-            'materias.ver',
-            'areas.ver',
-            'temas.ver',
-            'preguntas.ver',
-            'preguntas.crear',
-            'plantillas.ver',
-            'resultados.ver',
-            'reportes.ver',
-            'indicadores.ver',
-            'learning_analytics.ver',
-            'evaluaciones.ver',
-        ]);
-
-        $estudiante->syncPermissions([]);
+        foreach ([$superAdmin, $administrador, $docente, $estudiante] as $role) {
+            $role->syncPermissions(MatrizRbac::forRole($role->name));
+        }
 
         foreach ([
             'ti' => ['Adriana Choque Mamani', 'adriana.choque@avalancha.edu.bo', $superAdmin],

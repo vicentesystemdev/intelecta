@@ -7,6 +7,27 @@ const source = fs.readFileSync(new URL('../resources/js/lib/inputValidation.js',
     .replace(/^import options.*$/m, 'const options = {};');
 const { validationProps, inputConstraints } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 
+test('account editing is role-free and role assignment is a separate full-set operation', () => {
+    const account = fs.readFileSync(new URL('../resources/js/Components/Sistema/UsuarioForm.jsx', import.meta.url), 'utf8');
+    assert.doesNotMatch(account, /role:\s|roles:\s|roles\?\.\[0\]|setData\('role'/);
+    const roles = fs.readFileSync(new URL('../resources/js/Components/Sistema/UsuarioRolesForm.jsx', import.meta.url), 'utf8');
+    assert.match(roles, /roles: usuario\.roles\.map/);
+    assert.match(roles, /admin\.sistema\.usuarios\.roles/);
+    assert.match(roles, /form\.data\.roles\.filter/);
+    assert.match(roles, /\[\.\.\.form\.data\.roles, name\]/);
+});
+
+test('layout and landing use the whole role set and backend context, never the first role', () => {
+    const layout = fs.readFileSync(new URL('../resources/js/Layouts/AdminLayout.jsx', import.meta.url), 'utf8');
+    assert.doesNotMatch(layout, /roles\?\.\[0\]/);
+    assert.match(layout, /roles\?\.join/);
+    const landing = fs.readFileSync(new URL('../resources/js/Pages/Welcome.jsx', import.meta.url), 'utf8');
+    assert.doesNotMatch(landing, /route\('dashboard'\)|roles\.includes/);
+    assert.equal((landing.match(/href=\{auth\.homeUrl\}/g) || []).length, 3);
+    const menu = fs.readFileSync(new URL('../resources/js/Components/AppSidebar.jsx', import.meta.url), 'utf8');
+    assert.match(menu, /auth\.security === true/);
+});
+
 test('tutor uses explicit Personal and a separate opt-in identity edit, never legacy identity fields', () => {
     assert.equal(validationProps('personal_id').required, true);
     for (const field of ['nombres_tutor', 'apellidos_tutor', 'ci_tutor', 'celular_tutor', 'correo_tutor']) {

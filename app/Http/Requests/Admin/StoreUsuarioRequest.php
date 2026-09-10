@@ -4,7 +4,6 @@ namespace App\Http\Requests\Admin;
 
 use App\Http\Requests\NormalizedFormRequest;
 use App\Support\Validation\InputRules;
-use Illuminate\Validation\Rule;
 
 class StoreUsuarioRequest extends NormalizedFormRequest
 {
@@ -25,12 +24,8 @@ class StoreUsuarioRequest extends NormalizedFormRequest
             'password_confirmation' => ['prohibited'],
             'estado_cuenta' => ['prohibited'],
             'email_verified_at' => ['prohibited'],
-            'role' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::exists('roles', 'name')->where('guard_name', 'web'),
-            ],
+            'role' => ['missing'],
+            'roles' => ['missing'],
         ];
     }
 }

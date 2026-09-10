@@ -33,12 +33,8 @@ class UpdateUsuarioRequest extends NormalizedFormRequest
             'password_confirmation' => ['prohibited'],
             'estado_cuenta' => ['prohibited'],
             'email_verified_at' => ['prohibited'],
-            'role' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::exists('roles', 'name')->where('guard_name', 'web'),
-            ],
+            'role' => ['missing'],
+            'roles' => ['missing'],
         ];
     }
 }

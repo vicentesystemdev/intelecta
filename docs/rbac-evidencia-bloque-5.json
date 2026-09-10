@@ -1,0 +1,698 @@
+{
+  "block": 5,
+  "date": "2026-09-10",
+  "initial": {
+    "branch": "develop",
+    "head": "20cafdd",
+    "working_tree": "clean"
+  },
+  "backup": {
+    "path": "C:/laragon/tmp/intelecta-identity-backups/intelecta-before-block5-20260910_075546.dump",
+    "bytes": 203710,
+    "sha256": "2abcb688e187e005dce3ffaf8d3c9aceb4abbf44e4f2952d3d2c5bcb678e3cf8",
+    "restored_tables_matching": 41
+  },
+  "authorization_snapshot": {
+    "path": "C:/laragon/tmp/intelecta-identity-backups/intelecta-rbac-block5-before-20260910_075546.json",
+    "sha256": "75052a9519777b545c2d6916190f92cdad81aa34ab1893a34dcafab0c5bf3b6c"
+  },
+  "main": {
+    "before_tables": {
+      "alternativas": {
+        "count": 625,
+        "fingerprint": "52b80cea8f591ca6c216a99c6fa2376b"
+      },
+      "areas_conocimiento": {
+        "count": 16,
+        "fingerprint": "ce90cc36495f55d848b67299f1c1db20"
+      },
+      "asignaciones_tutores": {
+        "count": 16,
+        "fingerprint": "b6cec632eaa67e21c3aab6093bcd0c3e"
+      },
+      "asistencias_academicas": {
+        "count": 544,
+        "fingerprint": "904c0a41eb773d9912efc5668d7e0bf7"
+      },
+      "bitacora_sistema": {
+        "count": 5,
+        "fingerprint": "eb2c757f894ed5a32ae52266eebef6f6"
+      },
+      "cache": {
+        "count": 1,
+        "fingerprint": "fd2c1d62c69935fa03895563770561ee"
+      },
+      "cache_locks": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "cargos": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "carreras": {
+        "count": 26,
+        "fingerprint": "b8b8aa6a3d8f5462bb6e1eb7cbf786a8"
+      },
+      "colegios": {
+        "count": 10,
+        "fingerprint": "7f74ccd962ec8651f9d71957a98b7d61"
+      },
+      "cuotas_academicas": {
+        "count": 180,
+        "fingerprint": "1e2518ba6cc9cb0765f7a4317e39f8ab"
+      },
+      "evaluaciones_aplicadas": {
+        "count": 208,
+        "fingerprint": "082c0cbef7b2eed4904a05af297d0979"
+      },
+      "failed_jobs": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "grupos_academicos": {
+        "count": 6,
+        "fingerprint": "45d86c2acdaad66c400c6dbeccd8fff6"
+      },
+      "habilitaciones_academicas": {
+        "count": 72,
+        "fingerprint": "d97f9f1fbfee27c5cabe4f709e4de14e"
+      },
+      "inscripciones_academicas": {
+        "count": 72,
+        "fingerprint": "1e67b5bbb9404b92059ccabd3f04f568"
+      },
+      "job_batches": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "jobs": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "materias": {
+        "count": 4,
+        "fingerprint": "bf4ab2a02c0020b051612257bc5fba31"
+      },
+      "matriculas_academicas": {
+        "count": 72,
+        "fingerprint": "47403c1ecb6bdb6f3cfe1799037a9c2a"
+      },
+      "migrations": {
+        "count": 38,
+        "fingerprint": "34118f1cd3409e38e52da85a4208a71a"
+      },
+      "model_has_permissions": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "model_has_roles": {
+        "count": 9,
+        "fingerprint": "fd825680f2a997b2bad3a405aa964751"
+      },
+      "password_reset_tokens": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "permissions": {
+        "count": 80,
+        "fingerprint": "6a71e112727260396ece08e279a6e994"
+      },
+      "personal_institucional": {
+        "count": 4,
+        "fingerprint": "e5bc3f683d9681524c4487c021364b50"
+      },
+      "plantilla_preguntas": {
+        "count": 165,
+        "fingerprint": "9ca7c6f3677e0d18c26df027d4fe0621"
+      },
+      "plantillas_evaluacion": {
+        "count": 13,
+        "fingerprint": "650340e7e657b56fae1ede818c7c89c6"
+      },
+      "postulantes": {
+        "count": 72,
+        "fingerprint": "182ff9a29604e75b0ed1cbe39258a9d4"
+      },
+      "preguntas": {
+        "count": 125,
+        "fingerprint": "d90801879f2eaa5eb08c955fb2bda554"
+      },
+      "programas_academicos": {
+        "count": 4,
+        "fingerprint": "9a6c665162ec5843aae7d58f7e064e21"
+      },
+      "rendimientos_postulante": {
+        "count": 61,
+        "fingerprint": "4ec1e51585b285583f8d96f82c77448b"
+      },
+      "respuestas_evaluacion": {
+        "count": 2290,
+        "fingerprint": "5769fc48c48bcf10ea2b50a52fd018c7"
+      },
+      "role_has_permissions": {
+        "count": 179,
+        "fingerprint": "e884ea05cb06434ee4be10b4761a3684"
+      },
+      "roles": {
+        "count": 4,
+        "fingerprint": "d048b5d11bb304f8126812a01fe07ae2"
+      },
+      "sessions": {
+        "count": 3,
+        "fingerprint": "088fd972acc3e6f9b184d2dcc97f5415"
+      },
+      "simulacros_programados": {
+        "count": 12,
+        "fingerprint": "8168ea1838fc5e598947528222df850c"
+      },
+      "temas": {
+        "count": 51,
+        "fingerprint": "0fc51fe8e2f02dd7d747a1e32ffc74be"
+      },
+      "tutores_academicos": {
+        "count": 4,
+        "fingerprint": "7e19cf9f391ad7e870738a1368804d37"
+      },
+      "universidades": {
+        "count": 5,
+        "fingerprint": "c9ee2e2a4f9deb79d7c3a86900bbb492"
+      },
+      "users": {
+        "count": 9,
+        "fingerprint": "238b3df93bc5ed7f4280e17f35c019cb"
+      }
+    },
+    "after_tables": {
+      "alternativas": {
+        "count": 625,
+        "fingerprint": "52b80cea8f591ca6c216a99c6fa2376b"
+      },
+      "areas_conocimiento": {
+        "count": 16,
+        "fingerprint": "ce90cc36495f55d848b67299f1c1db20"
+      },
+      "asignaciones_tutores": {
+        "count": 16,
+        "fingerprint": "b6cec632eaa67e21c3aab6093bcd0c3e"
+      },
+      "asistencias_academicas": {
+        "count": 544,
+        "fingerprint": "904c0a41eb773d9912efc5668d7e0bf7"
+      },
+      "bitacora_sistema": {
+        "count": 5,
+        "fingerprint": "eb2c757f894ed5a32ae52266eebef6f6"
+      },
+      "cache": {
+        "count": 1,
+        "fingerprint": "fd2c1d62c69935fa03895563770561ee"
+      },
+      "cache_locks": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "cargos": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "carreras": {
+        "count": 26,
+        "fingerprint": "b8b8aa6a3d8f5462bb6e1eb7cbf786a8"
+      },
+      "colegios": {
+        "count": 10,
+        "fingerprint": "7f74ccd962ec8651f9d71957a98b7d61"
+      },
+      "cuotas_academicas": {
+        "count": 180,
+        "fingerprint": "1e2518ba6cc9cb0765f7a4317e39f8ab"
+      },
+      "evaluaciones_aplicadas": {
+        "count": 208,
+        "fingerprint": "082c0cbef7b2eed4904a05af297d0979"
+      },
+      "failed_jobs": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "grupos_academicos": {
+        "count": 6,
+        "fingerprint": "45d86c2acdaad66c400c6dbeccd8fff6"
+      },
+      "habilitaciones_academicas": {
+        "count": 72,
+        "fingerprint": "d97f9f1fbfee27c5cabe4f709e4de14e"
+      },
+      "inscripciones_academicas": {
+        "count": 72,
+        "fingerprint": "1e67b5bbb9404b92059ccabd3f04f568"
+      },
+      "job_batches": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "jobs": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "materias": {
+        "count": 4,
+        "fingerprint": "bf4ab2a02c0020b051612257bc5fba31"
+      },
+      "matriculas_academicas": {
+        "count": 72,
+        "fingerprint": "47403c1ecb6bdb6f3cfe1799037a9c2a"
+      },
+      "migrations": {
+        "count": 38,
+        "fingerprint": "34118f1cd3409e38e52da85a4208a71a"
+      },
+      "model_has_permissions": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "model_has_roles": {
+        "count": 9,
+        "fingerprint": "fd825680f2a997b2bad3a405aa964751"
+      },
+      "password_reset_tokens": {
+        "count": 0,
+        "fingerprint": null
+      },
+      "permissions": {
+        "count": 81,
+        "fingerprint": "ab7e3ea096e0c1a18226081f42589a8c"
+      },
+      "personal_institucional": {
+        "count": 4,
+        "fingerprint": "e5bc3f683d9681524c4487c021364b50"
+      },
+      "plantilla_preguntas": {
+        "count": 165,
+        "fingerprint": "9ca7c6f3677e0d18c26df027d4fe0621"
+      },
+      "plantillas_evaluacion": {
+        "count": 13,
+        "fingerprint": "650340e7e657b56fae1ede818c7c89c6"
+      },
+      "postulantes": {
+        "count": 72,
+        "fingerprint": "182ff9a29604e75b0ed1cbe39258a9d4"
+      },
+      "preguntas": {
+        "count": 125,
+        "fingerprint": "d90801879f2eaa5eb08c955fb2bda554"
+      },
+      "programas_academicos": {
+        "count": 4,
+        "fingerprint": "9a6c665162ec5843aae7d58f7e064e21"
+      },
+      "rendimientos_postulante": {
+        "count": 61,
+        "fingerprint": "4ec1e51585b285583f8d96f82c77448b"
+      },
+      "respuestas_evaluacion": {
+        "count": 2290,
+        "fingerprint": "5769fc48c48bcf10ea2b50a52fd018c7"
+      },
+      "role_has_permissions": {
+        "count": 137,
+        "fingerprint": "1a189517c3cb4ceacd7d8b6e0ff6e3f6"
+      },
+      "roles": {
+        "count": 4,
+        "fingerprint": "d048b5d11bb304f8126812a01fe07ae2"
+      },
+      "sessions": {
+        "count": 3,
+        "fingerprint": "088fd972acc3e6f9b184d2dcc97f5415"
+      },
+      "simulacros_programados": {
+        "count": 12,
+        "fingerprint": "8168ea1838fc5e598947528222df850c"
+      },
+      "temas": {
+        "count": 51,
+        "fingerprint": "0fc51fe8e2f02dd7d747a1e32ffc74be"
+      },
+      "tutores_academicos": {
+        "count": 4,
+        "fingerprint": "7e19cf9f391ad7e870738a1368804d37"
+      },
+      "universidades": {
+        "count": 5,
+        "fingerprint": "c9ee2e2a4f9deb79d7c3a86900bbb492"
+      },
+      "users": {
+        "count": 9,
+        "fingerprint": "238b3df93bc5ed7f4280e17f35c019cb"
+      }
+    },
+    "changed_tables": [
+      "permissions",
+      "role_has_permissions"
+    ],
+    "matrix_and_profiles": {
+      "matrix_exact": true,
+      "role_permission_counts": {
+        "Administrador": 61,
+        "Docente": 6,
+        "Estudiante": 0,
+        "Super Administrador": 70
+      },
+      "users": [
+        {
+          "id": 1,
+          "roles": [
+            "Super Administrador"
+          ],
+          "effective_permissions": [
+            "areas.crear",
+            "areas.editar",
+            "areas.ver",
+            "asignaciones-tutores.crear",
+            "asignaciones-tutores.editar",
+            "asignaciones-tutores.ver",
+            "asistencia.crear",
+            "asistencia.editar",
+            "asistencia.ver",
+            "bitacora.exportar",
+            "bitacora.ver",
+            "cargos.cambiar_estado",
+            "cargos.crear",
+            "cargos.editar",
+            "cargos.ver",
+            "configuracion.ver",
+            "dashboard.ver",
+            "evaluaciones.ver",
+            "ficha-academica.ver",
+            "grupos.crear",
+            "grupos.editar",
+            "grupos.ver",
+            "habilitacion-academica.editar",
+            "habilitacion-academica.ver",
+            "indicadores.ver",
+            "inscripciones.crear",
+            "inscripciones.editar",
+            "inscripciones.ver",
+            "learning_analytics.ver",
+            "materias.ver",
+            "matriculas-cuotas.crear",
+            "matriculas-cuotas.editar",
+            "matriculas-cuotas.ver",
+            "personal.cambiar_estado",
+            "personal.crear",
+            "personal.editar",
+            "personal.ver",
+            "plantillas.crear",
+            "plantillas.editar",
+            "plantillas.eliminar",
+            "plantillas.ver",
+            "postulantes.crear",
+            "postulantes.editar",
+            "postulantes.eliminar",
+            "postulantes.ver",
+            "preguntas.crear",
+            "preguntas.editar",
+            "preguntas.eliminar",
+            "preguntas.ver",
+            "programas.crear",
+            "programas.editar",
+            "programas.ver",
+            "ranking.ver",
+            "reportes.ver",
+            "resultados.ver",
+            "roles-permisos.editar",
+            "roles-permisos.ver",
+            "simulacros.crear",
+            "simulacros.editar",
+            "simulacros.ver",
+            "temas.crear",
+            "temas.editar",
+            "temas.ver",
+            "tutores.crear",
+            "tutores.editar",
+            "tutores.ver",
+            "usuarios.asignar_roles",
+            "usuarios.crear",
+            "usuarios.editar",
+            "usuarios.ver"
+          ],
+          "home": "http://127.0.0.1:8000/dashboard",
+          "context": "academic",
+          "security": true,
+          "personal_id": null,
+          "postulante_id": null
+        },
+        {
+          "id": 2,
+          "roles": [
+            "Administrador"
+          ],
+          "effective_permissions": [
+            "areas.crear",
+            "areas.editar",
+            "areas.ver",
+            "asignaciones-tutores.crear",
+            "asignaciones-tutores.editar",
+            "asignaciones-tutores.ver",
+            "asistencia.crear",
+            "asistencia.editar",
+            "asistencia.ver",
+            "cargos.cambiar_estado",
+            "cargos.crear",
+            "cargos.editar",
+            "cargos.ver",
+            "dashboard.ver",
+            "evaluaciones.ver",
+            "ficha-academica.ver",
+            "grupos.crear",
+            "grupos.editar",
+            "grupos.ver",
+            "habilitacion-academica.editar",
+            "habilitacion-academica.ver",
+            "indicadores.ver",
+            "inscripciones.crear",
+            "inscripciones.editar",
+            "inscripciones.ver",
+            "learning_analytics.ver",
+            "materias.ver",
+            "matriculas-cuotas.crear",
+            "matriculas-cuotas.editar",
+            "matriculas-cuotas.ver",
+            "personal.cambiar_estado",
+            "personal.crear",
+            "personal.editar",
+            "personal.ver",
+            "plantillas.crear",
+            "plantillas.editar",
+            "plantillas.eliminar",
+            "plantillas.ver",
+            "postulantes.crear",
+            "postulantes.editar",
+            "postulantes.eliminar",
+            "postulantes.ver",
+            "preguntas.crear",
+            "preguntas.editar",
+            "preguntas.eliminar",
+            "preguntas.ver",
+            "programas.crear",
+            "programas.editar",
+            "programas.ver",
+            "ranking.ver",
+            "reportes.ver",
+            "resultados.ver",
+            "simulacros.crear",
+            "simulacros.editar",
+            "simulacros.ver",
+            "temas.crear",
+            "temas.editar",
+            "temas.ver",
+            "tutores.crear",
+            "tutores.editar",
+            "tutores.ver"
+          ],
+          "home": "http://127.0.0.1:8000/dashboard",
+          "context": "academic",
+          "security": false,
+          "personal_id": null,
+          "postulante_id": null
+        },
+        {
+          "id": 3,
+          "roles": [
+            "Docente"
+          ],
+          "effective_permissions": [
+            "areas.ver",
+            "materias.ver",
+            "plantillas.ver",
+            "preguntas.crear",
+            "preguntas.ver",
+            "temas.ver"
+          ],
+          "home": "http://127.0.0.1:8000/preguntas",
+          "context": "teacher",
+          "security": false,
+          "personal_id": 1,
+          "postulante_id": null
+        },
+        {
+          "id": 4,
+          "roles": [
+            "Docente"
+          ],
+          "effective_permissions": [
+            "areas.ver",
+            "materias.ver",
+            "plantillas.ver",
+            "preguntas.crear",
+            "preguntas.ver",
+            "temas.ver"
+          ],
+          "home": "http://127.0.0.1:8000/preguntas",
+          "context": "teacher",
+          "security": false,
+          "personal_id": 2,
+          "postulante_id": null
+        },
+        {
+          "id": 5,
+          "roles": [
+            "Docente"
+          ],
+          "effective_permissions": [
+            "areas.ver",
+            "materias.ver",
+            "plantillas.ver",
+            "preguntas.crear",
+            "preguntas.ver",
+            "temas.ver"
+          ],
+          "home": "http://127.0.0.1:8000/preguntas",
+          "context": "teacher",
+          "security": false,
+          "personal_id": 3,
+          "postulante_id": null
+        },
+        {
+          "id": 6,
+          "roles": [
+            "Docente"
+          ],
+          "effective_permissions": [
+            "areas.ver",
+            "materias.ver",
+            "plantillas.ver",
+            "preguntas.crear",
+            "preguntas.ver",
+            "temas.ver"
+          ],
+          "home": "http://127.0.0.1:8000/preguntas",
+          "context": "teacher",
+          "security": false,
+          "personal_id": 4,
+          "postulante_id": null
+        },
+        {
+          "id": 7,
+          "roles": [
+            "Estudiante"
+          ],
+          "effective_permissions": [],
+          "home": "http://127.0.0.1:8000/estudiante/evaluaciones",
+          "context": "student",
+          "security": false,
+          "personal_id": null,
+          "postulante_id": null
+        },
+        {
+          "id": 8,
+          "roles": [
+            "Estudiante"
+          ],
+          "effective_permissions": [],
+          "home": "http://127.0.0.1:8000/estudiante/evaluaciones",
+          "context": "student",
+          "security": false,
+          "personal_id": null,
+          "postulante_id": null
+        },
+        {
+          "id": 9,
+          "roles": [
+            "Estudiante"
+          ],
+          "effective_permissions": [],
+          "home": "http://127.0.0.1:8000/estudiante/evaluaciones",
+          "context": "student",
+          "security": false,
+          "personal_id": null,
+          "postulante_id": null
+        }
+      ],
+      "direct_permissions": 0
+    },
+    "idempotence": true
+  },
+  "tests": {
+    "phpunit": {
+      "tests": 373,
+      "passed": 373,
+      "assertions": 2418
+    },
+    "node": {
+      "tests": 11,
+      "passed": 11
+    },
+    "postgres_rbac_final": {
+      "tests": 46,
+      "passed": 46,
+      "assertions": 390
+    },
+    "postgres_full": {
+      "tests": 371,
+      "passed": 371,
+      "assertions": 2323,
+      "duration_ms": 736945,
+      "note": "Suite completa seguida por 46 pruebas RBAC finales, incluyendo 2 nuevas de navegación/consumidores. 373 casos distintos cubiertos entre ambas ejecuciones; no sumar como casos independientes."
+    },
+    "postgres_scripts": {
+      "deployment": 90,
+      "account_installation": 12,
+      "last_sa_concurrency": 6,
+      "personal_installation": 41,
+      "personal_concurrency": 3,
+      "tutor_identity_migration": 100,
+      "identity_installation": 10,
+      "input_checks": 83,
+      "student_identity": 15,
+      "account_lifecycle": 12,
+      "birth_date": 11
+    },
+    "fresh_installation": {
+      "database": "intelecta_rbac_test_20260910_075546",
+      "matrix_exact": true,
+      "roles": 4,
+      "permissions": 81,
+      "role_has_permissions": 137,
+      "model_has_roles": 9,
+      "model_has_permissions": 0,
+      "users": 9,
+      "postulantes": 72,
+      "linked_students": 3,
+      "personal": 5,
+      "tutors": 4,
+      "cargos": 8
+    }
+  },
+  "quality": {
+    "build": true,
+    "pint": true,
+    "diff_check": true,
+    "commit": false,
+    "push": false,
+    "git_add": false
+  }
+}

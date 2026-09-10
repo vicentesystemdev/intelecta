@@ -4,8 +4,8 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
 {
@@ -33,7 +33,7 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
     }
 
-    public function test_users_with_student_role_are_redirected_to_landing_after_login(): void
+    public function test_users_with_student_role_are_redirected_to_portal_after_login(): void
     {
         Role::findOrCreate('Estudiante', 'web');
         $user = User::factory()->create();
@@ -45,7 +45,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect('/');
+        $response->assertRedirect(route('estudiante.evaluaciones'));
     }
 
     public function test_users_without_clear_role_are_redirected_to_landing_after_login(): void

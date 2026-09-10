@@ -14,14 +14,14 @@ class EnsureAdministrativeAccess
     {
         $user = $request->user();
 
-        if (! $user || $user->getRoleNames()->isEmpty()) {
+        if (! $user || ! $user->cuentaActiva()) {
             throw new AuthorizationException(
                 'No cuentas con permisos para acceder a este módulo.',
             );
         }
 
-        if ($user->hasRole('Estudiante')) {
-            if ($request->routeIs('dashboard')) {
+        if (! $user->hasAnyRole(['Super Administrador', 'Administrador', 'Docente'])) {
+            if ($user->hasRole('Estudiante') && $request->routeIs('dashboard')) {
                 return to_route('estudiante.evaluaciones');
             }
 

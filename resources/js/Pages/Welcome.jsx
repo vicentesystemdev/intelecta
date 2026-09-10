@@ -254,11 +254,8 @@ const LearningAnalyticsFallback = () => (
 );
 export default function Welcome({ auth }) {
     useTheme();
-    const roles = auth?.roles || auth?.user?.roles || [];
-    const isStudent = roles.includes('Estudiante');
-    const isAdminLike = roles.some((role) =>
-        ['Super Administrador', 'Administrador', 'Docente'].includes(role)
-    );
+    const isStudent = auth?.context === 'student';
+    const isAdminLike = ['academic', 'teacher'].includes(auth?.context);
 
     return (
         <>
@@ -327,7 +324,7 @@ export default function Welcome({ auth }) {
                                 ) : isAdminLike ? (
                                     <>
                                         <Link
-                                            href={route('dashboard')}
+                                            href={auth.homeUrl}
                                             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-primary px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-primary/20 transition-all hover:bg-brand-primary/90 hover:shadow-brand-primary/30 hover:-translate-y-0.5 active:translate-y-0"
                                         >
                                             Ir al panel
@@ -419,7 +416,7 @@ export default function Welcome({ auth }) {
                                     ) : isAdminLike ? (
                                         <>
                                             <Link
-                                                href={route('dashboard')}
+                                                href={auth.homeUrl}
                                                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-primary px-6 py-3.5 text-base font-semibold text-white shadow-xl shadow-brand-primary/20 transition-all hover:bg-brand-primary/90 hover:shadow-brand-primary/30 hover:-translate-y-0.5"
                                             >
                                                 Ir al panel
@@ -960,7 +957,7 @@ export default function Welcome({ auth }) {
                                 </Link>
                             ) : isAdminLike ? (
                                 <Link
-                                    href={route('dashboard')}
+                                    href={auth.homeUrl}
                                     className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-primary px-8 py-4 text-base font-bold text-white shadow-xl shadow-brand-primary/30 transition-all hover:bg-brand-primary/90 hover:shadow-brand-primary/40 hover:-translate-y-0.5"
                                 >
                                     Ir al panel
