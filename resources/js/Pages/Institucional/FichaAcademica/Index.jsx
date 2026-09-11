@@ -14,7 +14,7 @@ import { useMemo, useState } from 'react';
 const fullName = (postulante) =>
     `${postulante.nombres_post || ''} ${postulante.apellidos_post || ''}`.trim();
 
-export default function Index({ fichas, programas = [], grupos = [], filtros = {} }) {
+export default function Index({ fichas, programas = [], grupos = [], filtros = {}, vistaDocente = false }) {
     const [filters, setFilters] = useState({
         buscar: filtros.buscar || '',
         id_prog: filtros.id_prog || '',
@@ -60,7 +60,7 @@ export default function Index({ fichas, programas = [], grupos = [], filtros = {
                     <Search className="absolute left-3 top-3 h-4 w-4 text-text-muted" />
                     <input
                         className="h-10 w-full rounded-xl border border-brand-border bg-brand-card pl-9 pr-3 text-sm text-text-main outline-none focus:border-brand-secondary focus:ring-2 focus:ring-brand-secondary/15"
-                        placeholder="Nombre, apellido, C.I. o correo"
+                        placeholder={vistaDocente ? 'Nombre o apellido' : 'Nombre, apellido, C.I. o correo'}
                         value={filters.buscar}
                         onChange={(event) => setFilters({ ...filters, buscar: event.target.value })}
                     />

@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-const tabs = [
+const baseTabs = [
     ['datos', 'Datos académicos'],
     ['programa', 'Programa y grupo'],
     ['rendimiento', 'Rendimiento'],
@@ -43,10 +43,14 @@ export default function Show({
     administracion,
     asistencia,
     evaluacionesAplicadas = [],
+    vistaDocente = false,
 }) {
     const [activeTab, setActiveTab] = useState('datos');
     const fullName = `${postulante.nombres_post} ${postulante.apellidos_post}`;
     const score = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(1));
+    const tabs = vistaDocente
+        ? baseTabs.filter(([key]) => key !== 'administracion')
+        : baseTabs;
     const detail = (label, value) => (
         <div className="rounded-xl border border-brand-border bg-brand-card p-4">
             <p className="text-xs text-text-muted">{label}</p>
@@ -98,8 +102,8 @@ export default function Show({
                             <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                                 {detail('Nombres', postulante.nombres_post)}
                                 {detail('Apellidos', postulante.apellidos_post)}
-                                {detail('Fecha de nacimiento', formatDateLatam(postulante.fecha_nacimiento_post) || 'Pendiente de completar')}
-                                {detail('Edad', postulante.edad_actual ? `${postulante.edad_actual} años` : null)}
+                                {!vistaDocente && detail('Fecha de nacimiento', formatDateLatam(postulante.fecha_nacimiento_post) || 'Pendiente de completar')}
+                                {!vistaDocente && detail('Edad', postulante.edad_actual ? `${postulante.edad_actual} años` : null)}
                                 {detail('Colegio de procedencia', postulante.colegio?.nombre_col)}
                                 {detail('Universidad objetivo', postulante.carrera?.universidad?.sigla_uni || postulante.carrera?.universidad?.nombre_uni)}
                                 {detail('Carrera objetivo', postulante.carrera?.nombre_car)}

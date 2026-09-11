@@ -12,6 +12,7 @@ use App\Domains\Academico\Models\ProgramaAcademico;
 use App\Domains\Academico\Models\SimulacroProgramado;
 use App\Domains\Academico\Repositories\AcademicoRepository;
 use App\Domains\Postulantes\Models\Postulante;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class AcademicoService
@@ -27,11 +28,11 @@ class AcademicoService
         ];
     }
 
-    public function grupos(array $filters): array
+    public function grupos(array $filters, User $user): array
     {
         return [
-            'grupos' => $this->repository->paginateGrupos($filters),
-            'programas' => $this->repository->programasOptions(),
+            'grupos' => $this->repository->paginateGrupos($filters, $user),
+            'programas' => $this->repository->programasOptionsPara($user, 'grupos.ver'),
         ];
     }
 
@@ -69,17 +70,17 @@ class AcademicoService
         return $this->repository->rankingPortal($postulante);
     }
 
-    public function ficha(Postulante $postulante): array
+    public function ficha(Postulante $postulante, ?User $user = null): array
     {
-        return $this->repository->ficha($postulante);
+        return $this->repository->ficha($postulante, $user);
     }
 
-    public function fichas(array $filters): array
+    public function fichas(array $filters, User $user): array
     {
         return [
-            'fichas' => $this->repository->paginateFichas($filters),
-            'programas' => $this->repository->programasOptions(),
-            'grupos' => $this->repository->gruposOptions(),
+            'fichas' => $this->repository->paginateFichas($filters, $user),
+            'programas' => $this->repository->programasOptionsPara($user, 'ficha-academica.ver'),
+            'grupos' => $this->repository->gruposOptionsPara($user, 'ficha-academica.ver'),
         ];
     }
 
@@ -97,16 +98,28 @@ class AcademicoService
 
     public function saveGrupo(GrupoAcademicoData $data, ?GrupoAcademico $grupo = null): GrupoAcademico
     {
-        return DB::transaction(fn () => $grupo
-            ? $this->repository->updateGrupo($grupo, $data)
-            : $this->repository->createGrupo($data));
+        return DB::transaction(function () use ($data, $grupo): GrupoAcademico {
+            if (! $grupo) {
+                return $this->repository->createGrupo($data);
+            }
+
+            $locked = GrupoAcademico::query()->lockForUpdate()->findOrFail($grupo->getKey());
+
+            return $this->repository->updateGrupo($locked, $data);
+        }, 3);
     }
 
     public function saveInscripcion(InscripcionAcademicaData $data, ?InscripcionAcademica $inscripcion = null): InscripcionAcademica
     {
-        return DB::transaction(fn () => $inscripcion
-            ? $this->repository->updateInscripcion($inscripcion, $data)
-            : $this->repository->createInscripcion($data));
+        return DB::transaction(function () use ($data, $inscripcion): InscripcionAcademica {
+            if (! $inscripcion) {
+                return $this->repository->createInscripcion($data);
+            }
+
+            $locked = InscripcionAcademica::query()->lockForUpdate()->findOrFail($inscripcion->getKey());
+
+            return $this->repository->updateInscripcion($locked, $data);
+        }, 3);
     }
 
     public function saveSimulacro(SimulacroProgramadoData $data, ?SimulacroProgramado $simulacro = null): SimulacroProgramado

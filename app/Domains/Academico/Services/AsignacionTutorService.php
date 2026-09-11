@@ -27,8 +27,16 @@ class AsignacionTutorService
 
     public function save(AsignacionTutorData $data, ?AsignacionTutor $asignacion = null): AsignacionTutor
     {
-        return DB::transaction(fn () => $asignacion
-            ? $this->repository->update($asignacion, $data)
-            : $this->repository->create($data));
+        return DB::transaction(function () use ($data, $asignacion): AsignacionTutor {
+            if (! $asignacion) {
+                return $this->repository->create($data);
+            }
+
+            $locked = AsignacionTutor::query()
+                ->lockForUpdate()
+                ->findOrFail($asignacion->getKey());
+
+            return $this->repository->update($locked, $data);
+        }, 3);
     }
 }

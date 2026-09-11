@@ -4,8 +4,10 @@ namespace App\Http\Requests\Institucional;
 
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Models\InscripcionAcademica;
+use App\Domains\Academico\Services\AmbitoDocenteService;
 use App\Http\Requests\NormalizedFormRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
@@ -17,7 +19,14 @@ class AsistenciaAcademicaRequest extends NormalizedFormRequest
             ? 'asistencia.crear'
             : 'asistencia.editar';
 
-        return $this->user()?->can($permission) ?? false;
+        $user = $this->user();
+        if (! $user?->can($permission)) {
+            return false;
+        }
+
+        $attendance = $this->route('asistencia');
+
+        return ! $attendance || Gate::forUser($user)->allows('update', $attendance);
     }
 
     protected function prepareForValidation(): void
@@ -73,10 +82,27 @@ class AsistenciaAcademicaRequest extends NormalizedFormRequest
                     return;
                 }
 
+                $ambito = app(AmbitoDocenteService::class);
+                $user = $this->user();
+                $capacidad = $this->isMethod('post') ? 'asistencia.crear' : 'asistencia.editar';
+                abort_unless($ambito->puedeVerGrupo($user, $this->integer('id_grupo'), $capacidad), 403);
+                abort_unless(
+                    $ambito->inscripcionActivaPermitida(
+                        $user,
+                        $this->integer('id_grupo'),
+                        $this->integer('id_post'),
+                        $capacidad,
+                    ),
+                    403,
+                );
+                if ($this->filled('id_tutor') && $ambito->esDocenteRestringido($user, $capacidad)) {
+                    abort_unless($ambito->tutorId($user, $capacidad) === $this->integer('id_tutor'), 403);
+                }
+
                 $duplicate = DB::table('asistencias_academicas')
                     ->where('id_post', $this->integer('id_post'))
                     ->where('id_grupo', $this->integer('id_grupo'))
-                    ->where('fecha_asist', $this->input('fecha_asist'))
+                    ->whereDate('fecha_asist', $this->input('fecha_asist'))
                     ->where('sesion_asist', $this->input('sesion_asist'))
                     ->when($this->route('asistencia'), fn ($query, $asistencia) => $query->where('id_asist', '!=', $asistencia->id_asist))
                     ->exists();

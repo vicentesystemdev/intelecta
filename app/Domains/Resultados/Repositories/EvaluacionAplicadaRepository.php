@@ -2,16 +2,19 @@
 
 namespace App\Domains\Resultados\Repositories;
 
+use App\Domains\Academico\Services\AmbitoDocenteService;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
-use App\Domains\Postulantes\Models\Postulante;
 use App\Domains\Resultados\DTOs\EvaluacionAplicadaData;
 use App\Domains\Resultados\Models\EvaluacionAplicada;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class EvaluacionAplicadaRepository
 {
+    public function __construct(private readonly AmbitoDocenteService $ambito) {}
+
     public function findOpen(int $postulanteId, int $plantillaId): ?EvaluacionAplicada
     {
         return EvaluacionAplicada::query()
@@ -163,11 +166,33 @@ class EvaluacionAplicadaRepository
             ->get();
     }
 
-    public function paginateResults(array $filters, int $perPage = 15): LengthAwarePaginator
+    public function paginateResults(array $filters, User $user, int $perPage = 15): LengthAwarePaginator
     {
-        return EvaluacionAplicada::query()
+        $teacher = $this->ambito->esDocenteRestringido($user, 'resultados.ver');
+
+        $query = $this->ambito->evaluaciones(EvaluacionAplicada::query(), $user);
+        if ($teacher) {
+            $query->select([
+                'id_eval_apl',
+                'id_post',
+                'id_plantilla',
+                'id_sim',
+                'codigo_eval_apl',
+                'tipo_eval_apl',
+                'fecha_inicio_eval_apl',
+                'fecha_fin_eval_apl',
+                'estado_eval_apl',
+                'puntaje_total_eval_apl',
+                'puntaje_maximo_eval_apl',
+                'porcentaje_eval_apl',
+                'tiempo_total_segundos_eval_apl',
+                'intentos_eval_apl',
+            ]);
+        }
+
+        return $query
             ->with([
-                'postulante:id_post,nombres_post,apellidos_post,ci_post',
+                'postulante:id_post,nombres_post,apellidos_post',
                 'plantilla:id_plan,nombre_plan',
                 'simulacro:id_sim,titulo_sim',
             ])
@@ -176,11 +201,12 @@ class EvaluacionAplicadaRepository
                 'respuestas as respuestas_correctas_count' => fn (Builder $query) => $query
                     ->where('es_correcta_resp', true),
             ])
-            ->when($filters['buscar'] ?? null, function (Builder $query, string $search) {
+            ->when($filters['buscar'] ?? null, function (Builder $query, string $search) use ($teacher) {
                 $pattern = '%'.mb_strtolower(trim($search)).'%';
                 $query->whereHas('postulante', fn (Builder $query) => $query
                     ->whereRaw("LOWER(CONCAT_WS(' ', nombres_post, apellidos_post)) LIKE ?", [$pattern])
-                    ->orWhereRaw("LOWER(COALESCE(ci_post, '')) LIKE ?", [$pattern]));
+                    ->when(! $teacher, fn (Builder $query) => $query
+                        ->orWhereRaw("LOWER(COALESCE(ci_post, '')) LIKE ?", [$pattern])));
             })
             ->when(
                 $filters['id_plantilla'] ?? null,
@@ -202,5 +228,37 @@ class EvaluacionAplicadaRepository
             ->latest('id_eval_apl')
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function resultMetrics(User $user): array
+    {
+        $metrics = $this->ambito->evaluaciones(EvaluacionAplicada::query(), $user)
+            ->selectRaw('COUNT(*) AS total')
+            ->selectRaw("SUM(CASE WHEN estado_eval_apl = 'finalizada' THEN 1 ELSE 0 END) AS finalizadas")
+            ->selectRaw("SUM(CASE WHEN estado_eval_apl = 'en_progreso' THEN 1 ELSE 0 END) AS en_progreso")
+            ->selectRaw("AVG(CASE WHEN estado_eval_apl = 'finalizada' THEN porcentaje_eval_apl ELSE NULL END) AS promedio")
+            ->first();
+
+        return [
+            'total' => (int) ($metrics?->total ?? 0),
+            'finalizadas' => (int) ($metrics?->finalizadas ?? 0),
+            'enProgreso' => (int) ($metrics?->en_progreso ?? 0),
+            'promedio' => round((float) ($metrics?->promedio ?? 0), 2),
+        ];
+    }
+
+    public function plantillasResultsOptions(User $user): Collection
+    {
+        return PlantillaEvaluacion::query()
+            ->whereHas('evaluacionesAplicadas', fn (Builder $query) => $this->ambito->evaluaciones($query, $user))
+            ->orderBy('nombre_plan')
+            ->get(['id_plan', 'nombre_plan']);
+    }
+
+    public function plantillaPerteneceAlAmbito(User $user, int $plantillaId): bool
+    {
+        return $this->ambito->evaluaciones(EvaluacionAplicada::query(), $user)
+            ->where('id_plantilla', $plantillaId)
+            ->exists();
     }
 }

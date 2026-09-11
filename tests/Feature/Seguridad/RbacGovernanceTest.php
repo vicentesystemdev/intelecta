@@ -205,13 +205,16 @@ class RbacGovernanceTest extends TestCase
         app(CuentaService::class)->assignRoles($stale, User::factory()->active()->create()->id, ['roles' => ['Super Administrador']]);
     }
 
-    public function test_teacher_cannot_read_global_sensitive_modules_but_can_use_pedagogy(): void
+    public function test_teacher_keeps_global_sensitive_modules_closed_and_scoped_modules_fail_empty(): void
     {
         $teacher = User::factory()->active()->create()->assignRole('Docente');
         $this->staff($teacher);
         $this->actingAs($teacher);
-        foreach (['/dashboard', '/postulantes', '/admin/institucional/ficha-academica', '/admin/institucional/ranking', '/admin/evaluaciones/resultados', '/reportes-academicos', '/reportes-academicos/pdf/rendimiento', '/admin/institucional/matriculas-cuotas', '/admin/analisis/riesgo-academico', '/admin/analisis/learning-analytics', '/admin/institucional/asistencia'] as $url) {
+        foreach (['/dashboard', '/admin/institucional/programas', '/admin/institucional/ranking', '/admin/institucional/simulacros', '/reportes-academicos', '/reportes-academicos/pdf/rendimiento', '/admin/institucional/matriculas-cuotas', '/admin/analisis/riesgo-academico', '/admin/analisis/learning-analytics'] as $url) {
             $this->getJson($url)->assertForbidden();
+        }
+        foreach (['/postulantes', '/admin/institucional/ficha-academica', '/admin/evaluaciones/resultados', '/admin/institucional/asistencia', '/admin/institucional/grupos'] as $url) {
+            $this->get($url)->assertOk();
         }
         foreach (['/preguntas', '/preguntas/crear', '/plantillas-evaluacion', '/areas-conocimiento', '/temas', '/admin/evaluaciones/materias'] as $url) {
             $this->get($url)->assertOk();
@@ -288,7 +291,7 @@ class RbacGovernanceTest extends TestCase
 
     public function test_permission_editor_enforces_ceilings_and_audits_before_after(): void
     {
-        foreach (['Administrador' => ['usuarios.crear'], 'Docente' => ['postulantes.ver'], 'Estudiante' => ['preguntas.ver'], 'Super Administrador' => []] as $name => $permissions) {
+        foreach (['Administrador' => ['usuarios.crear'], 'Docente' => ['asistencia.editar'], 'Estudiante' => ['preguntas.ver'], 'Super Administrador' => []] as $name => $permissions) {
             $role = Role::findByName($name);
             $this->putJson(route('admin.sistema.roles-permisos.update', $role), ['permissions' => $permissions])->assertUnprocessable();
             $this->assertEqualsCanonicalizing(MatrizRbac::forRole($name), $role->fresh()->permissions->pluck('name')->all());
@@ -320,7 +323,7 @@ class RbacGovernanceTest extends TestCase
         }
         $service = app(DesplegarMatrizRbac::class);
         $this->assertSame($service->target(), $service->matrix($service->state()));
-        $this->assertDatabaseCount('role_has_permissions', 137);
+        $this->assertDatabaseCount('role_has_permissions', 143);
         $this->assertDatabaseCount('model_has_permissions', 0);
         $this->assertDatabaseCount('roles', 4);
     }

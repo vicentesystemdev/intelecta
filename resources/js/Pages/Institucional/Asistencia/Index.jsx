@@ -84,6 +84,7 @@ export default function Index({
     listaGrupo = [],
     sesionSeleccionada = 'General',
     filtros = {},
+    permisos = {},
 }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
@@ -149,13 +150,15 @@ export default function Index({
             id_tutor: filtros.id_tutor || '',
             fecha_asist: filtros.fecha_asist || '',
             sesion_asist: sesionSeleccionada,
-            registros: listaGrupo.map((item) => ({
-                id_post: item.id_post,
-                estado_asist: item.estado_asist || 'presente',
-                observacion_asist: item.observacion_asist || '',
-            })),
+            registros: listaGrupo
+                .filter((item) => permisos.editar || !item.asistencia)
+                .map((item) => ({
+                    id_post: item.id_post,
+                    estado_asist: item.estado_asist || 'presente',
+                    observacion_asist: item.observacion_asist || '',
+                })),
         });
-    }, [listaGrupo, filtros, sesionSeleccionada]);
+    }, [listaGrupo, filtros, sesionSeleccionada, permisos.editar]);
 
     const applyFilters = (event) => {
         event.preventDefault();
@@ -261,7 +264,7 @@ export default function Index({
                 title="Control de Asistencia"
                 description="Consolide la participación de postulantes por sesión y disponga de una variable complementaria para seguimiento académico."
                 icon={CalendarCheck2}
-                action={
+                action={permisos.crear ? (
                     <button
                         type="button"
                         className={primaryButtonClass}
@@ -270,7 +273,7 @@ export default function Index({
                         <Plus className="h-4 w-4" />
                         Registro individual
                     </button>
-                }
+                ) : null}
             />
             <FlashMessage message={flash?.success} />
 
@@ -385,7 +388,7 @@ export default function Index({
                 <button className={primaryButtonClass}>Aplicar filtros</button>
             </form>
 
-            <section className={`${cardClass} mb-6 p-5 sm:p-6`}>
+            {permisos.crear && <section className={`${cardClass} mb-6 p-5 sm:p-6`}>
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
                         <p className="text-xs font-bold uppercase tracking-wider text-brand-secondary">
@@ -399,7 +402,7 @@ export default function Index({
                             los postulantes inscritos.
                         </p>
                     </div>
-                    {listaGrupo.length > 0 && (
+                    {groupForm.data.registros.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                             {states.map(([value, label]) => (
                                 <button
@@ -446,22 +449,25 @@ export default function Index({
                                             <p className="break-words text-sm font-black text-text-main">
                                                 {studentName(item.postulante)}
                                             </p>
-                                            <p className="mt-1 text-xs text-text-muted">
-                                                C.I. {item.postulante?.ci_post || 'no registrada'}
-                                            </p>
+                                            {item.asistencia && !permisos.editar && (
+                                                <p className="mt-1 text-xs font-semibold text-text-muted">
+                                                    Asistencia ya registrada; requiere permiso de edición.
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="flex flex-wrap gap-2">
                                             {states.map(([value, label]) => (
                                                 <button
                                                     key={value}
                                                     type="button"
+                                                    disabled={!record}
                                                     onClick={() =>
                                                         setGroupStatus(
                                                             item.id_post,
                                                             value,
                                                         )
                                                     }
-                                                    className={`rounded-xl border px-3 py-2 text-xs font-bold transition ${
+                                                    className={`rounded-xl border px-3 py-2 text-xs font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${
                                                         record?.estado_asist === value
                                                             ? stateButton[value]
                                                             : 'border-brand-border bg-brand-card text-text-muted hover:bg-brand-border/30'
@@ -483,7 +489,7 @@ export default function Index({
                                 {groupForm.errors.registros}
                             </p>
                         )}
-                        <div className="mt-5 flex justify-end">
+                        {groupForm.data.registros.length > 0 && <div className="mt-5 flex justify-end">
                             <button
                                 className={primaryButtonClass}
                                 disabled={groupForm.processing}
@@ -491,7 +497,7 @@ export default function Index({
                                 <Save className="h-4 w-4" />
                                 Guardar asistencia del grupo
                             </button>
-                        </div>
+                        </div>}
                     </form>
                 ) : (
                     <div className="mt-5">
@@ -501,7 +507,7 @@ export default function Index({
                         />
                     </div>
                 )}
-            </section>
+            </section>}
 
             <section className={`${cardClass} overflow-hidden`}>
                 <div className="border-b border-brand-border p-5 sm:p-6">
@@ -563,7 +569,7 @@ export default function Index({
                                                 {item.observacion_asist || 'Sin observación'}
                                             </td>
                                             <td className="px-4 py-4 align-top">
-                                                <button
+                                                {permisos.editar && <button
                                                     type="button"
                                                     onClick={() =>
                                                         openIndividual(item)
@@ -572,7 +578,7 @@ export default function Index({
                                                     aria-label="Editar asistencia"
                                                 >
                                                     <Pencil className="h-4 w-4" />
-                                                </button>
+                                                </button>}
                                             </td>
                                         </tr>
                                     ))}
@@ -621,7 +627,7 @@ export default function Index({
                                     <p className="mt-3 break-words text-xs leading-5 text-text-muted">
                                         {item.observacion_asist || 'Sin observación'}
                                     </p>
-                                    <div className="mt-4 flex justify-end">
+                                    {permisos.editar && <div className="mt-4 flex justify-end">
                                         <button
                                             type="button"
                                             onClick={() => openIndividual(item)}
@@ -630,7 +636,7 @@ export default function Index({
                                             <Pencil className="h-4 w-4" />
                                             Editar
                                         </button>
-                                    </div>
+                                    </div>}
                                 </article>
                             ))}
                         </div>

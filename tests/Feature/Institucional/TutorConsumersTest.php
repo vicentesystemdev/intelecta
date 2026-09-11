@@ -23,7 +23,8 @@ class TutorConsumersTest extends TestCase
     {
         Notification::fake();
         $this->seed(DatabaseSeeder::class);
-        $this->actingAs(User::role('Super Administrador')->sole());
+        $sa = User::role('Super Administrador')->sole();
+        $this->actingAs($sa);
         $url = fn ($action, $id = []) => route('admin.institucional.'.$action, $id);
         foreach (['tutores.index', 'asignacion-tutores.index', 'asistencia.index', 'grupos.index', 'ficha.index'] as $action) {
             $this->get($url($action))->assertOk();
@@ -32,7 +33,7 @@ class TutorConsumersTest extends TestCase
         $assignments = app(AsignacionTutorRepository::class)->paginate(['id_tutor' => $tutor->id_tutor]);
         $this->assertGreaterThan(0, $assignments->total());
         $this->assertSame($tutor->nombre_completo, $assignments->items()[0]->tutor->nombre_completo);
-        $attendances = app(AsistenciaAcademicaRepository::class)->paginate(['id_tutor' => $tutor->id_tutor]);
+        $attendances = app(AsistenciaAcademicaRepository::class)->paginate(['id_tutor' => $tutor->id_tutor], $sa);
         $this->assertGreaterThan(0, $attendances->total());
         $this->assertSame($tutor->nombre_completo, $attendances->items()[0]->tutor->nombre_completo);
         $assignment = AsignacionTutor::where('id_tutor', $tutor->id_tutor)->whereNotNull('id_grupo')->firstOrFail();

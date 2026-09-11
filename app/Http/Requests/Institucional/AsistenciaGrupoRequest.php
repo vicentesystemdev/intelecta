@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Institucional;
 
 use App\Domains\Academico\Models\GrupoAcademico;
-use App\Domains\Academico\Models\InscripcionAcademica;
+use App\Domains\Academico\Services\AmbitoDocenteService;
 use App\Http\Requests\NormalizedFormRequest;
 use App\Support\Validation\InputRules;
 use Illuminate\Validation\Rule;
@@ -69,6 +69,13 @@ class AsistenciaGrupoRequest extends NormalizedFormRequest
                     return;
                 }
 
+                $ambito = app(AmbitoDocenteService::class);
+                $user = $this->user();
+                abort_unless($ambito->puedeVerGrupo($user, $grupo, 'asistencia.crear'), 403);
+                if ($this->filled('id_tutor') && $ambito->esDocenteRestringido($user, 'asistencia.crear')) {
+                    abort_unless($ambito->tutorId($user, 'asistencia.crear') === $this->integer('id_tutor'), 403);
+                }
+
                 if ($this->filled('id_prog') && $grupo->id_prog !== $this->integer('id_prog')) {
                     $validator->errors()->add('id_prog', 'El grupo seleccionado no pertenece al programa indicado.');
                 }
@@ -77,14 +84,13 @@ class AsistenciaGrupoRequest extends NormalizedFormRequest
                     ->pluck('id_post')
                     ->map(fn ($id) => (int) $id)
                     ->unique();
-                $inscritos = InscripcionAcademica::query()
-                    ->where('id_grupo', $grupo->id_grupo)
-                    ->where('estado_inscripcion', 'activo')
-                    ->whereIn('id_post', $postulantes)
-                    ->pluck('id_post');
-
-                if ($inscritos->count() !== $postulantes->count()) {
-                    $validator->errors()->add('registros', 'Todos los postulantes deben tener una inscripción activa en el grupo.');
+                if ($ambito->cantidadInscripcionesActivasPermitidas(
+                    $user,
+                    $grupo->id_grupo,
+                    $postulantes,
+                    'asistencia.crear',
+                ) !== $postulantes->count()) {
+                    abort(403, 'Uno o más postulantes no pertenecen al ámbito académico permitido.');
                 }
             },
         ];

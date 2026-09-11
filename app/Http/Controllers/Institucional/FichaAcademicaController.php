@@ -3,16 +3,21 @@
 namespace App\Http\Controllers\Institucional;
 
 use App\Domains\Academico\Services\AcademicoService;
+use App\Domains\Academico\Services\AmbitoDocenteService;
 use App\Domains\Postulantes\Models\Postulante;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class FichaAcademicaController extends Controller
 {
-    public function index(Request $request, AcademicoService $service): Response
-    {
+    public function index(
+        Request $request,
+        AcademicoService $service,
+        AmbitoDocenteService $ambito,
+    ): Response {
         $filters = $request->validate([
             'buscar' => ['nullable', 'string', 'max:160'],
             'id_prog' => ['nullable', 'integer', 'exists:programas_academicos,id_prog'],
@@ -30,14 +35,31 @@ class FichaAcademicaController extends Controller
             'nivel_riesgo_rend.in' => 'Seleccione un estado de seguimiento válido.',
         ]);
 
+        if (isset($filters['id_prog'])) {
+            abort_unless($ambito->puedeVerPrograma($request->user(), (int) $filters['id_prog'], 'ficha-academica.ver'), 403);
+        }
+        if (isset($filters['id_grupo'])) {
+            abort_unless($ambito->puedeVerGrupo($request->user(), (int) $filters['id_grupo'], 'ficha-academica.ver'), 403);
+        }
+
         return Inertia::render('Institucional/FichaAcademica/Index', [
-            ...$service->fichas($filters),
+            ...$service->fichas($filters, $request->user()),
             'filtros' => $filters,
+            'vistaDocente' => $ambito->esDocenteRestringido($request->user(), 'ficha-academica.ver'),
         ]);
     }
 
-    public function show(Postulante $postulante, AcademicoService $service): Response
-    {
-        return Inertia::render('Institucional/FichaAcademica/Show', $service->ficha($postulante));
+    public function show(
+        Request $request,
+        Postulante $postulante,
+        AcademicoService $service,
+        AmbitoDocenteService $ambito,
+    ): Response {
+        Gate::authorize('viewAcademicFile', $postulante);
+
+        return Inertia::render('Institucional/FichaAcademica/Show', [
+            ...$service->ficha($postulante, $request->user()),
+            'vistaDocente' => $ambito->esDocenteRestringido($request->user(), 'ficha-academica.ver'),
+        ]);
     }
 }

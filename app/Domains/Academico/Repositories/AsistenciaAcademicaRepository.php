@@ -7,56 +7,73 @@ use App\Domains\Academico\Models\AsistenciaAcademica;
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Models\InscripcionAcademica;
 use App\Domains\Academico\Models\ProgramaAcademico;
+use App\Domains\Academico\Models\TutorAcademico;
+use App\Domains\Academico\Services\AmbitoDocenteService;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class AsistenciaAcademicaRepository
 {
-    public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator
+    public function __construct(private readonly AmbitoDocenteService $ambito) {}
+
+    public function paginate(array $filters, User $user, int $perPage = 15): LengthAwarePaginator
     {
-        return $this->filteredQuery($filters)
+        $query = $this->filteredQuery($filters, $user)
             ->with([
                 'programa:id_prog,nombre_prog,codigo_prog',
                 'grupo:id_grupo,id_prog,nombre_grupo,codigo_grupo',
                 'postulante:id_post,nombres_post,apellidos_post',
-                'tutor:id_tutor,personal_id,especialidad_tutor',
-            ])
+            ]);
+
+        if (! $this->ambito->esDocenteRestringido($user, 'asistencia.ver')) {
+            $query->with('tutor:id_tutor,personal_id,especialidad_tutor');
+        }
+
+        return $query
             ->latest('fecha_asist')
             ->latest('id_asist')
             ->paginate($perPage)
             ->withQueryString();
     }
 
-    public function metrics(array $filters): array
+    public function metrics(array $filters, User $user): array
     {
-        $collection = $this->filteredQuery($filters)->get(['estado_asist']);
-        $total = $collection->count();
-        $attended = $collection->whereIn('estado_asist', ['presente', 'retraso', 'justificado'])->count();
+        $metrics = $this->filteredQuery($filters, $user)
+            ->selectRaw('COUNT(*) AS registradas')
+            ->selectRaw("SUM(CASE WHEN estado_asist = 'presente' THEN 1 ELSE 0 END) AS presentes")
+            ->selectRaw("SUM(CASE WHEN estado_asist = 'ausente' THEN 1 ELSE 0 END) AS ausentes")
+            ->selectRaw("SUM(CASE WHEN estado_asist = 'retraso' THEN 1 ELSE 0 END) AS retrasos")
+            ->selectRaw("SUM(CASE WHEN estado_asist = 'justificado' THEN 1 ELSE 0 END) AS justificados")
+            ->first();
+        $total = (int) ($metrics?->registradas ?? 0);
+        $attended = (int) ($metrics?->presentes ?? 0)
+            + (int) ($metrics?->retrasos ?? 0)
+            + (int) ($metrics?->justificados ?? 0);
 
         return [
             'registradas' => $total,
-            'presentes' => $collection->where('estado_asist', 'presente')->count(),
-            'ausentes' => $collection->where('estado_asist', 'ausente')->count(),
-            'retrasos' => $collection->where('estado_asist', 'retraso')->count(),
-            'justificados' => $collection->where('estado_asist', 'justificado')->count(),
+            'presentes' => (int) ($metrics?->presentes ?? 0),
+            'ausentes' => (int) ($metrics?->ausentes ?? 0),
+            'retrasos' => (int) ($metrics?->retrasos ?? 0),
+            'justificados' => (int) ($metrics?->justificados ?? 0),
             'promedio' => $total > 0 ? round(($attended / $total) * 100, 1) : 0,
         ];
     }
 
-    public function roster(int $grupoId, string $fecha, string $sesion): Collection
+    public function roster(User $user, int $grupoId, string $fecha, string $sesion): Collection
     {
-        $existing = AsistenciaAcademica::query()
+        $existing = $this->ambito->asistencias(AsistenciaAcademica::query(), $user)
             ->where('id_grupo', $grupoId)
             ->whereDate('fecha_asist', $fecha)
             ->where('sesion_asist', $sesion)
             ->get()
             ->keyBy('id_post');
 
-        return InscripcionAcademica::query()
-            ->with('postulante:id_post,nombres_post,apellidos_post,ci_post')
+        return $this->ambito->inscripciones(InscripcionAcademica::query(), $user, 'asistencia.ver', true)
+            ->with('postulante:id_post,nombres_post,apellidos_post')
             ->where('id_grupo', $grupoId)
-            ->where('estado_inscripcion', 'activo')
             ->orderBy('id_post')
             ->get()
             ->map(function (InscripcionAcademica $inscripcion) use ($existing) {
@@ -87,52 +104,37 @@ class AsistenciaAcademicaRepository
         return $asistencia->refresh();
     }
 
-    public function upsertGroup(array $data): Collection
+    public function programasOptions(User $user): Collection
     {
-        return collect($data['registros'])->map(function (array $registro) use ($data) {
-            return AsistenciaAcademica::updateOrCreate(
-                [
-                    'id_grupo' => (int) $data['id_grupo'],
-                    'id_post' => (int) $registro['id_post'],
-                    'fecha_asist' => $data['fecha_asist'],
-                    'sesion_asist' => $data['sesion_asist'],
-                ],
-                [
-                    'id_prog' => (int) $data['id_prog'],
-                    'id_tutor' => filled($data['id_tutor'] ?? null) ? (int) $data['id_tutor'] : null,
-                    'estado_asist' => $registro['estado_asist'],
-                    'observacion_asist' => filled($registro['observacion_asist'] ?? null)
-                        ? trim($registro['observacion_asist'])
-                        : null,
-                ],
-            );
-        });
-    }
-
-    public function programasOptions(): Collection
-    {
-        return ProgramaAcademico::query()
+        return $this->ambito->programas(ProgramaAcademico::query(), $user, 'asistencia.ver')
             ->orderBy('nombre_prog')
             ->get(['id_prog', 'nombre_prog', 'codigo_prog', 'estado_prog']);
     }
 
-    public function gruposOptions(): Collection
+    public function gruposOptions(User $user): Collection
     {
-        return GrupoAcademico::query()
+        return $this->ambito->grupos(GrupoAcademico::query(), $user, 'asistencia.ver')
             ->orderBy('nombre_grupo')
             ->get(['id_grupo', 'id_prog', 'nombre_grupo', 'codigo_grupo', 'estado_grupo']);
     }
 
-    public function tutoresOptions(): Collection
+    public function tutoresOptions(User $user): Collection
     {
+        if ($this->ambito->esDocenteRestringido($user, 'asistencia.ver')) {
+            return TutorAcademico::query()
+                ->without('personal')
+                ->with('personal:id_personal,nombres,apellidos')
+                ->whereKey($this->ambito->tutorId($user, 'asistencia.ver'))
+                ->get(['id_tutor', 'personal_id']);
+        }
+
         return app(TutorAcademicoRepository::class)->options(true);
     }
 
-    public function enrolledOptions(): Collection
+    public function enrolledOptions(User $user): Collection
     {
-        return InscripcionAcademica::query()
+        return $this->ambito->inscripciones(InscripcionAcademica::query(), $user, 'asistencia.ver', true)
             ->with('postulante:id_post,nombres_post,apellidos_post')
-            ->where('estado_inscripcion', 'activo')
             ->whereNotNull('id_grupo')
             ->orderBy('id_grupo')
             ->orderBy('id_post')
@@ -205,9 +207,9 @@ class AsistenciaAcademicaRepository
             ->get();
     }
 
-    private function filteredQuery(array $filters): Builder
+    private function filteredQuery(array $filters, User $user): Builder
     {
-        return AsistenciaAcademica::query()
+        return $this->ambito->asistencias(AsistenciaAcademica::query(), $user)
             ->when($filters['id_prog'] ?? null, fn (Builder $query, int|string $value) => $query->where('id_prog', $value))
             ->when($filters['id_grupo'] ?? null, fn (Builder $query, int|string $value) => $query->where('id_grupo', $value))
             ->when($filters['fecha_asist'] ?? null, fn (Builder $query, string $value) => $query->whereDate('fecha_asist', $value))

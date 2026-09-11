@@ -2,7 +2,7 @@
 
 namespace App\Domains\Seguridad\Support;
 
-/** Block 5 reviewed ceilings, shared by deployment, seeders and the security UI. */
+/** Reviewed role ceilings, shared by deployment, seeders and the security UI. */
 final class MatrizRbac
 {
     public const ROLES = ['Super Administrador', 'Administrador', 'Docente', 'Estudiante'];
@@ -124,6 +124,12 @@ final class MatrizRbac
         'preguntas.ver',
         'preguntas.crear',
         'plantillas.ver',
+        'grupos.ver',
+        'postulantes.ver',
+        'ficha-academica.ver',
+        'asistencia.ver',
+        'asistencia.crear',
+        'resultados.ver',
     ];
 
     public static function active(): array

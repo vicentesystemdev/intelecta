@@ -33,11 +33,16 @@ final readonly class AsistenciaAcademicaData
 
     public function withProgram(int $programaId): self
     {
+        return $this->withContext($programaId, $this->tutorId);
+    }
+
+    public function withContext(int $programaId, ?int $tutorId): self
+    {
         return new self(
             programaId: $programaId,
             grupoId: $this->grupoId,
             postulanteId: $this->postulanteId,
-            tutorId: $this->tutorId,
+            tutorId: $tutorId,
             fecha: $this->fecha,
             sesion: $this->sesion,
             estado: $this->estado,

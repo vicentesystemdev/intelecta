@@ -17,9 +17,11 @@ use App\Domains\Academico\Models\ProgramaAcademico;
 use App\Domains\Academico\Models\RendimientoPostulante;
 use App\Domains\Academico\Models\SimulacroProgramado;
 use App\Domains\Academico\Models\TutorAcademico;
+use App\Domains\Academico\Services\AmbitoDocenteService;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
 use App\Domains\Postulantes\Models\Postulante;
 use App\Domains\Resultados\Models\EvaluacionAplicada;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
@@ -29,6 +31,8 @@ use Illuminate\Support\Facades\Schema;
 
 class AcademicoRepository
 {
+    public function __construct(private readonly AmbitoDocenteService $ambito) {}
+
     public function paginateProgramas(array $filters, int $perPage = 12): LengthAwarePaginator
     {
         return ProgramaAcademico::query()
@@ -54,16 +58,16 @@ class AcademicoRepository
             ->withQueryString();
     }
 
-    public function paginateGrupos(array $filters, int $perPage = 12): LengthAwarePaginator
+    public function paginateGrupos(array $filters, User $user, int $perPage = 12): LengthAwarePaginator
     {
-        $query = GrupoAcademico::query()
+        $query = $this->ambito->grupos(GrupoAcademico::query(), $user)
             ->with('programa:id_prog,nombre_prog,codigo_prog')
             ->withCount([
                 'inscripciones as inscritos_count' => fn (Builder $query) => $query->where('estado_inscripcion', 'activo'),
                 'simulacros',
             ]);
 
-        if (Schema::hasTable('asignaciones_tutores')) {
+        if (Schema::hasTable('asignaciones_tutores') && ! $this->ambito->esDocenteRestringido($user, 'grupos.ver')) {
             $query->with('asignacionTutorActiva.tutor:id_tutor,personal_id,especialidad_tutor');
         }
 
@@ -175,6 +179,30 @@ class AcademicoRepository
             ->when($onlyActive, fn (Builder $query) => $query->where('estado_prog', 'activo'))
             ->orderBy('nombre_prog')
             ->get(['id_prog', 'nombre_prog', 'codigo_prog', 'universidad_objetivo_prog', 'modalidad_prog']);
+    }
+
+    public function programasOptionsPara(
+        User $user,
+        string $capacidad,
+        bool $onlyActive = false,
+    ): Collection {
+        return $this->ambito->programas(ProgramaAcademico::query(), $user, $capacidad)
+            ->when($onlyActive, fn (Builder $query) => $query->where('estado_prog', 'activo'))
+            ->orderBy('nombre_prog')
+            ->get(['id_prog', 'nombre_prog', 'codigo_prog', 'universidad_objetivo_prog', 'modalidad_prog']);
+    }
+
+    public function gruposOptionsPara(
+        User $user,
+        string $capacidad,
+        ?int $programaId = null,
+        bool $onlyActive = false,
+    ): Collection {
+        return $this->ambito->grupos(GrupoAcademico::query(), $user, $capacidad)
+            ->when($programaId, fn (Builder $query, int $value) => $query->where('id_prog', $value))
+            ->when($onlyActive, fn (Builder $query) => $query->where('estado_grupo', 'activo'))
+            ->orderBy('nombre_grupo')
+            ->get(['id_grupo', 'id_prog', 'nombre_grupo', 'codigo_grupo', 'estado_grupo']);
     }
 
     public function gruposOptions(?int $programaId = null, bool $onlyActive = false): Collection
@@ -346,46 +374,75 @@ class AcademicoRepository
         ];
     }
 
-    public function paginateFichas(array $filters, int $perPage = 12): LengthAwarePaginator
+    public function paginateFichas(array $filters, User $user, int $perPage = 12): LengthAwarePaginator
     {
-        $paginator = Postulante::query()
+        $teacher = $this->ambito->esDocenteRestringido($user, 'ficha-academica.ver');
+        $query = $this->ambito->postulantes(Postulante::query(), $user, 'ficha-academica.ver');
+
+        if ($teacher) {
+            $query->select([
+                'id_post',
+                'nombres_post',
+                'apellidos_post',
+                'estado_post',
+                'gestion_post',
+                'turno_post',
+                'id_col',
+                'id_car',
+            ]);
+        }
+
+        $paginator = $query
             ->with([
                 'colegio:id_col,nombre_col',
                 'carrera:id_car,id_uni,nombre_car',
                 'carrera.universidad:id_uni,nombre_uni,sigla_uni',
+                'inscripcionesAcademicas' => fn ($relation) => $this->ambito
+                    ->inscripciones($relation->getQuery(), $user, 'ficha-academica.ver')
+                    ->select(['id_insc', 'id_post', 'id_prog', 'id_grupo', 'fecha_inscripcion', 'estado_inscripcion']),
                 'inscripcionesAcademicas.programa:id_prog,nombre_prog,codigo_prog',
                 'inscripcionesAcademicas.grupo:id_grupo,nombre_grupo,codigo_grupo',
-                'rendimientosAcademicos:id_rend,id_post,id_prog,id_grupo,promedio_general_rend,nivel_riesgo_rend,created_at',
+                'rendimientosAcademicos' => fn ($relation) => $this->ambito
+                    ->rendimientos($relation->getQuery(), $user, 'ficha-academica.ver')
+                    ->select(['id_rend', 'id_post', 'id_prog', 'id_grupo', 'promedio_general_rend', 'nivel_riesgo_rend', 'created_at']),
             ])
-            ->when($filters['buscar'] ?? null, function (Builder $query, string $search) {
+            ->when($filters['buscar'] ?? null, function (Builder $query, string $search) use ($teacher) {
                 $pattern = '%'.mb_strtolower(trim($search)).'%';
-                $query->where(function (Builder $query) use ($pattern) {
+                $query->where(function (Builder $query) use ($pattern, $teacher) {
                     $query->whereRaw('LOWER(nombres_post) LIKE ?', [$pattern])
                         ->orWhereRaw('LOWER(apellidos_post) LIKE ?', [$pattern])
-                        ->orWhereRaw("LOWER(CONCAT_WS(' ', nombres_post, apellidos_post)) LIKE ?", [$pattern])
-                        ->orWhereRaw("LOWER(COALESCE(ci_post, '')) LIKE ?", [$pattern])
-                        ->orWhereRaw("LOWER(COALESCE(email_post, '')) LIKE ?", [$pattern]);
+                        ->orWhereRaw("LOWER(CONCAT_WS(' ', nombres_post, apellidos_post)) LIKE ?", [$pattern]);
+                    if (! $teacher) {
+                        $query->orWhereRaw("LOWER(COALESCE(ci_post, '')) LIKE ?", [$pattern])
+                            ->orWhereRaw("LOWER(COALESCE(email_post, '')) LIKE ?", [$pattern]);
+                    }
                 });
             })
             ->when(
                 $filters['id_prog'] ?? null,
                 fn (Builder $query, int|string $value) => $query->whereHas(
                     'inscripcionesAcademicas',
-                    fn (Builder $query) => $query->where('id_prog', $value),
+                    fn (Builder $query) => $this->ambito
+                        ->inscripciones($query, $user, 'ficha-academica.ver')
+                        ->where('id_prog', $value),
                 ),
             )
             ->when(
                 $filters['id_grupo'] ?? null,
                 fn (Builder $query, int|string $value) => $query->whereHas(
                     'inscripcionesAcademicas',
-                    fn (Builder $query) => $query->where('id_grupo', $value),
+                    fn (Builder $query) => $this->ambito
+                        ->inscripciones($query, $user, 'ficha-academica.ver')
+                        ->where('id_grupo', $value),
                 ),
             )
             ->when(
                 $filters['nivel_riesgo_rend'] ?? null,
                 fn (Builder $query, string $value) => $query->whereHas(
                     'rendimientosAcademicos',
-                    fn (Builder $query) => $query->where('nivel_riesgo_rend', $value),
+                    fn (Builder $query) => $this->ambito
+                        ->rendimientos($query, $user, 'ficha-academica.ver')
+                        ->where('nivel_riesgo_rend', $value),
                 ),
             )
             ->orderBy('apellidos_post')
@@ -393,7 +450,7 @@ class AcademicoRepository
             ->paginate($perPage)
             ->withQueryString();
 
-        return $paginator->through(function (Postulante $postulante) use ($filters): array {
+        return $paginator->through(function (Postulante $postulante) use ($filters, $teacher): array {
             $inscripciones = $postulante->inscripcionesAcademicas;
             if ($filters['id_grupo'] ?? null) {
                 $inscripciones = $inscripciones->where('id_grupo', $filters['id_grupo']);
@@ -424,8 +481,10 @@ class AcademicoRepository
                 'id_post' => $postulante->id_post,
                 'nombres_post' => $postulante->nombres_post,
                 'apellidos_post' => $postulante->apellidos_post,
-                'ci_post' => $postulante->ci_post,
-                'email_post' => $postulante->email_post,
+                ...($teacher ? [] : [
+                    'ci_post' => $postulante->ci_post,
+                    'email_post' => $postulante->email_post,
+                ]),
                 'estado_post' => $postulante->estado_post,
                 'colegio' => $postulante->colegio,
                 'carrera' => $postulante->carrera,
@@ -435,13 +494,36 @@ class AcademicoRepository
         });
     }
 
-    public function ficha(Postulante $postulante): array
+    public function ficha(Postulante $postulante, ?User $user = null): array
     {
+        $teacher = $user && $this->ambito->esDocenteRestringido($user, 'ficha-academica.ver');
+
+        if ($teacher) {
+            $postulante = $this->ambito->postulantes(Postulante::query(), $user, 'ficha-academica.ver')
+                ->select([
+                    'id_post',
+                    'nombres_post',
+                    'apellidos_post',
+                    'estado_post',
+                    'gestion_post',
+                    'turno_post',
+                    'id_col',
+                    'id_car',
+                ])
+                ->findOrFail($postulante->getKey());
+        }
+
         $postulante->load([
             'colegio',
             'carrera.universidad',
+            'inscripcionesAcademicas' => fn ($relation) => $user
+                ? $this->ambito->inscripciones($relation->getQuery(), $user, 'ficha-academica.ver')
+                : $relation,
             'inscripcionesAcademicas.programa',
             'inscripcionesAcademicas.grupo',
+            'rendimientosAcademicos' => fn ($relation) => $user
+                ? $this->ambito->rendimientos($relation->getQuery(), $user, 'ficha-academica.ver')
+                : $relation,
             'rendimientosAcademicos.programa',
             'rendimientosAcademicos.grupo',
         ]);
@@ -458,6 +540,8 @@ class AcademicoRepository
         $evaluacionesAplicadas = collect();
 
         if (
+            ! $teacher
+            &&
             $inscripcion
             && Schema::hasTable('asignaciones_tutores')
             && Schema::hasTable('tutores_academicos')
@@ -486,6 +570,8 @@ class AcademicoRepository
         }
 
         if (
+            ! $teacher
+            &&
             Schema::hasTable('matriculas_academicas')
             && Schema::hasTable('cuotas_academicas')
             && Schema::hasTable('habilitaciones_academicas')
@@ -526,15 +612,18 @@ class AcademicoRepository
         }
 
         if (Schema::hasTable('asistencias_academicas')) {
-            $registrosAsistencia = AsistenciaAcademica::query()
-                ->with([
-                    'grupo:id_grupo,nombre_grupo,codigo_grupo',
-                    'tutor:id_tutor,personal_id',
-                ])
+            $attendanceQuery = AsistenciaAcademica::query()
+                ->with('grupo:id_grupo,nombre_grupo,codigo_grupo')
                 ->where('id_post', $postulante->id_post)
                 ->latest('fecha_asist')
-                ->latest('id_asist')
-                ->get();
+                ->latest('id_asist');
+            if ($user) {
+                $this->ambito->asistencias($attendanceQuery, $user, 'ficha-academica.ver');
+            }
+            if (! $teacher) {
+                $attendanceQuery->with('tutor:id_tutor,personal_id');
+            }
+            $registrosAsistencia = $attendanceQuery->get();
             $totalAsistencia = $registrosAsistencia->count();
             $asistenciasComputadas = $registrosAsistencia
                 ->whereIn('estado_asist', ['presente', 'retraso', 'justificado'])
@@ -554,21 +643,41 @@ class AcademicoRepository
         }
 
         if (Schema::hasTable('evaluaciones_aplicadas')) {
-            $evaluacionesAplicadas = EvaluacionAplicada::query()
+            $evaluationQuery = EvaluacionAplicada::query()
                 ->with('plantilla:id_plan,nombre_plan')
                 ->where('id_post', $postulante->id_post)
                 ->latest('fecha_fin_eval_apl')
                 ->latest('id_eval_apl')
-                ->limit(12)
-                ->get();
+                ->limit(12);
+            if ($user) {
+                $this->ambito->evaluaciones($evaluationQuery, $user, 'ficha-academica.ver');
+            }
+            if ($teacher) {
+                $evaluationQuery->select([
+                    'id_eval_apl',
+                    'id_post',
+                    'id_plantilla',
+                    'codigo_eval_apl',
+                    'puntaje_total_eval_apl',
+                    'puntaje_maximo_eval_apl',
+                    'porcentaje_eval_apl',
+                    'fecha_fin_eval_apl',
+                    'estado_eval_apl',
+                ]);
+            }
+            $evaluacionesAplicadas = $evaluationQuery->get();
         }
 
         $position = null;
         $percentile = null;
         if ($rendimiento?->id_prog) {
-            $ranking = RendimientoPostulante::query()
+            $rankingQuery = RendimientoPostulante::query()
                 ->where('id_prog', $rendimiento->id_prog)
-                ->orderByDesc('promedio_general_rend')
+                ->orderByDesc('promedio_general_rend');
+            if ($user) {
+                $this->ambito->rendimientos($rankingQuery, $user, 'ficha-academica.ver');
+            }
+            $ranking = $rankingQuery
                 ->pluck('id_post')
                 ->values();
             $index = $ranking->search($postulante->id_post);

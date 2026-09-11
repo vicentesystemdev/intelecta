@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\Academico\Models\RendimientoPostulante;
+use App\Domains\Academico\Services\AmbitoDocenteService;
 use App\Domains\Evaluaciones\Models\Materia;
 use App\Domains\Institucional\Models\Carrera;
 use App\Domains\Institucional\Models\Colegio;
@@ -33,6 +34,7 @@ use App\Http\Controllers\ResultadoAcademicoController;
 use App\Http\Controllers\TemaController;
 use App\Http\Middleware\EnsureStudentAccess;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -271,7 +273,9 @@ Route::middleware('auth')->group(function () {
                     return Inertia::render('Modulos/TutoresAcademicos');
                 })->middleware('permission:tutores.ver')->name('admin.docentes');
 
-                Route::get('/carreras', function () {
+                Route::get('/carreras', function (Request $request, AmbitoDocenteService $ambito) {
+                    abort_unless($ambito->esGlobal($request->user(), 'postulantes.ver'), 403);
+
                     $items = Carrera::query()
                         ->with('universidad:id_uni,nombre_uni,sigla_uni')
                         ->withCount('postulantes')
@@ -290,7 +294,9 @@ Route::middleware('auth')->group(function () {
                     ]);
                 })->middleware('permission:postulantes.ver')->name('admin.carreras');
 
-                Route::get('/colegios', function () {
+                Route::get('/colegios', function (Request $request, AmbitoDocenteService $ambito) {
+                    abort_unless($ambito->esGlobal($request->user(), 'postulantes.ver'), 403);
+
                     $items = Colegio::query()
                         ->withCount('postulantes')
                         ->orderBy('nombre_col')

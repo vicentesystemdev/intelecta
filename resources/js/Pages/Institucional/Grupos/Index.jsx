@@ -37,7 +37,7 @@ const assignedTutorName = (grupo) => {
         : grupo?.tutor_responsable_grupo || 'Sin tutor asignado';
 };
 
-export default function Index({ grupos, programas = [], filtros = {} }) {
+export default function Index({ grupos, programas = [], filtros = {}, permisos = {} }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
         id_prog: filtros.id_prog || '',
@@ -71,7 +71,7 @@ export default function Index({ grupos, programas = [], filtros = {} }) {
     return (
         <AdminLayout title="Grupos y Paralelos" subtitle="Organización operativa de postulantes por programa, turno y nivel." wide>
             <Head title="Grupos y Paralelos" />
-            <InstitutionalBanner eyebrow="Gestión institucional" title="Grupos y Paralelos" description="Administre cupos, aulas, turnos y tutoría responsable para cada ciclo de nivelación." icon={School} action={<button className={primaryButtonClass} onClick={() => openForm()}><Plus className="h-4 w-4" />Nuevo grupo</button>} />
+            <InstitutionalBanner eyebrow="Gestión institucional" title="Grupos y Paralelos" description="Administre cupos, aulas, turnos y tutoría responsable para cada ciclo de nivelación." icon={School} action={permisos.crear ? <button className={primaryButtonClass} onClick={() => openForm()}><Plus className="h-4 w-4" />Nuevo grupo</button> : null} />
             <FlashMessage message={flash?.success} />
             <form onSubmit={filter} className={`${cardClass} mb-5 grid gap-3 p-4 md:grid-cols-5`}>
                 <select className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main" value={filters.id_prog} onChange={(e) => setFilters({ ...filters, id_prog: e.target.value })}><option value="">Todos los programas</option>{programas.map((programa) => <option key={programa.id_prog} value={programa.id_prog}>{programa.nombre_prog}</option>)}</select>
@@ -89,7 +89,7 @@ export default function Index({ grupos, programas = [], filtros = {} }) {
                     <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-wider text-brand-secondary">{grupo.codigo_grupo || 'Grupo académico'}</p><h3 className="mt-2 break-words text-lg font-black text-text-main">{grupo.nombre_grupo}</h3><p className="mt-1 text-xs text-text-muted">{grupo.programa?.nombre_prog}</p></div><InstitutionalStatus status={grupo.estado_grupo} /></div>
                     <div className="mt-5 grid grid-cols-2 gap-3 text-xs"><div className="rounded-xl bg-brand-bg p-3"><p className="text-text-muted">Turno</p><p className="mt-1 font-bold text-text-main">{grupo.turno_grupo || 'Por definir'}</p></div><div className="rounded-xl bg-brand-bg p-3"><p className="text-text-muted">Aula</p><p className="mt-1 font-bold text-text-main">{grupo.aula_grupo || 'Por definir'}</p></div><div className="rounded-xl bg-brand-bg p-3"><p className="text-text-muted">Nivel</p><p className="mt-1 font-bold text-text-main">{grupo.nivel_grupo || 'General'}</p></div><div className="rounded-xl bg-brand-bg p-3"><p className="text-text-muted">Simulacros</p><p className="mt-1 font-bold text-text-main">{grupo.simulacros_count}</p></div></div>
                     <div className="mt-5"><div className="flex justify-between text-xs"><span className="font-bold text-text-main">Cupos ocupados</span><span className="text-text-muted">{occupied}/{capacity}</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-brand-border"><div className="h-full rounded-full bg-brand-secondary" style={{ width: `${percentage}%` }} /></div></div>
-                    <div className="mt-5 flex items-center justify-between border-t border-brand-border pt-4"><span className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><UserRoundCheck className="h-4 w-4 shrink-0" /><span className="truncate">{tutorName}</span></span><div className="flex gap-1"><button className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30" onClick={() => setDetail(grupo)}><Eye className="h-4 w-4" /></button><button className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30" onClick={() => openForm(grupo)}><Pencil className="h-4 w-4" /></button></div></div>
+                    <div className="mt-5 flex items-center justify-between border-t border-brand-border pt-4"><span className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><UserRoundCheck className="h-4 w-4 shrink-0" /><span className="truncate">{tutorName}</span></span><div className="flex gap-1"><button className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30" onClick={() => setDetail(grupo)}><Eye className="h-4 w-4" /></button>{permisos.editar && <button className="rounded-lg p-2 text-text-muted hover:bg-brand-border/30" onClick={() => openForm(grupo)}><Pencil className="h-4 w-4" /></button>}</div></div>
                 </article>;
             })}</div> : <EmptyInstitutional title="No hay grupos disponibles" description="Registre un grupo/paralelo para comenzar la asignación de postulantes." />}
             <Pagination links={grupos.links} />

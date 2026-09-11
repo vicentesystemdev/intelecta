@@ -63,11 +63,11 @@ class RbacDeploymentTest extends TestCase
         }
         $service = app(DesplegarMatrizRbac::class);
         $state = $service->state();
-        $this->assertDatabaseCount('role_has_permissions', 179);
+        $this->assertDatabaseCount('role_has_permissions', 180);
         $this->assertTrue($service->apply($this->snapshot));
         $this->assertSame($state, json_decode(file_get_contents($this->snapshot), true)['before']);
         $this->assertSame($service->target(), $service->matrix($service->state()));
-        $this->assertDatabaseCount('role_has_permissions', 137);
+        $this->assertDatabaseCount('role_has_permissions', 143);
         $this->assertDatabaseCount('permissions', 81);
         $this->assertFalse($service->apply($this->snapshot));
         $this->assertTrue($service->restore($this->snapshot));
@@ -81,7 +81,9 @@ class RbacDeploymentTest extends TestCase
             }
             $this->assertNull($admin->fresh()->personalInstitucional);
             $this->assertNull($student->fresh()->postulante);
-            $this->assertFalse($teacher->fresh()->can('postulantes.ver'));
+            $this->assertTrue($teacher->fresh()->can('postulantes.ver'));
+            $this->assertTrue($teacher->fresh()->can('asistencia.crear'));
+            $this->assertFalse($teacher->fresh()->can('asistencia.editar'));
             $this->assertTrue($teacher->fresh()->can('preguntas.ver'));
             $this->assertFalse($admin->fresh()->can('usuarios.crear'));
         } finally {

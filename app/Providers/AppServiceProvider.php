@@ -2,7 +2,13 @@
 
 namespace App\Providers;
 
+use App\Domains\Academico\Models\AsistenciaAcademica;
+use App\Domains\Academico\Models\GrupoAcademico;
+use App\Domains\Postulantes\Models\Postulante;
 use App\Models\User;
+use App\Policies\AsistenciaAcademicaPolicy;
+use App\Policies\GrupoAcademicoPolicy;
+use App\Policies\PostulantePolicy;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -25,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(GrupoAcademico::class, GrupoAcademicoPolicy::class);
+        Gate::policy(Postulante::class, PostulantePolicy::class);
+        Gate::policy(AsistenciaAcademica::class, AsistenciaAcademicaPolicy::class);
+
         ResetPassword::toMailUsing(fn (User $user, string $token) => (new MailMessage)
             ->subject('Establecer o restablecer tu contraseña de INTELECTA')
             ->line('Usa este enlace para establecer o restablecer tu contraseña. Nunca compartas el enlace ni tu contraseña.')

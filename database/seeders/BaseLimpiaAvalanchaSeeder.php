@@ -446,36 +446,32 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
             $tutors->put($row[0], $tutor);
         }
 
-        $subjectTutors = [
-            'Matemática' => $tutors['Matemática'],
-            'Física' => $tutors['Física'],
-            'Química' => $tutors['Química'],
+        // Fixtures deliberadamente disjuntos: cada Docente obtiene su ámbito
+        // por un Tutor y una asignación explícita, nunca por rol/cargo/correo.
+        $groupAssignments = [
+            ['group' => 'PF-ING-MA-A', 'subject' => 'Matemática', 'tutor' => $tutors['Matemática']],
+            ['group' => 'PF-ING-TA-B', 'subject' => 'Física', 'tutor' => $tutors['Física']],
+            ['group' => 'PF-ING-NO-C', 'subject' => 'Química', 'tutor' => $tutors['Química']],
+            ['group' => 'PS-ING-FS-A', 'subject' => 'Coordinación Académica', 'tutor' => $tutors['Razonamiento Lógico / Coordinación Académica']],
         ];
-        $targetGroups = $groups->only([
-            'PF-ING-MA-A',
-            'PF-ING-TA-B',
-            'PF-ING-NO-C',
-            'PS-ING-FS-A',
-        ]);
 
-        foreach ($targetGroups as $group) {
-            foreach ($subjectTutors as $subject => $tutor) {
-                AsignacionTutor::updateOrCreate(
-                    [
-                        'id_tutor' => $tutor->id_tutor,
-                        'id_prog' => $group->id_prog,
-                        'id_grupo' => $group->id_grupo,
-                        'materia_referencia_asig' => $subject,
-                    ],
-                    [
-                        'rol_asig' => 'Tutor Académico',
-                        'fecha_inicio_asig' => '2026-02-02',
-                        'fecha_fin_asig' => '2026-08-15',
-                        'estado_asig' => 'activo',
-                        'observacion_asig' => "Acompañamiento de {$subject} para el grupo {$group->codigo_grupo}.",
-                    ],
-                );
-            }
+        foreach ($groupAssignments as $assignment) {
+            $group = $groups[$assignment['group']];
+            AsignacionTutor::updateOrCreate(
+                [
+                    'id_tutor' => $assignment['tutor']->id_tutor,
+                    'id_prog' => $group->id_prog,
+                    'id_grupo' => $group->id_grupo,
+                    'materia_referencia_asig' => $assignment['subject'],
+                ],
+                [
+                    'rol_asig' => 'Tutor Académico',
+                    'fecha_inicio_asig' => '2026-02-02',
+                    'fecha_fin_asig' => '2026-08-15',
+                    'estado_asig' => 'activo',
+                    'observacion_asig' => "Acompañamiento de {$assignment['subject']} para el grupo {$group->codigo_grupo}.",
+                ],
+            );
         }
 
         foreach ($programs as $program) {

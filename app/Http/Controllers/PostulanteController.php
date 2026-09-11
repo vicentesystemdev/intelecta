@@ -14,6 +14,7 @@ use App\Http\Requests\Postulantes\StorePostulanteRequest;
 use App\Http\Requests\Postulantes\UpdatePostulanteRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,7 +30,7 @@ class PostulanteController extends Controller
             'estado_post' => ['nullable', 'in:activo,inactivo'],
         ]);
 
-        $result = $action->execute($filters);
+        $result = $action->execute($filters, $request->user());
 
         return Inertia::render('Postulantes/Index', [
             ...$result,
@@ -82,8 +83,10 @@ class PostulanteController extends Controller
         Postulante $postulante,
         PostulanteService $service,
     ): Response {
+        Gate::authorize('view', $postulante);
+
         return Inertia::render('Postulantes/Show', [
-            'postulante' => $service->find($postulante->getKey()),
+            'postulante' => $service->find($postulante->getKey(), $request->user()),
             'permisos' => $this->permissions($request),
         ]);
     }
@@ -92,10 +95,9 @@ class PostulanteController extends Controller
         Request $request,
         Postulante $postulante,
         PostulanteService $service,
-    ): Response
-    {
+    ): Response {
         return Inertia::render('Postulantes/Edit', [
-            'postulante' => $service->find($postulante->getKey()),
+            'postulante' => $service->find($postulante->getKey(), $request->user()),
             'opciones' => $service->formOptions(),
             'permisos' => $this->permissions($request),
         ]);

@@ -6,6 +6,7 @@ use App\Domains\Academico\Actions\GuardarGrupoAcademicoAction;
 use App\Domains\Academico\DTOs\GrupoAcademicoData;
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Services\AcademicoService;
+use App\Domains\Academico\Services\AmbitoDocenteService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Institucional\GrupoAcademicoRequest;
 use Illuminate\Http\RedirectResponse;
@@ -15,8 +16,11 @@ use Inertia\Response;
 
 class GrupoAcademicoController extends Controller
 {
-    public function index(Request $request, AcademicoService $service): Response
-    {
+    public function index(
+        Request $request,
+        AcademicoService $service,
+        AmbitoDocenteService $ambito,
+    ): Response {
         $filters = $request->validate([
             'id_prog' => ['nullable', 'integer', 'exists:programas_academicos,id_prog'],
             'turno_grupo' => ['nullable', 'string', 'max:80'],
@@ -24,9 +28,17 @@ class GrupoAcademicoController extends Controller
             'estado_grupo' => ['nullable', 'in:activo,inactivo'],
         ]);
 
+        if (isset($filters['id_prog'])) {
+            abort_unless($ambito->puedeVerPrograma($request->user(), (int) $filters['id_prog'], 'grupos.ver'), 403);
+        }
+
         return Inertia::render('Institucional/Grupos/Index', [
-            ...$service->grupos($filters),
+            ...$service->grupos($filters, $request->user()),
             'filtros' => $filters,
+            'permisos' => [
+                'crear' => $request->user()->can('grupos.crear'),
+                'editar' => $request->user()->can('grupos.editar'),
+            ],
         ]);
     }
 

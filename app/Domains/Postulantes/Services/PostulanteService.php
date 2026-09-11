@@ -5,6 +5,7 @@ namespace App\Domains\Postulantes\Services;
 use App\Domains\Postulantes\DTOs\PostulanteData;
 use App\Domains\Postulantes\Models\Postulante;
 use App\Domains\Postulantes\Repositories\PostulanteRepository;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class PostulanteService
@@ -17,11 +18,11 @@ class PostulanteService
      * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
      */
-    public function list(array $filters): array
+    public function list(array $filters, User $user): array
     {
         return [
-            'postulantes' => $this->repository->paginate($filters),
-            'opciones' => $this->repository->formOptions(),
+            'postulantes' => $this->repository->paginate($filters, $user),
+            'opciones' => $this->repository->formOptions($user),
         ];
     }
 
@@ -46,9 +47,9 @@ class PostulanteService
         );
     }
 
-    public function find(int $id): Postulante
+    public function find(int $id, User $user): Postulante
     {
-        return $this->repository->find($id);
+        return $this->repository->find($id, $user);
     }
 
     /**

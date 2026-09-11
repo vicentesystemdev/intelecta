@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
-use App\Domains\Resultados\Models\EvaluacionAplicada;
 use App\Domains\Resultados\Repositories\EvaluacionAplicadaRepository;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -34,34 +32,29 @@ class ResultadoAcademicoController extends Controller
         $schemaReady = Schema::hasTable('evaluaciones_aplicadas')
             && Schema::hasTable('respuestas_evaluacion');
         $resultados = $schemaReady
-            ? $repository->paginateResults($filters)
+            ? $repository->paginateResults($filters, $request->user())
             : new LengthAwarePaginator([], 0, 15, 1, [
                 'path' => $request->url(),
                 'query' => $request->query(),
             ]);
 
+        if ($schemaReady && isset($filters['id_plantilla'])) {
+            abort_unless(
+                $repository->plantillaPerteneceAlAmbito($request->user(), (int) $filters['id_plantilla']),
+                403,
+            );
+        }
+
         return Inertia::render('Modulos/ResultadosSeguimiento', [
             'resultados' => $resultados,
-            'plantillas' => PlantillaEvaluacion::query()
-                ->orderBy('nombre_plan')
-                ->get(['id_plan', 'nombre_plan']),
+            'plantillas' => $schemaReady
+                ? $repository->plantillasResultsOptions($request->user())
+                : [],
             'filtros' => $filters,
             'estructuraResultadosDisponible' => $schemaReady,
-            'metricas' => [
-                'total' => $schemaReady ? EvaluacionAplicada::count() : 0,
-                'finalizadas' => $schemaReady
-                    ? EvaluacionAplicada::where('estado_eval_apl', 'finalizada')->count()
-                    : 0,
-                'enProgreso' => $schemaReady
-                    ? EvaluacionAplicada::where('estado_eval_apl', 'en_progreso')->count()
-                    : 0,
-                'promedio' => $schemaReady
-                    ? round((float) EvaluacionAplicada::where(
-                        'estado_eval_apl',
-                        'finalizada',
-                    )->avg('porcentaje_eval_apl'), 2)
-                    : 0,
-            ],
+            'metricas' => $schemaReady
+                ? $repository->resultMetrics($request->user())
+                : ['total' => 0, 'finalizadas' => 0, 'enProgreso' => 0, 'promedio' => 0],
         ]);
     }
 }

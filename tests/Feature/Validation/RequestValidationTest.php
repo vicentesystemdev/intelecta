@@ -53,24 +53,24 @@ class RequestValidationTest extends TestCase
             /** @var NormalizedFormRequest $request */
             $request = $class::createFrom($incoming);
             $request->setContainer(app())->setRedirector(app('redirect'));
-            $request->setUserResolver(fn () => new class
+            $request->setUserResolver(fn () => new class extends User
             {
                 public function canChangeLoginEmail(): bool
                 {
                     return true;
                 }
 
-                public function can($permission): bool
+                public function can($abilities, $arguments = []): bool
                 {
                     return true;
                 }
 
-                public function hasAnyRole($roles): bool
+                public function hasAnyRole(...$roles): bool
                 {
                     return true;
                 }
 
-                public function hasRole($role): bool
+                public function hasRole($roles, ?string $guard = null): bool
                 {
                     return true;
                 }

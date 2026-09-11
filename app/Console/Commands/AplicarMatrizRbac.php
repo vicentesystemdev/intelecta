@@ -9,7 +9,7 @@ use Throwable;
 
 class AplicarMatrizRbac extends Command
 {
-    protected $signature = 'rbac:matriz {--apply : Aplicar matriz Bloque 5} {--snapshot= : Archivo NUEVO obligatorio al aplicar} {--restore= : Restaurar un snapshot de esta misma base} {--confirm-database= : Nombre exacto de la BD para autorizar escrituras}';
+    protected $signature = 'rbac:matriz {--apply : Aplicar la matriz RBAC gobernada} {--snapshot= : Archivo NUEVO obligatorio al aplicar} {--restore= : Restaurar un snapshot de esta misma base} {--confirm-database= : Nombre exacto de la BD para autorizar escrituras}';
 
     protected $description = 'Preflight por defecto; despliegue RBAC reversible sin seeders ni cambios de cuentas';
 
