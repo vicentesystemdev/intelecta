@@ -6,7 +6,6 @@ use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Models\InscripcionAcademica;
 use App\Domains\Academico\Services\AmbitoDocenteService;
 use App\Http\Requests\NormalizedFormRequest;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -49,7 +48,7 @@ class AsistenciaAcademicaRequest extends NormalizedFormRequest
                 'exists:postulantes,id_post',
             ],
             'id_tutor' => ['nullable', 'integer', 'exists:tutores_academicos,id_tutor'],
-            'fecha_asist' => ['required', 'date_format:Y-m-d', 'date', 'before_or_equal:today'],
+            'fecha_asist' => ['prohibited'],
             'sesion_asist' => ['required', 'string', 'min:2', 'max:120'],
             'estado_asist' => ['required', Rule::in(['presente', 'ausente', 'retraso', 'justificado'])],
             'observacion_asist' => ['nullable', 'string', 'max:2000'],
@@ -65,9 +64,7 @@ class AsistenciaAcademicaRequest extends NormalizedFormRequest
             'id_post.exists' => 'El postulante seleccionado no existe.',
             'id_post.unique' => 'La asistencia del postulante ya fue registrada para este grupo, fecha y sesión.',
             'id_tutor.exists' => 'El tutor académico seleccionado no existe.',
-            'fecha_asist.required' => 'La fecha de asistencia es obligatoria.',
-            'fecha_asist.date' => 'La fecha de asistencia no tiene un formato válido.',
-            'fecha_asist.before_or_equal' => 'La asistencia no puede registrarse en una fecha futura.',
+            'fecha_asist.prohibited' => 'La fecha de asistencia se asigna automáticamente por el servidor y no puede enviarse manualmente.',
             'sesion_asist.required' => 'Indique la sesión académica.',
             'estado_asist.required' => 'Seleccione el estado de asistencia del postulante.',
             'estado_asist.in' => 'Seleccione un estado válido de asistencia.',
@@ -97,17 +94,6 @@ class AsistenciaAcademicaRequest extends NormalizedFormRequest
                 );
                 if ($this->filled('id_tutor') && $ambito->esDocenteRestringido($user, $capacidad)) {
                     abort_unless($ambito->tutorId($user, $capacidad) === $this->integer('id_tutor'), 403);
-                }
-
-                $duplicate = DB::table('asistencias_academicas')
-                    ->where('id_post', $this->integer('id_post'))
-                    ->where('id_grupo', $this->integer('id_grupo'))
-                    ->whereDate('fecha_asist', $this->input('fecha_asist'))
-                    ->where('sesion_asist', $this->input('sesion_asist'))
-                    ->when($this->route('asistencia'), fn ($query, $asistencia) => $query->where('id_asist', '!=', $asistencia->id_asist))
-                    ->exists();
-                if ($duplicate) {
-                    $validator->errors()->add('id_post', $this->messages()['id_post.unique']);
                 }
 
                 $grupo = GrupoAcademico::find($this->integer('id_grupo'));

@@ -2,7 +2,6 @@
 
 use App\Domains\Academico\Models\RendimientoPostulante;
 use App\Domains\Academico\Services\AmbitoDocenteService;
-use App\Domains\Evaluaciones\Models\Materia;
 use App\Domains\Institucional\Models\Carrera;
 use App\Domains\Institucional\Models\Colegio;
 use App\Http\Controllers\Admin\BitacoraSistemaController;
@@ -25,6 +24,7 @@ use App\Http\Controllers\Institucional\ProgramaAcademicoController;
 use App\Http\Controllers\Institucional\RankingAcademicoController;
 use App\Http\Controllers\Institucional\SimulacroProgramadoController;
 use App\Http\Controllers\Institucional\TutorAcademicoController;
+use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\PlantillaEvaluacionController;
 use App\Http\Controllers\PostulanteController;
 use App\Http\Controllers\PreguntaController;
@@ -329,29 +329,14 @@ Route::middleware('auth')->group(function () {
                     ->middleware('permission:plantillas.ver')
                     ->name('admin.evaluaciones.plantillas');
 
-                Route::get('/materias', function () {
-                    $items = Materia::query()
-                        ->with(['areas' => fn ($query) => $query->withCount('temas')])
-                        ->withCount('areas')
-                        ->orderBy('nombre_mat')
-                        ->get()
-                        ->map(function (Materia $materia) {
-                            $materia->setAttribute('temas_count', $materia->areas->sum('temas_count'));
-
-                            return $materia;
-                        });
-
-                    return Inertia::render('Catalogos/Index', [
-                        'tipo' => 'materias',
-                        'items' => $items,
-                        'metricas' => [
-                            'total' => $items->count(),
-                            'activos' => $items->where('estado_mat', 'activo')->count(),
-                            'vinculados' => $items->where('areas_count', '>', 0)->count(),
-                            'postulantes' => $items->sum('temas_count'),
-                        ],
-                    ]);
-                })->middleware('permission:materias.ver')->name('admin.evaluaciones.materias');
+                Route::get('/materias', [MateriaController::class, 'index'])
+                    ->middleware('permission:materias.ver')->name('admin.evaluaciones.materias');
+                Route::post('/materias', [MateriaController::class, 'store'])
+                    ->middleware('permission:materias.crear')->name('admin.evaluaciones.materias.store');
+                Route::put('/materias/{materia}', [MateriaController::class, 'update'])
+                    ->middleware('permission:materias.editar')->name('admin.evaluaciones.materias.update');
+                Route::patch('/materias/{materia}/estado', [MateriaController::class, 'changeStatus'])
+                    ->middleware('permission:materias.cambiar_estado')->name('admin.evaluaciones.materias.estado');
 
                 Route::get('/', function () {
                     return Inertia::render('Modulos/CentroEvaluaciones');

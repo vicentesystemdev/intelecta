@@ -323,7 +323,7 @@ class RbacGovernanceTest extends TestCase
         }
         $service = app(DesplegarMatrizRbac::class);
         $this->assertSame($service->target(), $service->matrix($service->state()));
-        $this->assertDatabaseCount('role_has_permissions', 143);
+        $this->assertDatabaseCount('role_has_permissions', 146);
         $this->assertDatabaseCount('model_has_permissions', 0);
         $this->assertDatabaseCount('roles', 4);
     }

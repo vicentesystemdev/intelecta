@@ -37,8 +37,10 @@ class InscripcionAcademicaRequest extends NormalizedFormRequest
                     ->where(fn ($query) => $query->where('id_prog', $this->integer('id_prog')))
                     ->ignore($inscripcion?->id_insc, 'id_insc'),
             ],
-            'fecha_inscripcion' => ['nullable', 'date_format:Y-m-d', 'date', 'before_or_equal:today'],
-            'estado_inscripcion' => ['required', Rule::enum(EstadoRegistro::class)],
+            'fecha_inscripcion' => ['prohibited'],
+            'estado_inscripcion' => $this->isMethod('post')
+                ? ['prohibited']
+                : ['required', Rule::enum(EstadoRegistro::class)],
             'observacion_inscripcion' => ['nullable', 'string', 'max:2000'],
         ];
     }
@@ -52,10 +54,10 @@ class InscripcionAcademicaRequest extends NormalizedFormRequest
             'id_post.required' => 'Seleccione un postulante.',
             'id_post.exists' => 'El postulante seleccionado no existe.',
             'id_post.unique' => 'El postulante ya está inscrito en este programa académico.',
-            'fecha_inscripcion.date' => 'La fecha de inscripción no tiene un formato válido.',
-            'fecha_inscripcion.before_or_equal' => 'La fecha de inscripción no puede ser posterior a la fecha actual.',
+            'fecha_inscripcion.prohibited' => 'La fecha de inscripción se asigna automáticamente por el servidor y no puede enviarse manualmente.',
+            'estado_inscripcion.prohibited' => 'Una nueva inscripción nace activa; el estado no puede seleccionarse durante el alta.',
             'estado_inscripcion.required' => 'Seleccione el estado de la inscripción académica.',
-            'estado_inscripcion.in' => 'Seleccione un estado válido para la inscripción.',
+            'estado_inscripcion.enum' => 'Seleccione un estado válido para la inscripción.',
         ];
     }
 }

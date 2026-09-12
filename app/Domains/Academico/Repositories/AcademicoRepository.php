@@ -61,7 +61,10 @@ class AcademicoRepository
     public function paginateGrupos(array $filters, User $user, int $perPage = 12): LengthAwarePaginator
     {
         $query = $this->ambito->grupos(GrupoAcademico::query(), $user)
-            ->with('programa:id_prog,nombre_prog,codigo_prog')
+            ->with([
+                'programa:id_prog,nombre_prog,codigo_prog',
+                'tutorResponsable:id_tutor,personal_id,especialidad_tutor,estado_tutor',
+            ])
             ->withCount([
                 'inscripciones as inscritos_count' => fn (Builder $query) => $query->where('estado_inscripcion', 'activo'),
                 'simulacros',
@@ -189,7 +192,7 @@ class AcademicoRepository
         return $this->ambito->programas(ProgramaAcademico::query(), $user, $capacidad)
             ->when($onlyActive, fn (Builder $query) => $query->where('estado_prog', 'activo'))
             ->orderBy('nombre_prog')
-            ->get(['id_prog', 'nombre_prog', 'codigo_prog', 'universidad_objetivo_prog', 'modalidad_prog']);
+            ->get(['id_prog', 'nombre_prog', 'codigo_prog', 'universidad_objetivo_prog', 'modalidad_prog', 'estado_prog']);
     }
 
     public function gruposOptionsPara(
@@ -223,6 +226,15 @@ class AcademicoRepository
             ->orderBy('apellidos_post')
             ->orderBy('nombres_post')
             ->get(['id_post', 'nombres_post', 'apellidos_post', 'id_col', 'id_car']);
+    }
+
+    public function tutoresResponsablesOptions(): Collection
+    {
+        return TutorAcademico::query()
+            ->where('estado_tutor', 'activo')
+            ->whereHas('personal')
+            ->orderBy('id_tutor')
+            ->get(['id_tutor', 'personal_id', 'especialidad_tutor', 'estado_tutor']);
     }
 
     public function plantillasOptions(): Collection

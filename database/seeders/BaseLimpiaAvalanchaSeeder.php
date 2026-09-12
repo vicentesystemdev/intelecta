@@ -27,6 +27,7 @@ use App\Domains\Resultados\Actions\IniciarEvaluacionAplicadaAction;
 use App\Domains\Resultados\DTOs\EnviarEvaluacionData;
 use App\Domains\Resultados\DTOs\RespuestaEvaluacionData;
 use App\Domains\Resultados\Models\EvaluacionAplicada;
+use App\Support\Validation\AcademicDatePolicy;
 use Carbon\Carbon;
 use Database\Seeders\Support\AvalanchaAcademicCatalog;
 use Illuminate\Database\Seeder;
@@ -406,33 +407,66 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
             $groups->put($row[1], $group);
         }
 
+        $demoStart = AcademicDatePolicy::tomorrow();
+        $demoProgram = ProgramaAcademico::updateOrCreate(
+            ['codigo_prog' => 'DEMO-ADM'],
+            [
+                'nombre_prog' => 'Demostración de Gestión Académica',
+                'universidad_objetivo_prog' => 'Universidades de La Paz',
+                'carrera_area_prog' => 'Ingeniería',
+                'modalidad_prog' => 'Nivelación',
+                'fecha_inicio_prog' => $demoStart->format('Y-m-d'),
+                'fecha_fin_prog' => $demoStart->addDays(90)->format('Y-m-d'),
+                'descripcion_prog' => 'Escenario vigente para demostrar la captura administrativa del sistema.',
+                'estado_prog' => 'activo',
+            ],
+        );
+        $programs->put('DEMO-ADM', $demoProgram);
+        $demoGroup = GrupoAcademico::updateOrCreate(
+            ['id_prog' => $demoProgram->id_prog, 'codigo_grupo' => 'DEMO-MA-A'],
+            [
+                'nombre_grupo' => 'Demostración Mañana A',
+                'turno_grupo' => 'Mañana',
+                'aula_grupo' => '214',
+                'capacidad_grupo' => 20,
+                'nivel_grupo' => 'Preuniversitario',
+                'tutor_responsable_grupo' => null,
+                'estado_grupo' => 'activo',
+            ],
+        );
+        $groups->put('DEMO-MA-A', $demoGroup);
+
         return [$programs, $groups];
     }
 
     private function seedTutorsAndAssignments(Collection $programs, Collection $groups, array $personal): Collection
     {
         $rows = [
-            [
+            'docente_1' => [
                 'Matemática',
                 'Licenciatura en Matemática',
             ],
-            [
+            'docente_2' => [
                 'Física',
                 'Ingeniería Física',
             ],
-            [
+            'docente_3' => [
                 'Química',
                 'Licenciatura en Química',
             ],
-            [
+            'docente_4' => [
                 'Razonamiento Lógico / Coordinación Académica',
                 'Ciencias de la Educación',
+            ],
+            'demo_tutor_sin_asignacion' => [
+                'Orientación Académica',
+                'Licenciatura en Ciencias de la Educación',
             ],
         ];
         $tutors = collect();
 
-        foreach ($rows as $index => $row) {
-            $person = $personal['docente_'.($index + 1)];
+        foreach ($rows as $personalKey => $row) {
+            $person = $personal[$personalKey];
             $tutor = TutorAcademico::updateOrCreate(
                 ['personal_id' => $person->id_personal],
                 [
@@ -472,7 +506,10 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
                     'observacion_asig' => "Acompañamiento de {$assignment['subject']} para el grupo {$group->codigo_grupo}.",
                 ],
             );
+            $group->update(['id_tutor_responsable' => $assignment['tutor']->id_tutor]);
         }
+
+        $groups['DEMO-MA-A']->update(['id_tutor_responsable' => $tutors['Matemática']->id_tutor]);
 
         foreach ($programs as $program) {
             AsignacionTutor::updateOrCreate(

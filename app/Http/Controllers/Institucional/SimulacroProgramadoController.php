@@ -8,6 +8,7 @@ use App\Domains\Academico\Models\SimulacroProgramado;
 use App\Domains\Academico\Services\AcademicoService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Institucional\SimulacroProgramadoRequest;
+use App\Support\Validation\AcademicDatePolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -28,6 +29,7 @@ class SimulacroProgramadoController extends Controller
         return Inertia::render('Institucional/Simulacros/Index', [
             ...$service->simulacros($filters),
             'filtros' => $filters,
+            'fechaMinimaPlanificacion' => AcademicDatePolicy::tomorrowString(),
         ]);
     }
 

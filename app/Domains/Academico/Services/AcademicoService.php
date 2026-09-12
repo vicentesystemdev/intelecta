@@ -15,6 +15,7 @@ use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
 use App\Domains\Evaluaciones\Services\ConsistenciaEvaluacionService;
 use App\Domains\Postulantes\Models\Postulante;
 use App\Models\User;
+use App\Support\Validation\AcademicDatePolicy;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -41,6 +42,9 @@ class AcademicoService
         return [
             'grupos' => $this->repository->paginateGrupos($filters, $user),
             'programas' => $this->repository->programasOptionsPara($user, 'grupos.ver'),
+            'tutores' => $user->can('grupos.crear') || $user->can('grupos.editar')
+                ? $this->repository->tutoresResponsablesOptions()
+                : [],
         ];
     }
 
@@ -156,12 +160,17 @@ class AcademicoService
     {
         return DB::transaction(function () use ($data, $inscripcion): InscripcionAcademica {
             if (! $inscripcion) {
+                $data = $data->withAdministrativeValues(AcademicDatePolicy::todayString(), 'activo');
                 $this->elegibilidadInscripcion->validar($data);
 
                 return $this->repository->createInscripcion($data);
             }
 
             $locked = InscripcionAcademica::query()->lockForUpdate()->findOrFail($inscripcion->getKey());
+            $data = $data->withAdministrativeValues(
+                $locked->fecha_inscripcion?->format('Y-m-d'),
+                $data->estado,
+            );
 
             if ($this->cambiaContextoInscripcion($locked, $data) && $this->inscripcionTieneDependencias($locked)) {
                 throw ValidationException::withMessages([

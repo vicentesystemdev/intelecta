@@ -1,4 +1,5 @@
 import InputError from '@/Components/InputError';
+import { formatDateLatam } from '@/lib/dateOnly';
 import { validationProps } from '@/lib/inputValidation';
 import {
     EmptyInstitutional,
@@ -34,8 +35,6 @@ import { useMemo, useState } from 'react';
 
 const emptyMatricula = {
     id_insc: '',
-    codigo_mat: '',
-    fecha_matricula_mat: '',
     monto_matricula_mat: 0,
     estado_matricula_mat: 'activa',
     tipo_beneficio_mat: '',
@@ -69,13 +68,6 @@ const formatDate = (value) =>
 const studentName = (postulante) =>
     `${postulante?.nombres_post || ''} ${postulante?.apellidos_post || ''}`.trim();
 
-const localToday = () => {
-    const date = new Date();
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 10);
-};
-
 export default function Index({
     matriculas,
     metricas = {},
@@ -83,6 +75,7 @@ export default function Index({
     programas = [],
     grupos = [],
     filtros = {},
+    fechaHoy,
 }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
@@ -120,9 +113,6 @@ export default function Index({
             matricula
                 ? {
                       id_insc: String(matricula.id_insc),
-                      codigo_mat: matricula.codigo_mat || '',
-                      fecha_matricula_mat:
-                          matricula.fecha_matricula_mat?.slice(0, 10) || '',
                       monto_matricula_mat: matricula.monto_matricula_mat ?? 0,
                       estado_matricula_mat:
                           matricula.estado_matricula_mat || 'inactiva',
@@ -527,28 +517,15 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field {...validationProps('codigo_mat')}
-                        label="Código de matrícula"
-                        placeholder="Se genera automáticamente"
-                        value={matriculaForm.data.codigo_mat}
-                        onChange={(event) =>
-                            matriculaForm.setData('codigo_mat', event.target.value)
-                        }
-                        error={matriculaForm.errors.codigo_mat}
-                    />
-                    <Field {...validationProps('fecha_matricula_mat')}
-                        type="date"
-                        label="Fecha de matrícula"
-                        max={localToday()}
-                        value={matriculaForm.data.fecha_matricula_mat}
-                        onChange={(event) =>
-                            matriculaForm.setData(
-                                'fecha_matricula_mat',
-                                event.target.value,
-                            )
-                        }
-                        error={matriculaForm.errors.fecha_matricula_mat}
-                    />
+                    <div className="rounded-xl border border-brand-border bg-brand-bg px-4 py-3">
+                        <p className="text-xs font-bold text-text-muted">Código de matrícula</p>
+                        <p className="mt-1 font-semibold text-text-main">{matriculaModal.matricula?.codigo_mat || 'Se genera automáticamente'}</p>
+                    </div>
+                    <div className="rounded-xl border border-brand-border bg-brand-bg px-4 py-3">
+                        <p className="text-xs font-bold text-text-muted">Fecha de matrícula</p>
+                        <p className="mt-1 font-semibold text-text-main">{formatDateLatam((matriculaModal.matricula?.fecha_matricula_mat || fechaHoy || '').slice(0, 10))}</p>
+                        <p className="mt-1 text-xs text-text-muted">Asignada automáticamente por el servidor.</p>
+                    </div>
                     <Field {...validationProps('monto_matricula_mat')}
                         type="number"
                         min="0"

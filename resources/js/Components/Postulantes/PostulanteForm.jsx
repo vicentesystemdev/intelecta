@@ -30,8 +30,15 @@ export default function PostulanteForm({
         celular_post: postulante?.celular_post || '',
         fecha_nacimiento_post: formatDateLatam(postulante?.fecha_nacimiento_post),
         id_col: postulante?.id_col || '',
+        crear_otro_colegio: false,
+        otro_colegio_nombre: '',
         id_uni: postulante?.carrera?.id_uni || '',
+        crear_otra_universidad: false,
+        otra_universidad_nombre: '',
+        otra_universidad_sigla: '',
         id_car: postulante?.id_car || '',
+        crear_otra_carrera: false,
+        otra_carrera_nombre: '',
         turno_post: postulante?.turno_post || '',
         gestion_post: postulante?.gestion_post || gestionActual,
         estado_post: postulante?.estado_post || 'activo',
@@ -68,8 +75,20 @@ export default function PostulanteForm({
                 : [],
         [data.id_uni, opciones.carreras],
     );
+    const universidadIndicada = Boolean(data.id_uni || data.crear_otra_universidad);
 
     const changeUniversidad = (value) => {
+        if (value === '__otro__') {
+            setData({
+                ...data,
+                id_uni: '',
+                id_car: '',
+                crear_otra_universidad: true,
+                crear_otra_carrera: false,
+                otra_carrera_nombre: '',
+            });
+            return;
+        }
         const carreraActual = opciones.carreras.find(
             (carrera) => String(carrera.id_car) === String(data.id_car),
         );
@@ -77,11 +96,16 @@ export default function PostulanteForm({
         setData({
             ...data,
             id_uni: value,
+            crear_otra_universidad: false,
+            otra_universidad_nombre: '',
+            otra_universidad_sigla: '',
             id_car:
                 carreraActual &&
                 String(carreraActual.id_uni) === String(value)
                     ? data.id_car
                     : '',
+            crear_otra_carrera: false,
+            otra_carrera_nombre: '',
         });
     };
 
@@ -202,10 +226,10 @@ export default function PostulanteForm({
                         <select {...validationProps('id_col')}
                             id="id_col"
                             className={`${fieldClass} w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
-                            value={data.id_col}
-                            onChange={(event) =>
-                                field('id_col', event.target.value)
-                            }
+                            value={data.crear_otro_colegio ? '__otro__' : data.id_col}
+                            onChange={(event) => event.target.value === '__otro__'
+                                ? setData({ ...data, id_col: '', crear_otro_colegio: true })
+                                : setData({ ...data, id_col: event.target.value, crear_otro_colegio: false, otro_colegio_nombre: '' })}
                         >
                             <option value="">Seleccione un colegio</option>
                             {opciones.colegios.map((colegio) => (
@@ -213,15 +237,21 @@ export default function PostulanteForm({
                                     {colegio.nombre_col}
                                 </option>
                             ))}
+                            <option value="__otro__">Otro colegio</option>
                         </select>
                         <InputError className="mt-1.5" message={errors.id_col} />
+                        {data.crear_otro_colegio && <div className="mt-3">
+                            <Label htmlFor="otro_colegio_nombre">Nombre del nuevo colegio *</Label>
+                            <Input {...validationProps('otro_colegio_nombre', { required: true, minLength: 2, maxLength: 255 })} id="otro_colegio_nombre" className={fieldClass} value={data.otro_colegio_nombre} onChange={(event) => field('otro_colegio_nombre', event.target.value)} />
+                            <InputError className="mt-1.5" message={errors.otro_colegio_nombre} />
+                        </div>}
                     </div>
                     <div>
                         <Label htmlFor="id_uni">Universidad postulada</Label>
                         <select {...validationProps('id_uni')}
                             id="id_uni"
                             className={`${fieldClass} w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
-                            value={data.id_uni}
+                            value={data.crear_otra_universidad ? '__otro__' : data.id_uni}
                             onChange={(event) =>
                                 changeUniversidad(event.target.value)
                             }
@@ -237,21 +267,27 @@ export default function PostulanteForm({
                                         : universidad.nombre_uni}
                                 </option>
                             ))}
+                            <option value="__otro__">Otra universidad</option>
                         </select>
                         <InputError className="mt-1.5" message={errors.id_uni} />
+                        {data.crear_otra_universidad && <div className="mt-3 grid gap-3">
+                            <div><Label htmlFor="otra_universidad_nombre">Nombre de la nueva universidad *</Label><Input {...validationProps('otra_universidad_nombre', { required: true, minLength: 2, maxLength: 255 })} id="otra_universidad_nombre" className={fieldClass} value={data.otra_universidad_nombre} onChange={(event) => field('otra_universidad_nombre', event.target.value)} /><InputError className="mt-1.5" message={errors.otra_universidad_nombre} /></div>
+                            <div><Label htmlFor="otra_universidad_sigla">Sigla</Label><Input {...validationProps('otra_universidad_sigla', { maxLength: 60 })} id="otra_universidad_sigla" className={fieldClass} value={data.otra_universidad_sigla} onChange={(event) => field('otra_universidad_sigla', event.target.value)} /><InputError className="mt-1.5" message={errors.otra_universidad_sigla} /></div>
+                        </div>}
                     </div>
                     <div>
-                        <Label htmlFor="id_car">Carrera postulada</Label>
-                        <select {...validationProps('id_car')}
+                        <Label htmlFor="id_car">Carrera postulada{universidadIndicada ? ' *' : ''}</Label>
+                        <select {...validationProps('id_car', { required: universidadIndicada })}
                             id="id_car"
                             className={`${fieldClass} w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
-                            value={data.id_car}
-                            onChange={(event) =>
-                                field('id_car', event.target.value)
-                            }
+                            value={data.crear_otra_carrera ? '__otro__' : data.id_car}
+                            disabled={!universidadIndicada}
+                            onChange={(event) => event.target.value === '__otro__'
+                                ? setData({ ...data, id_car: '', crear_otra_carrera: true })
+                                : setData({ ...data, id_car: event.target.value, crear_otra_carrera: false, otra_carrera_nombre: '' })}
                         >
                             <option value="">
-                                {data.id_uni
+                                {universidadIndicada
                                     ? 'Seleccione una carrera'
                                     : 'Seleccione primero una universidad'}
                             </option>
@@ -262,8 +298,14 @@ export default function PostulanteForm({
                                         'Nivel no definido'}
                                 </option>
                             ))}
+                            {universidadIndicada && <option value="__otro__">Otra carrera</option>}
                         </select>
                         <InputError className="mt-1.5" message={errors.id_car} />
+                        {data.crear_otra_carrera && <div className="mt-3">
+                            <Label htmlFor="otra_carrera_nombre">Nombre de la nueva carrera *</Label>
+                            <Input {...validationProps('otra_carrera_nombre', { required: true, minLength: 2, maxLength: 255 })} id="otra_carrera_nombre" className={fieldClass} value={data.otra_carrera_nombre} onChange={(event) => field('otra_carrera_nombre', event.target.value)} />
+                            <InputError className="mt-1.5" message={errors.otra_carrera_nombre} />
+                        </div>}
                     </div>
                     <div>
                         <Label htmlFor="turno_post">Turno</Label>
@@ -338,6 +380,7 @@ export default function PostulanteForm({
             </Card>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                {errors.catalogos && <InputError className="sm:mr-auto" message={errors.catalogos} />}
                 {onCancel ? (
                     <Button
                         type="button"

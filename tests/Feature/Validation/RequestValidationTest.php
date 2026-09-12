@@ -167,8 +167,9 @@ class RequestValidationTest extends TestCase
             $this->probe('Institucional\\ProgramaAcademicoRequest', $base + ['fecha_inicio_prog' => $date, 'fecha_fin_prog' => now()->addDays(4)->toDateString()])->assertUnprocessable()->assertJsonValidationErrors('fecha_inicio_prog');
         }
         $this->probe('Institucional\\ProgramaAcademicoRequest', $base + ['fecha_inicio_prog' => now()->addDays(3)->toDateString(), 'fecha_fin_prog' => now()->addDays(2)->toDateString()])->assertUnprocessable()->assertJsonValidationErrors('fecha_fin_prog');
-        $this->probe('Institucional\\ProgramaAcademicoRequest', $base + ['fecha_inicio_prog' => today()->toDateString(), 'fecha_fin_prog' => today()->toDateString()])->assertOk();
-        $this->probe('Institucional\\ProgramaAcademicoRequest', $base + ['fecha_inicio_prog' => null, 'fecha_fin_prog' => today()->toDateString()])->assertOk();
+        $this->probe('Institucional\\ProgramaAcademicoRequest', $base + ['fecha_inicio_prog' => today()->toDateString(), 'fecha_fin_prog' => today()->addDay()->toDateString()])->assertUnprocessable()->assertJsonValidationErrors('fecha_inicio_prog');
+        $this->probe('Institucional\\ProgramaAcademicoRequest', $base + ['fecha_inicio_prog' => null, 'fecha_fin_prog' => today()->addDay()->toDateString()])->assertUnprocessable()->assertJsonValidationErrors('fecha_inicio_prog');
+        $this->probe('Institucional\\ProgramaAcademicoRequest', $base + ['fecha_inicio_prog' => today()->addDay()->toDateString(), 'fecha_fin_prog' => today()->addDays(2)->toDateString()])->assertOk();
         $this->probe('Institucional\\SimulacroProgramadoRequest', ['id_prog' => $this->ids['program'], 'titulo_sim' => 'Simulacro', 'estado_sim' => 'programado', 'hora_inicio_sim' => ['09:00'], 'hora_fin_sim' => '10:00'])->assertUnprocessable()->assertJsonValidationErrors('hora_inicio_sim');
     }
 
@@ -181,10 +182,10 @@ class RequestValidationTest extends TestCase
         foreach (['si', 'yes', 'activo', 'abc', [], 2] as $value) {
             $this->probe('Institucional\\HabilitacionAcademicaRequest', array_replace($base, ['habilitado_evaluaciones_hab' => $value]))->assertUnprocessable()->assertJsonValidationErrors('habilitado_evaluaciones_hab');
         }
-        $group = ['id_prog' => $this->ids['program'], 'nombre_grupo' => 'Grupo', 'capacidad_grupo' => 1, 'estado_grupo' => 'activo', 'codigo_grupo' => ' fis-001 '];
+        $group = ['id_prog' => $this->ids['program'], 'nombre_grupo' => 'Grupo', 'turno_grupo' => 'Mañana', 'aula_grupo' => '214', 'nivel_grupo' => 'Preuniversitario', 'capacidad_grupo' => 1, 'estado_grupo' => 'activo', 'codigo_grupo' => ' fis-001 '];
         $this->probe('Institucional\\GrupoAcademicoRequest', $group)->assertOk()->assertJsonPath('codigo_grupo', 'FIS-001');
         $this->probe('Institucional\\GrupoAcademicoRequest', array_replace($group, ['tutor_responsable_grupo' => 'Vicente123']))->assertUnprocessable()->assertJsonValidationErrors('tutor_responsable_grupo');
-        foreach ([0, 501, '1.5', 'abc', true] as $value) {
+        foreach ([0, 21, '1.5', 'abc', true] as $value) {
             $this->probe('Institucional\\GrupoAcademicoRequest', array_replace($group, ['capacidad_grupo' => $value]))->assertUnprocessable()->assertJsonValidationErrors('capacidad_grupo');
         }
         foreach (['abc', 999999, ['1'], true] as $value) {
@@ -194,13 +195,13 @@ class RequestValidationTest extends TestCase
 
     public function test_attendance_permissions_and_response_arrays_are_defensive(): void
     {
-        $base = ['id_grupo' => $this->ids['group'], 'fecha_asist' => today()->toDateString(), 'sesion_asist' => 'General'];
+        $base = ['id_grupo' => $this->ids['group'], 'sesion_asist' => 'General'];
         foreach (['texto', [1], [null], [['id_post' => ['1']]]] as $records) {
             $this->probe('Institucional\\AsistenciaGrupoRequest', $base + ['registros' => $records])->assertUnprocessable();
         }
         $this->probe('Institucional\\AsistenciaGrupoRequest', $base + ['registros' => [['id_post' => $this->ids['post'], 'estado_asist' => 'presente']]])->assertOk();
         $this->probe('Institucional\\AsistenciaAcademicaRequest', array_replace($base, ['id_post' => $this->ids['post'], 'estado_asist' => 'presente', 'sesion_asist' => ['bad']]))->assertUnprocessable()->assertJsonValidationErrors('sesion_asist');
-        $this->probe('Institucional\\AsistenciaAcademicaRequest', array_replace($base, ['id_post' => $this->ids['post'], 'estado_asist' => 'presente', 'fecha_asist' => 'not-a-date']))->assertUnprocessable()->assertJsonValidationErrors('fecha_asist');
+        $this->probe('Institucional\\AsistenciaAcademicaRequest', array_replace($base, ['id_post' => $this->ids['post'], 'estado_asist' => 'presente', 'fecha_asist' => today()->subDay()->toDateString()]))->assertUnprocessable()->assertJsonValidationErrors('fecha_asist');
         foreach (['texto', [1], [null], [['id_preg' => ['1']]]] as $responses) {
             $this->probe('Resultados\\EnviarRespuestasEvaluacionRequest', ['respuestas' => $responses])->assertUnprocessable();
         }

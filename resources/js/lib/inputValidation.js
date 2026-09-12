@@ -5,11 +5,12 @@ export { options as inputOptions };
 // UX hints only. Laravel Form Requests remain authoritative.
 export const inputConstraints = {
     "nombre_cargo": {"required":true,"minLength":2,"maxLength":160,"format":"denomination"},
+    "descripcion": {"required":true,"minLength":10,"maxLength":2000,"format":"denomination"},
     "nombres": {"required":true,"minLength":2,"maxLength":120,"format":"person"},
     "apellidos": {"required":true,"minLength":2,"maxLength":120,"format":"person"},
-    "ci": {"minLength":4,"maxLength":30,"format":"document"},
-    "celular": {"maxLength":32,"format":"phone","type":"tel","inputMode":"tel"},
-    "correo_contacto": {"maxLength":254,"format":"email","type":"email"},
+    "ci": {"required":true,"minLength":4,"maxLength":30,"format":"document"},
+    "celular": {"required":true,"maxLength":16,"format":"phone","type":"tel","inputMode":"tel"},
+    "correo_contacto": {"required":true,"maxLength":254,"format":"email","type":"email"},
     "id_sim": {"inputMode":"numeric","step":1},
     "tipo_eval_apl": {"maxLength":120},
     "id_preg": {"inputMode":"numeric","step":1},
@@ -35,9 +36,9 @@ export const inputConstraints = {
     "observaciones_post": {"maxLength":2000},
     "user_id": {"inputMode":"numeric","step":1},
     "personal_id": {"required":true,"inputMode":"numeric","step":1},
-    "especialidad_tutor": {"maxLength":160},
-    "formacion_tutor": {"maxLength":220},
-    "experiencia_tutor": {"maxLength":3000},
+    "especialidad_tutor": {"required":true,"minLength":2,"maxLength":160,"format":"denomination"},
+    "formacion_tutor": {"required":true,"minLength":10,"maxLength":220,"format":"denomination"},
+    "experiencia_tutor": {"required":true,"minLength":10,"maxLength":3000,"format":"denomination"},
     "estado_tutor": {"required":true},
     "observacion_tutor": {"maxLength":2000},
     "id_prog": {"inputMode":"numeric","step":1},
@@ -82,11 +83,13 @@ export const inputConstraints = {
     "codigo_grupo": {"minLength":2,"maxLength":60,"format":"code"},
     "turno_grupo": {"maxLength":80},
     "aula_grupo": {"maxLength":80},
-    "capacidad_grupo": {"required":true,"inputMode":"numeric","step":1,"min":1,"max":500},
+    "capacidad_grupo": {"required":true,"inputMode":"numeric","step":1,"min":1,"max":20},
     "nivel_grupo": {"maxLength":100},
-    "tutor_responsable_grupo": {"minLength":2,"maxLength":180,"format":"person"},
+    "id_tutor_responsable": {"inputMode":"numeric","step":1},
     "estado_grupo": {"required":true},
     "id_mat": {"inputMode":"numeric","step":1},
+    "nombre_mat": {"required":true,"minLength":2,"maxLength":255,"format":"denomination"},
+    "descripcion_mat": {"required":true,"minLength":10,"maxLength":3000,"format":"denomination"},
     "nro_cuota": {"inputMode":"numeric","step":1,"min":1,"max":120},
     "concepto_cuota": {"maxLength":180},
     "monto_cuota": {"required":true,"inputMode":"decimal","step":0.01,"min":0,"max":99999999.99},
@@ -96,7 +99,7 @@ export const inputConstraints = {
     "estado_cuota": {"required":true},
     "observacion_cuota": {"maxLength":2000},
     "id_tutor": {"inputMode":"numeric","step":1},
-    "fecha_asist": {"required":true},
+    "fecha_asist": {},
     "sesion_asist": {"required":true,"minLength":2,"maxLength":120},
     "estado_asist": {"required":true},
     "observacion_asist": {"maxLength":2000},
@@ -161,4 +164,15 @@ export function validationProps(field, overrides = {}) {
     if (patterns[format]) props.pattern = patterns[format];
     if (key === 'gestion_post') props.max = new Date().getFullYear() + 1;
     return { name: field, ...props, ...overrides };
+}
+
+export function constraintsWhenChanged(originalValue, currentValue, constraints) {
+    if (
+        originalValue === undefined ||
+        String(originalValue ?? '') !== String(currentValue ?? '')
+    ) {
+        return constraints;
+    }
+
+    return Object.fromEntries(Object.keys(constraints).map((key) => [key, undefined]));
 }

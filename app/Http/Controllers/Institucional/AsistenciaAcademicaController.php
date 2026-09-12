@@ -10,6 +10,7 @@ use App\Domains\Academico\Services\AsistenciaAcademicaService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Institucional\AsistenciaAcademicaRequest;
 use App\Http\Requests\Institucional\AsistenciaGrupoRequest;
+use App\Support\Validation\AcademicDatePolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -48,6 +49,7 @@ class AsistenciaAcademicaController extends Controller
                 'crear' => $request->user()->can('asistencia.crear'),
                 'editar' => $request->user()->can('asistencia.editar'),
             ],
+            'fechaHoy' => AcademicDatePolicy::todayString(),
         ]);
     }
 

@@ -8,6 +8,7 @@ use App\Domains\Academico\Models\AsignacionTutor;
 use App\Domains\Academico\Services\AsignacionTutorService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Institucional\AsignacionTutorRequest;
+use App\Support\Validation\AcademicDatePolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,6 +28,7 @@ class AsignacionTutorController extends Controller
         return Inertia::render('Institucional/AsignacionTutores/Index', [
             ...$service->index($filters),
             'filtros' => $filters,
+            'fechaMinimaPlanificacion' => AcademicDatePolicy::tomorrowString(),
         ]);
     }
 

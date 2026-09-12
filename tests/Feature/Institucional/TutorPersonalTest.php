@@ -43,7 +43,13 @@ class TutorPersonalTest extends TestCase
 
     private function payload(PersonalInstitucional $person, array $extra = []): array
     {
-        return array_replace(['personal_id' => $person->id_personal, 'estado_tutor' => 'activo', 'especialidad_tutor' => 'Física'], $extra);
+        return array_replace([
+            'personal_id' => $person->id_personal,
+            'estado_tutor' => 'activo',
+            'especialidad_tutor' => 'Física',
+            'formacion_tutor' => 'Licenciatura en Ciencias de la Educación',
+            'experiencia_tutor' => 'Cinco años de acompañamiento académico institucional',
+        ], $extra);
     }
 
     private function url(string $action, mixed $id = []): string

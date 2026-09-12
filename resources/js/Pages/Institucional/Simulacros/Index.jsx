@@ -1,4 +1,5 @@
 import { validationProps } from '@/lib/inputValidation';
+import { nextMinute } from '@/lib/academicDates';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import Pagination from '@/Components/Pagination';
 import {
@@ -31,11 +32,8 @@ const emptySimulation = {
     observacion_sim: '',
 };
 
-const localToday = () => {
-    const date = new Date();
-    const offset = date.getTimezoneOffset();
-    return new Date(date.getTime() - offset * 60_000).toISOString().slice(0, 10);
-};
+const dateInputValue = (value) => value?.slice(0, 10) || '';
+const timeInputValue = (value) => value?.slice(0, 5) || '';
 
 export default function Index({
     simulacros,
@@ -43,6 +41,7 @@ export default function Index({
     grupos = [],
     plantillas = [],
     filtros = {},
+    fechaMinimaPlanificacion,
 }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
@@ -55,6 +54,10 @@ export default function Index({
     const [formModal, setFormModal] = useState({ open: false, simulacro: null });
     const [detail, setDetail] = useState(null);
     const form = useForm(emptySimulation);
+    const reprogramming = !formModal.simulacro
+        || dateInputValue(form.data.fecha_sim) !== dateInputValue(formModal.simulacro.fecha_sim)
+        || timeInputValue(form.data.hora_inicio_sim) !== timeInputValue(formModal.simulacro.hora_inicio_sim)
+        || timeInputValue(form.data.hora_fin_sim) !== timeInputValue(formModal.simulacro.hora_fin_sim);
     const formGroups = useMemo(
         () =>
             form.data.id_prog
@@ -294,7 +297,7 @@ export default function Index({
             >
                 <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
                     <SelectField {...validationProps('id_prog', { required: true })}
-                        label="Programa académico"
+                        label="Programa académico *"
                         value={form.data.id_prog}
                         onChange={(e) =>
                             form.setData({
@@ -344,7 +347,7 @@ export default function Index({
                         ))}
                     </SelectField>
                     <Field {...validationProps('titulo_sim')}
-                        label="Título"
+                        label="Título *"
                         value={form.data.titulo_sim}
                         onChange={(e) => form.setData('titulo_sim', e.target.value)}
                         error={form.errors.titulo_sim}
@@ -364,23 +367,18 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field {...validationProps('fecha_sim')}
+                    <Field {...validationProps('fecha_sim', { required: reprogramming })}
                         type="date"
-                        min={
-                            formModal.simulacro &&
-                            formModal.simulacro.fecha_sim?.slice(0, 10) < localToday()
-                                ? undefined
-                                : localToday()
-                        }
-                        label="Fecha"
+                        min={reprogramming ? fechaMinimaPlanificacion : undefined}
+                        label="Fecha *"
                         value={form.data.fecha_sim}
                         onChange={(e) => form.setData('fecha_sim', e.target.value)}
                         error={form.errors.fecha_sim}
                     />
                     <Field {...validationProps('modalidad_sim')} label="Modalidad" value={form.data.modalidad_sim} onChange={(e) => form.setData('modalidad_sim', e.target.value)} error={form.errors.modalidad_sim} />
-                    <Field {...validationProps('hora_inicio_sim')} type="time" label="Hora de inicio" value={form.data.hora_inicio_sim} onChange={(e) => form.setData('hora_inicio_sim', e.target.value)} error={form.errors.hora_inicio_sim} />
-                    <Field {...validationProps('hora_fin_sim')} type="time" min={form.data.hora_inicio_sim || undefined} label="Hora de finalización" value={form.data.hora_fin_sim} onChange={(e) => form.setData('hora_fin_sim', e.target.value)} error={form.errors.hora_fin_sim} />
-                    <SelectField {...validationProps('estado_sim')} label="Estado" value={form.data.estado_sim} onChange={(e) => form.setData('estado_sim', e.target.value)} error={form.errors.estado_sim}>
+                    <Field {...validationProps('hora_inicio_sim', { required: reprogramming })} type="time" label="Hora de inicio *" value={form.data.hora_inicio_sim} onChange={(e) => form.setData({ ...form.data, hora_inicio_sim: e.target.value, hora_fin_sim: form.data.hora_fin_sim && form.data.hora_fin_sim <= e.target.value ? '' : form.data.hora_fin_sim })} error={form.errors.hora_inicio_sim} />
+                    <Field {...validationProps('hora_fin_sim', { required: reprogramming })} type="time" min={nextMinute(form.data.hora_inicio_sim) || undefined} label="Hora de finalización *" value={form.data.hora_fin_sim} onChange={(e) => form.setData('hora_fin_sim', e.target.value)} error={form.errors.hora_fin_sim} />
+                    <SelectField {...validationProps('estado_sim')} label="Estado *" value={form.data.estado_sim} onChange={(e) => form.setData('estado_sim', e.target.value)} error={form.errors.estado_sim}>
                         <option value="programado">Programado</option>
                         <option value="en preparación">En preparación</option>
                         <option value="aplicado">Aplicado</option>

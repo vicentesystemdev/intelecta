@@ -1,4 +1,5 @@
 import { validationProps } from '@/lib/inputValidation';
+import { clearInvalidEndDate, nextCivilDate } from '@/lib/academicDates';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import Pagination from '@/Components/Pagination';
 import {
@@ -39,14 +40,7 @@ const emptyProgram = {
     estado_prog: 'activo',
 };
 
-const localToday = () => {
-    const date = new Date();
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 10);
-};
-
-export default function Index({ programas, universidades = [], modalidades = [], filtros = {} }) {
+export default function Index({ programas, universidades = [], modalidades = [], filtros = {}, fechaMinimaPlanificacion }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
         buscar: filtros.buscar || '',
@@ -57,16 +51,24 @@ export default function Index({ programas, universidades = [], modalidades = [],
     const [formModal, setFormModal] = useState({ open: false, programa: null });
     const [detail, setDetail] = useState(null);
     const form = useForm(emptyProgram);
+    const reprogramming = !formModal.programa
+        || form.data.fecha_inicio_prog !== formModal.programa.fecha_inicio_prog?.slice(0, 10)
+        || form.data.fecha_fin_prog !== formModal.programa.fecha_fin_prog?.slice(0, 10);
 
     const openForm = (programa = null) => {
         form.clearErrors();
         form.setData(
             programa
                 ? {
-                      ...emptyProgram,
-                      ...programa,
+                      nombre_prog: programa.nombre_prog || '',
+                      codigo_prog: programa.codigo_prog || '',
+                      universidad_objetivo_prog: programa.universidad_objetivo_prog || '',
+                      carrera_area_prog: programa.carrera_area_prog || '',
+                      modalidad_prog: programa.modalidad_prog || '',
                       fecha_inicio_prog: programa.fecha_inicio_prog?.slice(0, 10) || '',
                       fecha_fin_prog: programa.fecha_fin_prog?.slice(0, 10) || '',
+                      descripcion_prog: programa.descripcion_prog || '',
+                      estado_prog: programa.estado_prog || 'activo',
                   }
                 : emptyProgram,
         );
@@ -184,14 +186,14 @@ export default function Index({ programas, universidades = [], modalidades = [],
 
             <ModalInstitucional open={formModal.open} onOpenChange={(open) => setFormModal((current) => ({ ...current, open }))} title={formModal.programa ? 'Editar programa académico' : 'Nuevo programa académico'} description="Configure el ciclo de nivelación, su enfoque y vigencia." size="lg">
                 <form onSubmit={submitForm} className="grid gap-4 sm:grid-cols-2">
-                    <Field {...validationProps('nombre_prog')} label="Nombre del programa" value={form.data.nombre_prog} onChange={(e) => form.setData('nombre_prog', e.target.value)} error={form.errors.nombre_prog} className="sm:col-span-2" />
+                    <Field {...validationProps('nombre_prog')} label="Nombre del programa *" value={form.data.nombre_prog} onChange={(e) => form.setData('nombre_prog', e.target.value)} error={form.errors.nombre_prog} className="sm:col-span-2" />
                     <Field {...validationProps('codigo_prog')} label="Código" value={form.data.codigo_prog} onChange={(e) => form.setData('codigo_prog', e.target.value)} error={form.errors.codigo_prog} />
                     <Field {...validationProps('universidad_objetivo_prog')} label="Universidad objetivo" value={form.data.universidad_objetivo_prog} onChange={(e) => form.setData('universidad_objetivo_prog', e.target.value)} error={form.errors.universidad_objetivo_prog} />
                     <Field {...validationProps('carrera_area_prog')} label="Carrera o área" value={form.data.carrera_area_prog} onChange={(e) => form.setData('carrera_area_prog', e.target.value)} error={form.errors.carrera_area_prog} />
                     <Field {...validationProps('modalidad_prog')} label="Modalidad" value={form.data.modalidad_prog} onChange={(e) => form.setData('modalidad_prog', e.target.value)} error={form.errors.modalidad_prog} />
-                    <Field {...validationProps('fecha_inicio_prog')} type="date" min={formModal.programa ? undefined : localToday()} label="Fecha de inicio" value={form.data.fecha_inicio_prog} onChange={(e) => form.setData('fecha_inicio_prog', e.target.value)} error={form.errors.fecha_inicio_prog} />
-                    <Field {...validationProps('fecha_fin_prog')} type="date" min={form.data.fecha_inicio_prog || undefined} label="Fecha de finalización" value={form.data.fecha_fin_prog} onChange={(e) => form.setData('fecha_fin_prog', e.target.value)} error={form.errors.fecha_fin_prog} />
-                    <SelectField {...validationProps('estado_prog')} label="Estado" value={form.data.estado_prog} onChange={(e) => form.setData('estado_prog', e.target.value)} error={form.errors.estado_prog}><option value="activo">Activo</option><option value="inactivo">Inactivo</option></SelectField>
+                    <Field {...validationProps('fecha_inicio_prog', { required: !formModal.programa || Boolean(form.data.fecha_inicio_prog) })} type="date" min={reprogramming ? fechaMinimaPlanificacion : undefined} label="Fecha de inicio *" value={form.data.fecha_inicio_prog} onChange={(e) => form.setData({ ...form.data, fecha_inicio_prog: e.target.value, fecha_fin_prog: clearInvalidEndDate(e.target.value, form.data.fecha_fin_prog) })} error={form.errors.fecha_inicio_prog} />
+                    <Field {...validationProps('fecha_fin_prog', { required: !formModal.programa || Boolean(form.data.fecha_fin_prog) })} type="date" min={reprogramming && form.data.fecha_inicio_prog ? nextCivilDate(form.data.fecha_inicio_prog) : undefined} label="Fecha de finalización *" value={form.data.fecha_fin_prog} onChange={(e) => form.setData('fecha_fin_prog', e.target.value)} error={form.errors.fecha_fin_prog} />
+                    <SelectField {...validationProps('estado_prog')} label="Estado *" value={form.data.estado_prog} onChange={(e) => form.setData('estado_prog', e.target.value)} error={form.errors.estado_prog}><option value="activo">Activo</option><option value="inactivo">Inactivo</option></SelectField>
                     <TextareaField {...validationProps('descripcion_prog')} label="Descripción" value={form.data.descripcion_prog} onChange={(e) => form.setData('descripcion_prog', e.target.value)} error={form.errors.descripcion_prog} className="sm:col-span-2" />
                     <div className="flex justify-end gap-3 border-t border-brand-border pt-4 sm:col-span-2">
                         <button type="button" className={secondaryButtonClass} onClick={() => setFormModal({ open: false, programa: null })}>Cancelar</button>

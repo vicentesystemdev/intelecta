@@ -66,7 +66,12 @@ class DesplegarMatrizRbac
             }
         }
         $missing = array_diff(MatrizRbac::CATALOG, array_column($state['permissions'], 'name'));
-        if (array_diff($missing, ['usuarios.asignar_roles'])) {
+        if (array_diff($missing, [
+            'usuarios.asignar_roles',
+            'materias.crear',
+            'materias.editar',
+            'materias.cambiar_estado',
+        ])) {
             throw new RuntimeException('Faltan permisos previos; no se infiere una instalación válida.');
         }
     }
@@ -139,7 +144,12 @@ class DesplegarMatrizRbac
             }
             $added = array_diff_key($currentById, $beforeById);
             foreach ($added as $permission) {
-                if ($permission['name'] !== 'usuarios.asignar_roles') {
+                if (! in_array($permission['name'], [
+                    'usuarios.asignar_roles',
+                    'materias.crear',
+                    'materias.editar',
+                    'materias.cambiar_estado',
+                ], true)) {
                     throw new RuntimeException('El snapshot no autoriza retirar esta definición.');
                 }
             }

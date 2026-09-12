@@ -49,7 +49,19 @@ class OrganizacionTest extends TestCase
 
     private function person(array $extra = []): array
     {
-        return array_replace(['nombres' => 'María José', 'apellidos' => "Muñoz O'Connor", 'ci' => null, 'celular' => null, 'correo_contacto' => null, 'cargo_id' => null], $extra);
+        $sequence = PersonalInstitucional::count() + 1;
+        $cargoId = array_key_exists('cargo_id', $extra)
+            ? $extra['cargo_id']
+            : Cargo::firstOrCreate(['nombre_cargo' => 'Personal base'], ['descripcion' => 'Cargo institucional para pruebas de Personal.'])->id_cargo;
+
+        return array_replace([
+            'nombres' => 'María José',
+            'apellidos' => "Muñoz O'Connor",
+            'ci' => (string) (8_100_000 + $sequence),
+            'celular' => (string) (71_000_000 + $sequence),
+            'correo_contacto' => "personal{$sequence}@example.test",
+            'cargo_id' => $cargoId,
+        ], $extra);
     }
 
     public function test_admin_creates_edits_and_inactivates_cargo(): void
@@ -58,7 +70,8 @@ class OrganizacionTest extends TestCase
         $cargo = Cargo::firstOrFail();
         $this->assertSame('Coordinador Académico', $cargo->nombre_cargo);
         $this->assertSame(EstadoCargo::ACTIVO, $cargo->estado);
-        $this->putJson($this->url('cargos.update', $cargo), ['nombre_cargo' => 'Coordinación Académica', 'descripcion' => null])->assertRedirect();
+        $this->putJson($this->url('cargos.update', $cargo), ['nombre_cargo' => 'Coordinación Académica', 'descripcion' => null])->assertUnprocessable()->assertJsonValidationErrors('descripcion');
+        $this->putJson($this->url('cargos.update', $cargo), ['nombre_cargo' => 'Coordinación Académica', 'descripcion' => 'Coordinación de la gestión académica institucional.'])->assertRedirect();
         $this->patchJson($this->url('cargos.estado', $cargo), ['estado' => 'inactivo'])->assertRedirect();
         $this->assertSame(EstadoCargo::INACTIVO, $cargo->fresh()->estado);
         foreach (['crear_cargo', 'editar_cargo', 'cambiar_estado_cargo'] as $action) {
@@ -82,7 +95,7 @@ class OrganizacionTest extends TestCase
     {
         $cargo = Cargo::factory()->create(['nombre_cargo' => 'Director de Carrera']);
         $this->postJson($this->url('cargos.store'), ['nombre_cargo' => ' director   DE carrera '])->assertUnprocessable()->assertJsonValidationErrors('nombre_cargo');
-        $this->putJson($this->url('cargos.update', $cargo), ['nombre_cargo' => 'DIRECTOR DE CARRERA'])->assertRedirect();
+        $this->putJson($this->url('cargos.update', $cargo), ['nombre_cargo' => 'DIRECTOR DE CARRERA', 'descripcion' => 'Dirección académica de una carrera institucional.'])->assertRedirect();
         $this->assertDatabaseCount('cargos', 1);
     }
 
@@ -103,12 +116,12 @@ class OrganizacionTest extends TestCase
         $this->assertSame($permissions, $this->admin->fresh()->getAllPermissions()->pluck('id')->all());
     }
 
-    public function test_personal_can_exist_without_user_or_cargo_and_does_not_match_email(): void
+    public function test_personal_can_exist_without_user_but_requires_cargo_and_does_not_match_email(): void
     {
         $this->postJson($this->url('personal.store'), $this->person(['correo_contacto' => strtoupper($this->admin->email)]))->assertRedirect();
         $record = PersonalInstitucional::firstOrFail();
         $this->assertNull($record->user_id);
-        $this->assertNull($record->cargo_id);
+        $this->assertNotNull($record->cargo_id);
         $this->assertNull($this->admin->fresh()->personalInstitucional);
         $this->assertSame($this->admin->email, $record->correo_contacto);
         $this->assertSame(EstadoPersonal::PENDIENTE, $record->estado);
@@ -132,7 +145,7 @@ class OrganizacionTest extends TestCase
         $this->assertDatabaseCount('personal_institucional', 0);
     }
 
-    public function test_personal_normalization_and_unique_optional_ci(): void
+    public function test_personal_normalization_and_unique_ci(): void
     {
         $data = $this->person(['nombres' => '  José   Ángel ', 'ci' => ' 1234567-1A LP ', 'celular' => '+591 (777)-12345', 'correo_contacto' => ' CONTACTO@EXAMPLE.COM ']);
         $this->postJson($this->url('personal.store'), $data)->assertRedirect();
@@ -142,9 +155,8 @@ class OrganizacionTest extends TestCase
         $this->assertSame('contacto@example.com', $record->correo_contacto);
         $this->postJson($this->url('personal.store'), $data)->assertUnprocessable()->assertJsonValidationErrors('ci');
         $this->putJson($this->url('personal.update', $record), $data)->assertRedirect();
-        $this->postJson($this->url('personal.store'), $this->person())->assertRedirect();
-        $this->postJson($this->url('personal.store'), $this->person())->assertRedirect();
-        $this->assertDatabaseCount('personal_institucional', 3);
+        $this->postJson($this->url('personal.store'), $this->person(['ci' => null]))->assertUnprocessable()->assertJsonValidationErrors('ci');
+        $this->assertDatabaseCount('personal_institucional', 1);
     }
 
     public function test_crud_cannot_write_user_identity_security_or_bypass_state_permission(): void

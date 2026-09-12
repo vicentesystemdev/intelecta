@@ -45,6 +45,9 @@ final class MatrizRbac
         'inscripciones.ver',
         'learning_analytics.ver',
         'materias.ver',
+        'materias.crear',
+        'materias.editar',
+        'materias.cambiar_estado',
         'matriculas-cuotas.crear',
         'matriculas-cuotas.editar',
         'matriculas-cuotas.ver',
@@ -115,6 +118,9 @@ final class MatrizRbac
         'bitacora.ver',
         'bitacora.exportar',
         'configuracion.ver',
+        'materias.crear',
+        'materias.editar',
+        'materias.cambiar_estado',
     ];
 
     public const TEACHER = [

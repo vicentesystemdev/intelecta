@@ -10,6 +10,7 @@ use App\Domains\Academico\Models\MatriculaAcademica;
 use App\Domains\Academico\Repositories\AcademicoRepository;
 use App\Domains\Academico\Repositories\HabilitacionAcademicaRepository;
 use App\Domains\Academico\Repositories\MatriculaCuotaRepository;
+use App\Support\Validation\AcademicDatePolicy;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -86,7 +87,9 @@ class MatriculaCuotaService
                 'id_post' => $inscripcion->id_post,
                 'id_prog' => $inscripcion->id_prog,
                 'id_grupo' => $inscripcion->id_grupo,
-                'fecha_matricula_mat' => $data->fechaMatricula ?? today()->toDateString(),
+                'codigo_mat' => $locked?->codigo_mat,
+                'fecha_matricula_mat' => $locked?->fecha_matricula_mat?->format('Y-m-d')
+                    ?? AcademicDatePolicy::todayString(),
             ];
 
             $saved = $locked
@@ -96,7 +99,11 @@ class MatriculaCuotaService
             if (! $saved->codigo_mat) {
                 $saved = $this->repository->update($saved, [
                     ...$attributes,
-                    'codigo_mat' => sprintf('MAT-%s-%05d', now()->format('Y'), $saved->id_mat),
+                    'codigo_mat' => sprintf(
+                        'MTR-%s-%06d',
+                        $saved->fecha_matricula_mat->format('Y'),
+                        $saved->id_mat,
+                    ),
                 ]);
             }
 

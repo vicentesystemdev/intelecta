@@ -34,6 +34,11 @@ final class InputRules
         return ['string', 'min:2', 'max:'.$max, new InputFormat('denomination')];
     }
 
+    public static function descriptiveText(int $min = 10, int $max = 2000): array
+    {
+        return ['string', 'min:'.$min, 'max:'.$max, new InputFormat('denomination')];
+    }
+
     public static function dateOrder(string $rule, mixed $reference, string $format = 'Y-m-d'): array
     {
         // A malformed companion field is reported by its own rule, never passed to DateTime.
@@ -60,9 +65,9 @@ final class InputRules
         return ['string', 'max:16', new InputFormat('phone')];
     }
 
-    public static function code(): array
+    public static function code(int $max = 60): array
     {
-        return ['string', 'min:2', 'max:60', new InputFormat('code')];
+        return ['string', 'min:2', 'max:'.$max, new InputFormat('code')];
     }
 
     public static function password(): array

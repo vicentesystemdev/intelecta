@@ -196,6 +196,82 @@ class PostulanteModuleTest extends TestCase
         ]);
     }
 
+    public function test_other_catalogs_are_created_as_real_relations_and_reused_by_normalized_name(): void
+    {
+        $payload = [
+            ...$this->validData(),
+            'id_col' => null,
+            'crear_otro_colegio' => true,
+            'otro_colegio_nombre' => '  Colegio   Nueva Esperanza  ',
+            'id_uni' => null,
+            'id_car' => null,
+            'crear_otra_universidad' => true,
+            'otra_universidad_nombre' => 'Universidad Técnica del Altiplano',
+            'otra_universidad_sigla' => 'UTA',
+            'crear_otra_carrera' => true,
+            'otra_carrera_nombre' => 'Ingeniería Mecatrónica',
+        ];
+
+        $this->actingAs($this->administrator)->postJson(route('postulantes.store'), $payload)->assertRedirect();
+        $postulante = Postulante::where('ci_post', '8765432')->firstOrFail();
+        $this->assertSame('Colegio Nueva Esperanza', $postulante->colegio->nombre_col);
+        $this->assertSame('Universidad Técnica del Altiplano', $postulante->carrera->universidad->nombre_uni);
+        $this->assertSame('Ingeniería Mecatrónica', $postulante->carrera->nombre_car);
+
+        $this->actingAs($this->administrator)->postJson(route('postulantes.store'), [
+            ...$this->validData(),
+            'ci_post' => '8765433',
+            'email_post' => 'otra@example.test',
+            'id_col' => null,
+            'crear_otro_colegio' => true,
+            'otro_colegio_nombre' => 'colegio nueva esperanza',
+        ])->assertRedirect();
+        $this->assertSame(1, Colegio::query()->whereRaw("LOWER(nombre_col) = 'colegio nueva esperanza'")->count());
+    }
+
+    public function test_other_catalog_validation_is_atomic_and_rejects_cross_university_career(): void
+    {
+        $otraUniversidad = Universidad::create(['nombre_uni' => 'Universidad B', 'sigla_uni' => 'UB', 'estado_uni' => 'activo']);
+        $otraCarrera = Carrera::create(['id_uni' => $otraUniversidad->id_uni, 'nombre_car' => 'Ingeniería Civil', 'estado_car' => 'activo']);
+
+        $universidadesAntes = Universidad::count();
+        $this->actingAs($this->administrator)->postJson(route('postulantes.store'), [
+            ...$this->validData(),
+            'id_uni' => null,
+            'id_car' => null,
+            'crear_otra_universidad' => true,
+            'otra_universidad_nombre' => 'Universidad sin carrera',
+        ])->assertUnprocessable()->assertJsonValidationErrors('id_car');
+        $this->assertSame($universidadesAntes, Universidad::count());
+
+        $this->actingAs($this->administrator)->postJson(route('postulantes.store'), [
+            ...$this->validData(),
+            'ci_post' => '8765433',
+            'email_post' => 'nueva.carrera@example.test',
+            'id_car' => null,
+            'crear_otra_carrera' => true,
+            'otra_carrera_nombre' => 'Ingeniería Ambiental',
+        ])->assertRedirect();
+        $postulanteNuevaCarrera = Postulante::where('ci_post', '8765433')->firstOrFail();
+        $this->assertSame($this->universidad->id_uni, $postulanteNuevaCarrera->carrera->id_uni);
+        $this->assertSame('Ingeniería Ambiental', $postulanteNuevaCarrera->carrera->nombre_car);
+
+        $this->actingAs($this->administrator)->postJson(route('postulantes.store'), [
+            ...$this->validData(),
+            'id_car' => $otraCarrera->id_car,
+        ])->assertUnprocessable()->assertJsonValidationErrors('id_car');
+
+        Postulante::create($this->validData());
+        $before = [Colegio::count(), Universidad::count(), Carrera::count()];
+        $this->actingAs($this->administrator)->postJson(route('postulantes.store'), [
+            ...$this->validData(),
+            'crear_otro_colegio' => true,
+            'id_col' => null,
+            'otro_colegio_nombre' => 'Colegio que no debe persistir',
+        ])->assertUnprocessable()->assertJsonValidationErrors('ci_post');
+        $this->assertSame($before, [Colegio::count(), Universidad::count(), Carrera::count()]);
+    }
+
     /**
      * @return array<string, mixed>
      */

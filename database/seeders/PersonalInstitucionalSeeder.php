@@ -29,5 +29,23 @@ class PersonalInstitucionalSeeder extends Seeder
                 'estado' => EstadoPersonal::ACTIVO, 'ci' => $ci, 'celular' => $celular, 'correo_contacto' => $correo,
             ]));
         }
+
+        foreach ([
+            'demo_personal_sin_tutor' => ['Elena', 'Mamani Flores', '7900001', '71000001', 'elena.mamani@avalancha.edu.bo'],
+            'demo_tutor_sin_asignacion' => ['Javier', 'Quispe Condori', '7900002', '71000002', 'javier.quispe@avalancha.edu.bo'],
+        ] as $key => [$nombres, $apellidos, $ci, $celular, $correo]) {
+            $this->personal[$key] = PersonalInstitucional::unguarded(fn () => PersonalInstitucional::firstOrCreate(
+                ['ci' => $ci],
+                [
+                    'user_id' => null,
+                    'nombres' => $nombres,
+                    'apellidos' => $apellidos,
+                    'cargo_id' => $cargos['docencia']->id_cargo,
+                    'estado' => EstadoPersonal::ACTIVO,
+                    'celular' => $celular,
+                    'correo_contacto' => $correo,
+                ],
+            ));
+        }
     }
 }

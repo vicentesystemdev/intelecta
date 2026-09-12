@@ -28,9 +28,9 @@ class OrganizacionSeederTest extends TestCase
         $this->seed(DatabaseSeeder::class);
         $this->assertDatabaseCount('users', 9);
         $this->assertDatabaseCount('cargos', 8);
-        $this->assertDatabaseCount('personal_institucional', 5);
-        $this->assertDatabaseCount('tutores_academicos', 4);
-        $this->assertSame(81, Permission::count());
+        $this->assertDatabaseCount('personal_institucional', 7);
+        $this->assertDatabaseCount('tutores_academicos', 5);
+        $this->assertSame(84, Permission::count());
         $rbac = app(DesplegarMatrizRbac::class);
         $this->assertSame($rbac->target(), $rbac->matrix($rbac->state()));
         $this->assertDatabaseCount('model_has_permissions', 0);
@@ -54,6 +54,9 @@ class OrganizacionSeederTest extends TestCase
         $this->assertSame(9, User::where('estado_cuenta', 'activa')->whereNotNull('email_verified_at')->count());
         $this->assertSame(3, Postulante::whereNotNull('user_id')->count());
         $this->assertSame(69, Postulante::whereNull('user_id')->count());
+        $this->assertDatabaseHas('personal_institucional', ['ci' => '7900001', 'user_id' => null]);
+        $this->assertDatabaseHas('tutores_academicos', ['personal_id' => PersonalInstitucional::where('ci', '7900002')->sole()->id_personal]);
+        $this->assertDatabaseMissing('asignaciones_tutores', ['id_tutor' => TutorAcademico::where('personal_id', PersonalInstitucional::where('ci', '7900002')->sole()->id_personal)->sole()->id_tutor]);
         Notification::assertNothingSent();
     }
 
@@ -69,7 +72,7 @@ class OrganizacionSeederTest extends TestCase
         $seed = app(PersonalInstitucionalSeeder::class);
         $seed->run($users, $positions->cargos);
         $seed->run($users, $positions->cargos);
-        $this->assertDatabaseCount('personal_institucional', 5);
+        $this->assertDatabaseCount('personal_institucional', 7);
         foreach ($users as $key => $user) {
             $profile = $user->fresh()->personalInstitucional;
             $this->assertSame($user->id, $profile->user_id);
@@ -77,6 +80,22 @@ class OrganizacionSeederTest extends TestCase
             $this->assertSame([], $user->fresh()->getRoleNames()->all());
             $this->assertSame('pendiente', $user->fresh()->estado_cuenta->value);
         }
+    }
+
+    public function test_cargo_fixture_reuses_a_normalized_equivalent_without_overwriting_history(): void
+    {
+        $legacy = Cargo::create([
+            'nombre_cargo' => '  rector  ',
+            'descripcion' => 'Descripción histórica que debe conservarse.',
+        ]);
+        $seed = app(CargosSeeder::class);
+
+        $seed->run();
+        $seed->run();
+
+        $this->assertDatabaseCount('cargos', 8);
+        $this->assertSame($legacy->id_cargo, $seed->cargos['rectorado']->id_cargo);
+        $this->assertSame('Descripción histórica que debe conservarse.', $legacy->fresh()->descripcion);
     }
 
     public function test_factories_are_explicit_and_do_not_create_accounts_implicitly(): void

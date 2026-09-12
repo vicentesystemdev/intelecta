@@ -8,6 +8,7 @@ use App\Domains\Academico\Models\InscripcionAcademica;
 use App\Domains\Academico\Services\AcademicoService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Institucional\InscripcionAcademicaRequest;
+use App\Support\Validation\AcademicDatePolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,6 +28,7 @@ class InscripcionAcademicaController extends Controller
         return Inertia::render('Institucional/Inscripciones/Index', [
             ...$service->inscripciones($filters),
             'filtros' => $filters,
+            'fechaHoy' => AcademicDatePolicy::todayString(),
         ]);
     }
 

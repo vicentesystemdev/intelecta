@@ -282,16 +282,16 @@ export default function Index({
                             onChange={(event) => form.setData('personal', { ...form.data.personal, [key]: event.target.value })}
                             error={form.errors[`personal.${key}`]} />
                     ))}
-                    <Field {...validationProps('especialidad_tutor')}
-                        label="Especialidad"
+                    <Field {...validationProps('especialidad_tutor', { required: !modal.tutor || Boolean(form.data.especialidad_tutor) })}
+                        label="Especialidad *"
                         value={form.data.especialidad_tutor}
                         onChange={(event) =>
                             form.setData('especialidad_tutor', event.target.value)
                         }
                         error={form.errors.especialidad_tutor}
                     />
-                    <Field {...validationProps('formacion_tutor')}
-                        label="Formación profesional"
+                    <Field {...validationProps('formacion_tutor', { required: !modal.tutor || Boolean(form.data.formacion_tutor), minLength: 10 })}
+                        label="Formación profesional *"
                         value={form.data.formacion_tutor}
                         onChange={(event) =>
                             form.setData('formacion_tutor', event.target.value)
@@ -300,7 +300,7 @@ export default function Index({
                         className="sm:col-span-2"
                     />
                     <SelectField {...validationProps('estado_tutor')}
-                        label="Estado"
+                        label="Estado *"
                         value={form.data.estado_tutor}
                         onChange={(event) =>
                             form.setData('estado_tutor', event.target.value)
@@ -310,8 +310,8 @@ export default function Index({
                         <option value="activo">Activo</option>
                         <option value="inactivo">Inactivo</option>
                     </SelectField>
-                    <TextareaField {...validationProps('experiencia_tutor')}
-                        label="Experiencia académica"
+                    <TextareaField {...validationProps('experiencia_tutor', { required: !modal.tutor || Boolean(form.data.experiencia_tutor), minLength: 10 })}
+                        label="Experiencia académica *"
                         value={form.data.experiencia_tutor}
                         onChange={(event) =>
                             form.setData('experiencia_tutor', event.target.value)

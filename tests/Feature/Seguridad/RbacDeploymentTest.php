@@ -25,7 +25,12 @@ class RbacDeploymentTest extends TestCase
     {
         parent::setUp();
         $this->snapshot = sys_get_temp_dir().'/intelecta-rbac-'.bin2hex(random_bytes(12)).'.json';
-        $old = array_diff(MatrizRbac::CATALOG, ['usuarios.asignar_roles']);
+        $old = array_diff(MatrizRbac::CATALOG, [
+            'usuarios.asignar_roles',
+            'materias.crear',
+            'materias.editar',
+            'materias.cambiar_estado',
+        ]);
         foreach ($old as $name) {
             Permission::findOrCreate($name, 'web');
         }
@@ -67,8 +72,8 @@ class RbacDeploymentTest extends TestCase
         $this->assertTrue($service->apply($this->snapshot));
         $this->assertSame($state, json_decode(file_get_contents($this->snapshot), true)['before']);
         $this->assertSame($service->target(), $service->matrix($service->state()));
-        $this->assertDatabaseCount('role_has_permissions', 143);
-        $this->assertDatabaseCount('permissions', 81);
+        $this->assertDatabaseCount('role_has_permissions', 146);
+        $this->assertDatabaseCount('permissions', 84);
         $this->assertFalse($service->apply($this->snapshot));
         $this->assertTrue($service->restore($this->snapshot));
         $this->assertSame($state, $service->state());

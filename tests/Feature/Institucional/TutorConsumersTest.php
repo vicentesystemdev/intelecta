@@ -39,7 +39,8 @@ class TutorConsumersTest extends TestCase
         $assignment = AsignacionTutor::where('id_tutor', $tutor->id_tutor)->whereNotNull('id_grupo')->firstOrFail();
         $this->postJson($url('asignacion-tutores.store'), [
             'id_tutor' => $tutor->id_tutor, 'id_prog' => $assignment->id_prog, 'id_grupo' => $assignment->id_grupo,
-            'estado_asig' => 'activo', 'fecha_inicio_asig' => today()->format('Y-m-d'), 'rol_asig' => 'Acompañamiento de prueba',
+            'estado_asig' => 'activo', 'fecha_inicio_asig' => today('America/La_Paz')->addDay()->format('Y-m-d'),
+            'fecha_fin_asig' => today('America/La_Paz')->addDays(2)->format('Y-m-d'), 'rol_asig' => 'Acompañamiento de prueba',
         ])->assertRedirect();
         $created = AsignacionTutor::latest('id_asig')->firstOrFail();
         $this->patchJson($url('asignacion-tutores.update', $created), [
@@ -50,7 +51,7 @@ class TutorConsumersTest extends TestCase
         $attendance = AsistenciaAcademica::where('id_tutor', $tutor->id_tutor)->firstOrFail();
         $payload = [
             'id_tutor' => $tutor->id_tutor, 'id_prog' => $attendance->id_prog, 'id_grupo' => $attendance->id_grupo,
-            'id_post' => $attendance->id_post, 'fecha_asist' => today()->format('Y-m-d'),
+            'id_post' => $attendance->id_post,
             'sesion_asist' => 'Sesión de prueba del Bloque cuatro', 'estado_asist' => 'presente',
         ];
         $this->postJson($url('asistencia.store'), $payload)->assertRedirect();

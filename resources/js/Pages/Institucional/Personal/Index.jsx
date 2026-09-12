@@ -11,7 +11,8 @@ import { Users } from 'lucide-react';
 import { useState } from 'react';
 
 const empty = { nombres: '', apellidos: '', ci: '', celular: '', correo_contacto: '', cargo_id: '' };
-const labels = { nombres: 'Nombres', apellidos: 'Apellidos', ci: 'C.I. (opcional)', celular: 'Celular (opcional)', correo_contacto: 'Correo de contacto (opcional)' };
+const labels = { nombres: 'Nombres', apellidos: 'Apellidos', ci: 'C.I.', celular: 'Celular', correo_contacto: 'Correo de contacto' };
+const progressiveRequired = new Set(['ci', 'celular', 'correo_contacto']);
 
 export default function Index({ personal, cargosActivos = [], filtros = {}, permisos = {} }) {
     const { flash } = usePage().props;
@@ -38,7 +39,7 @@ export default function Index({ personal, cargosActivos = [], filtros = {}, perm
     const retainInactive = currentCargo && !cargosActivos.some((cargo) => cargo.id_cargo === currentCargo.id_cargo);
     return <AdminLayout title="Personal Institucional" subtitle="Personas y cargos, independientes de la identidad digital y los permisos." wide>
         <Head title="Personal Institucional" />
-        <InstitutionalBanner eyebrow="Gestión institucional" title="Personal Institucional" description="Registre a la persona aunque todavía no tenga cargo o cuenta. La gestión de seguridad de User continúa a cargo de TI." icon={Users}
+        <InstitutionalBanner eyebrow="Gestión institucional" title="Personal Institucional" description="Registre los datos institucionales completos. La gestión de seguridad de User continúa a cargo de TI." icon={Users}
             action={permisos.crear && <button className={primaryButtonClass} onClick={() => open()}>Nuevo personal</button>} />
         <FlashMessage message={flash?.success} />
         <OrganizationFilters routeName="admin.institucional.personal.index" filters={filtros} personal />
@@ -61,9 +62,12 @@ export default function Index({ personal, cargosActivos = [], filtros = {}, perm
         <Pagination links={personal.links} />
         <ModalInstitucional open={Boolean(modal)} onOpenChange={(open) => !open && !form.processing && setModal(null)} title={modal?.person ? 'Editar datos institucionales' : 'Registrar personal'} description="Los nuevos registros quedan pendientes. Este formulario no modifica cuentas, contraseñas ni roles." size="lg">
             <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-                {Object.entries(labels).map(([field, label]) => <Field key={field} label={label} {...validationProps(field)} value={form.data[field]} onChange={(event) => form.setData(field, event.target.value)} error={form.errors[field]} />)}
-                <SelectField label="Cargo principal (opcional)" value={form.data.cargo_id} onChange={(event) => form.setData('cargo_id', event.target.value)} error={form.errors.cargo_id}>
-                    <option value="">Sin cargo acreditado</option>
+                {Object.entries(labels).map(([field, label]) => {
+                    const required = !modal?.person || !progressiveRequired.has(field) || Boolean(form.data[field]);
+                    return <Field key={field} label={`${label}${required ? ' *' : ''}`} {...validationProps(field, { required })} value={form.data[field]} onChange={(event) => form.setData(field, event.target.value)} error={form.errors[field]} />;
+                })}
+                <SelectField label={`Cargo principal${!modal?.person || Boolean(form.data.cargo_id) ? ' *' : ''}`} required={!modal?.person || Boolean(form.data.cargo_id)} value={form.data.cargo_id} onChange={(event) => form.setData('cargo_id', event.target.value)} error={form.errors.cargo_id}>
+                    <option value="">Seleccione un cargo institucional</option>
                     {cargosActivos.map((cargo) => <option key={cargo.id_cargo} value={cargo.id_cargo}>{cargo.nombre_cargo}</option>)}
                     {retainInactive && <option value={currentCargo.id_cargo}>{currentCargo.nombre_cargo} (inactivo, asignación actual)</option>}
                 </SelectField>

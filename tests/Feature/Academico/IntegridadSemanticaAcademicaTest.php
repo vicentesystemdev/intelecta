@@ -188,6 +188,9 @@ class IntegridadSemanticaAcademicaTest extends TestCase
                 'id_prog' => $this->programaA->id_prog,
                 'id_grupo' => $this->grupoB->id_grupo,
                 'titulo_sim' => 'Cruce inválido',
+                'fecha_sim' => today()->addDay()->toDateString(),
+                'hora_inicio_sim' => '08:00',
+                'hora_fin_sim' => '09:00',
                 'estado_sim' => 'programado',
             ],
         )->assertUnprocessable()->assertJsonValidationErrors('id_grupo');
@@ -270,8 +273,10 @@ class IntegridadSemanticaAcademicaTest extends TestCase
 
         $payload['id_prog'] = $this->programaB->id_prog;
         $payload['aula_grupo'] = 'A-10';
-        $this->putJson(route('admin.institucional.grupos.update', $libre), $payload)->assertRedirect();
-        $this->assertSame('A-10', $libre->fresh()->aula_grupo);
+        $this->putJson(route('admin.institucional.grupos.update', $libre), $payload)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('aula_grupo');
+        $this->assertNull($libre->fresh()->aula_grupo);
     }
 
     public function test_enrollment_context_is_immutable_with_dependencies_but_editable_without_them(): void
@@ -474,8 +479,6 @@ class IntegridadSemanticaAcademicaTest extends TestCase
             'id_prog' => $programa->id_prog,
             'id_grupo' => $grupo->id_grupo,
             'id_post' => $postulante->id_post,
-            'fecha_inscripcion' => today()->toDateString(),
-            'estado_inscripcion' => 'activo',
         ];
     }
 

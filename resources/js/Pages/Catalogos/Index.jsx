@@ -1,12 +1,20 @@
 import {
     EmptyInstitutional,
+    Field,
+    FlashMessage,
     InstitutionalBanner,
     InstitutionalStatus,
     MetricTile,
     cardClass,
+    primaryButtonClass,
+    secondaryButtonClass,
+    TextareaField,
 } from '@/Components/Institucional/InstitutionalUi';
+import ConfirmModal from '@/Components/ConfirmModal';
+import ModalInstitucional from '@/Components/ModalInstitucional';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head } from '@inertiajs/react';
+import { validationProps } from '@/lib/inputValidation';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import {
     BookOpenCheck,
     BriefcaseBusiness,
@@ -14,7 +22,10 @@ import {
     CheckCircle2,
     GraduationCap,
     Layers3,
+    Pencil,
+    Plus,
 } from 'lucide-react';
+import { useState } from 'react';
 
 const definitions = {
     carreras: {
@@ -46,8 +57,29 @@ const definitions = {
     },
 };
 
-export default function Index({ tipo, items = [], metricas = {} }) {
+export default function Index({ tipo, items = [], metricas = {}, permisos = {} }) {
+    const { flash } = usePage().props;
     const config = definitions[tipo] || definitions.carreras;
+    const [modal, setModal] = useState(null);
+    const [transition, setTransition] = useState(null);
+    const form = useForm({ codigo_mat: '', nombre_mat: '', descripcion_mat: '' });
+    const stateForm = useForm({ estado_mat: '' });
+    const openMateria = (materia = null) => {
+        form.clearErrors();
+        form.setData({
+            codigo_mat: materia?.codigo_mat || '',
+            nombre_mat: materia?.nombre_mat || '',
+            descripcion_mat: materia?.descripcion_mat || '',
+        });
+        setModal({ materia });
+    };
+    const submitMateria = (event) => {
+        event.preventDefault();
+        const options = { preserveScroll: true, onSuccess: () => setModal(null) };
+        modal.materia
+            ? form.put(route('admin.evaluaciones.materias.update', modal.materia.id_mat), options)
+            : form.post(route('admin.evaluaciones.materias.store'), options);
+    };
     const metrics = [
         [config.labels[0], metricas.total || 0, config.icon, 'primary'],
         [config.labels[1], metricas.activos || 0, CheckCircle2, 'success'],
@@ -63,7 +95,10 @@ export default function Index({ tipo, items = [], metricas = {} }) {
                 title={config.title}
                 description={config.description}
                 icon={config.icon}
+                action={tipo === 'materias' && permisos.crear ? <button className={primaryButtonClass} onClick={() => openMateria()}><Plus className="h-4 w-4" />Nueva materia</button> : null}
             />
+            <FlashMessage message={flash?.success} />
+            {stateForm.errors.estado_mat && <p role="alert" className="mb-4 text-sm font-semibold text-brand-danger">{stateForm.errors.estado_mat}</p>}
             <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {metrics.map(([label, value, icon, tone]) => (
                     <MetricTile key={label} label={label} value={value} icon={icon} tone={tone} />
@@ -114,6 +149,10 @@ export default function Index({ tipo, items = [], metricas = {} }) {
                                     </>
                                 )}
                             </div>
+                            {tipo === 'materias' && (permisos.editar || permisos.cambiarEstado) && <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-brand-border pt-4">
+                                {permisos.editar && <button className={secondaryButtonClass} onClick={() => openMateria(item)}><Pencil className="h-4 w-4" />Editar</button>}
+                                {permisos.cambiarEstado && <button className={secondaryButtonClass} onClick={() => { stateForm.clearErrors(); stateForm.setData('estado_mat', item.estado_mat === 'activo' ? 'inactivo' : 'activo'); setTransition(item); }}>{item.estado_mat === 'activo' ? 'Inactivar' : 'Activar'}</button>}
+                            </div>}
                         </article>
                     ))}
                 </div>
@@ -123,6 +162,15 @@ export default function Index({ tipo, items = [], metricas = {} }) {
                     description="No existe información disponible para este catálogo institucional."
                 />
             )}
+            {tipo === 'materias' && <ModalInstitucional open={Boolean(modal)} onOpenChange={(open) => !open && !form.processing && setModal(null)} title={modal?.materia ? 'Editar materia' : 'Nueva materia'} description="Catálogo curricular raíz. Los nuevos registros comienzan activos.">
+                <form onSubmit={submitMateria} className="space-y-4">
+                    <Field {...validationProps('codigo_mat', { required: true, minLength: 2, maxLength: 60 })} label="Código *" value={form.data.codigo_mat} onChange={(event) => form.setData('codigo_mat', event.target.value)} error={form.errors.codigo_mat} />
+                    <Field {...validationProps('nombre_mat', { required: true, minLength: 2, maxLength: 255 })} label="Nombre *" value={form.data.nombre_mat} onChange={(event) => form.setData('nombre_mat', event.target.value)} error={form.errors.nombre_mat} />
+                    <TextareaField {...validationProps('descripcion_mat', { required: true, minLength: 10, maxLength: 3000 })} label="Descripción *" value={form.data.descripcion_mat} onChange={(event) => form.setData('descripcion_mat', event.target.value)} error={form.errors.descripcion_mat} />
+                    <div className="flex justify-end gap-2"><button type="button" className={secondaryButtonClass} onClick={() => setModal(null)}>Cancelar</button><button className={primaryButtonClass} disabled={form.processing}>Guardar</button></div>
+                </form>
+            </ModalInstitucional>}
+            {tipo === 'materias' && <ConfirmModal open={Boolean(transition)} onOpenChange={(open) => !open && !stateForm.processing && setTransition(null)} title="Cambiar estado de la materia" message={`${transition?.nombre_mat || ''} → ${stateForm.data.estado_mat}`} supportingText="No se elimina historial. Una materia con áreas activas no puede inactivarse." processing={stateForm.processing} onConfirm={() => stateForm.patch(route('admin.evaluaciones.materias.estado', transition.id_mat), { preserveScroll: true, onSuccess: () => setTransition(null) })} />}
         </AdminLayout>
     );
 }

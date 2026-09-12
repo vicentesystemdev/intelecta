@@ -4,12 +4,26 @@ namespace App\Http\Requests\Institucional;
 
 use App\Domains\Academico\Enums\EstadoRegistro;
 use App\Http\Requests\NormalizedFormRequest;
+use App\Support\Validation\AcademicDatePolicy;
 use App\Support\Validation\InputRules;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class ProgramaAcademicoRequest extends NormalizedFormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        parent::prepareForValidation();
+
+        $programa = $this->route('programa');
+        if ($programa) {
+            $this->merge([
+                ...(! $this->exists('fecha_inicio_prog') ? ['fecha_inicio_prog' => $programa->fecha_inicio_prog?->format('Y-m-d')] : []),
+                ...(! $this->exists('fecha_fin_prog') ? ['fecha_fin_prog' => $programa->fecha_fin_prog?->format('Y-m-d')] : []),
+            ]);
+        }
+    }
+
     public function authorize(): bool
     {
         $permission = $this->isMethod('post')
@@ -35,26 +49,39 @@ class ProgramaAcademicoRequest extends NormalizedFormRequest
             'carrera_area_prog' => ['nullable', 'string', 'max:180'],
             'modalidad_prog' => ['nullable', 'string', 'max:100'],
             'fecha_inicio_prog' => [
-                'bail',
-                'nullable',
-                'date_format:Y-m-d', 'date',
-                function (string $attribute, mixed $value, \Closure $fail) use ($programa): void {
-                    if (! $value) {
-                        return;
-                    }
-
-                    $existingDate = $programa?->fecha_inicio_prog?->format('Y-m-d');
-                    $isHistoricalDateUnchanged = $existingDate && $existingDate === $value;
-
-                    if (Carbon::parse($value)->startOfDay()->lt(today()) && ! $isHistoricalDateUnchanged) {
-                        $fail('La fecha de inicio de un programa nuevo no puede ser anterior a la fecha actual.');
-                    }
-                },
+                $programa ? 'nullable' : 'required',
+                'date_format:Y-m-d',
             ],
-            'fecha_fin_prog' => ['nullable', 'date_format:Y-m-d', 'date', ...InputRules::dateOrder('after_or_equal:fecha_inicio_prog', $this->input('fecha_inicio_prog'))],
+            'fecha_fin_prog' => [$programa ? 'nullable' : 'required', 'date_format:Y-m-d'],
             'descripcion_prog' => ['nullable', 'string', 'max:3000'],
             'estado_prog' => ['required', Rule::enum(EstadoRegistro::class)],
         ];
+    }
+
+    public function after(): array
+    {
+        return [function (Validator $validator): void {
+            if ($validator->errors()->hasAny(['fecha_inicio_prog', 'fecha_fin_prog'])) {
+                return;
+            }
+
+            $programa = $this->route('programa');
+            $inicio = $this->input('fecha_inicio_prog');
+            $fin = $this->input('fecha_fin_prog');
+            $inicioAnterior = $programa?->fecha_inicio_prog?->format('Y-m-d');
+            $finAnterior = $programa?->fecha_fin_prog?->format('Y-m-d');
+            $reprograma = ! $programa || $inicio !== $inicioAnterior || $fin !== $finAnterior;
+
+            if (! $reprograma) {
+                return;
+            }
+            if (! $inicio || ! AcademicDatePolicy::isTomorrowOrLater($inicio)) {
+                $validator->errors()->add('fecha_inicio_prog', 'La fecha de inicio debe ser posterior a la fecha actual.');
+            }
+            if (! $fin || ($inicio && ! AcademicDatePolicy::isStrictlyAfter($fin, $inicio))) {
+                $validator->errors()->add('fecha_fin_prog', 'La fecha de finalización debe ser posterior a la fecha de inicio.');
+            }
+        }];
     }
 
     public function attributes(): array
@@ -77,11 +104,12 @@ class ProgramaAcademicoRequest extends NormalizedFormRequest
         return [
             'nombre_prog.required' => 'El nombre del programa académico es obligatorio.',
             'codigo_prog.unique' => 'El código indicado ya pertenece a otro programa académico.',
-            'fecha_inicio_prog.date' => 'La fecha de inicio no tiene un formato válido.',
-            'fecha_fin_prog.date' => 'La fecha de finalización no tiene un formato válido.',
-            'fecha_fin_prog.after_or_equal' => 'La fecha de finalización debe ser posterior o igual a la fecha de inicio.',
+            'fecha_inicio_prog.date_format' => 'La fecha de inicio no tiene un formato válido.',
+            'fecha_inicio_prog.required' => 'La fecha de inicio es obligatoria.',
+            'fecha_fin_prog.date_format' => 'La fecha de finalización no tiene un formato válido.',
+            'fecha_fin_prog.required' => 'La fecha de finalización es obligatoria.',
             'estado_prog.required' => 'Seleccione el estado del programa académico.',
-            'estado_prog.in' => 'Seleccione un estado válido para el programa académico.',
+            'estado_prog.enum' => 'Seleccione un estado válido para el programa académico.',
         ];
     }
 }

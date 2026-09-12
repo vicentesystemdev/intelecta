@@ -12,7 +12,7 @@ final readonly class GrupoAcademicoData
         public ?string $aula,
         public int $capacidad,
         public ?string $nivel,
-        public ?string $tutorResponsable,
+        public ?int $tutorResponsableId,
         public string $estado,
     ) {}
 
@@ -26,7 +26,7 @@ final readonly class GrupoAcademicoData
             aula: self::nullable($data['aula_grupo'] ?? null),
             capacidad: (int) ($data['capacidad_grupo'] ?? 30),
             nivel: self::nullable($data['nivel_grupo'] ?? null),
-            tutorResponsable: self::nullable($data['tutor_responsable_grupo'] ?? null),
+            tutorResponsableId: filled($data['id_tutor_responsable'] ?? null) ? (int) $data['id_tutor_responsable'] : null,
             estado: $data['estado_grupo'] ?? 'activo',
         );
     }
@@ -41,7 +41,7 @@ final readonly class GrupoAcademicoData
             'aula_grupo' => $this->aula,
             'capacidad_grupo' => $this->capacidad,
             'nivel_grupo' => $this->nivel,
-            'tutor_responsable_grupo' => $this->tutorResponsable,
+            'id_tutor_responsable' => $this->tutorResponsableId,
             'estado_grupo' => $this->estado,
         ];
     }

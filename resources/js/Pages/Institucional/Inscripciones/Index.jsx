@@ -1,4 +1,5 @@
 import { validationProps } from '@/lib/inputValidation';
+import { formatDateLatam } from '@/lib/dateOnly';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import Pagination from '@/Components/Pagination';
 import {
@@ -18,19 +19,10 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { ArrowRight, ClipboardList, Pencil, Plus, Search, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-const localToday = () => {
-    const date = new Date();
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 10);
-};
-
 const emptyEnrollment = {
     id_prog: '',
     id_grupo: '',
     id_post: '',
-    fecha_inscripcion: localToday(),
-    estado_inscripcion: 'activo',
     observacion_inscripcion: '',
 };
 
@@ -40,6 +32,7 @@ export default function Index({
     grupos = [],
     postulantes = [],
     filtros = {},
+    fechaHoy,
 }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
@@ -74,7 +67,6 @@ export default function Index({
                       id_prog: String(inscripcion.id_prog),
                       id_grupo: inscripcion.id_grupo ? String(inscripcion.id_grupo) : '',
                       id_post: String(inscripcion.id_post),
-                      fecha_inscripcion: inscripcion.fecha_inscripcion?.slice(0, 10) || '',
                       estado_inscripcion: inscripcion.estado_inscripcion,
                       observacion_inscripcion: inscripcion.observacion_inscripcion || '',
                   }
@@ -415,17 +407,14 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field {...validationProps('fecha_inscripcion')}
-                        type="date"
-                        label="Fecha de inscripción"
-                        max={localToday()}
-                        value={form.data.fecha_inscripcion}
-                        onChange={(event) =>
-                            form.setData('fecha_inscripcion', event.target.value)
-                        }
-                        error={form.errors.fecha_inscripcion}
-                    />
-                    <SelectField {...validationProps('estado_inscripcion')}
+                    <div className="rounded-xl border border-brand-border bg-brand-bg px-4 py-3">
+                        <p className="text-xs font-bold text-text-muted">Fecha de inscripción</p>
+                        <p className="mt-1 font-semibold text-text-main">
+                            {formatDateLatam((formModal.inscripcion?.fecha_inscripcion || fechaHoy || '').slice(0, 10))}
+                        </p>
+                        <p className="mt-1 text-xs text-text-muted">Asignada automáticamente por el servidor.</p>
+                    </div>
+                    {formModal.inscripcion && <SelectField {...validationProps('estado_inscripcion')}
                         label="Estado"
                         value={form.data.estado_inscripcion}
                         onChange={(event) =>
@@ -435,7 +424,7 @@ export default function Index({
                     >
                         <option value="activo">Activa</option>
                         <option value="inactivo">Inactiva</option>
-                    </SelectField>
+                    </SelectField>}
                     <TextareaField {...validationProps('observacion_inscripcion')}
                         label="Observación"
                         value={form.data.observacion_inscripcion}

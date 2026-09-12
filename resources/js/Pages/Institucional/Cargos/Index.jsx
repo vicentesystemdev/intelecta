@@ -49,8 +49,8 @@ export default function Index({ cargos, filtros = {}, permisos = {} }) {
         <Pagination links={cargos.links} />
         <ModalInstitucional open={Boolean(modal)} onOpenChange={(open) => !open && !form.processing && setModal(null)} title={modal?.cargo ? 'Editar cargo' : 'Nuevo cargo'} description="La denominación es única sin distinguir mayúsculas. Los cargos nuevos comienzan activos.">
             <form onSubmit={submit} className="space-y-4">
-                <Field label="Nombre del cargo" {...validationProps('nombre_cargo')} value={form.data.nombre_cargo} onChange={(event) => form.setData('nombre_cargo', event.target.value)} error={form.errors.nombre_cargo} />
-                <TextareaField label="Descripción (opcional)" maxLength={2000} value={form.data.descripcion} onChange={(event) => form.setData('descripcion', event.target.value)} error={form.errors.descripcion} />
+                <Field label="Nombre del cargo *" {...validationProps('nombre_cargo')} value={form.data.nombre_cargo} onChange={(event) => form.setData('nombre_cargo', event.target.value)} error={form.errors.nombre_cargo} />
+                <TextareaField label="Descripción *" required minLength={10} maxLength={2000} value={form.data.descripcion} onChange={(event) => form.setData('descripcion', event.target.value)} error={form.errors.descripcion} />
                 <div className="flex justify-end gap-2"><button type="button" className={secondaryButtonClass} disabled={form.processing} onClick={() => setModal(null)}>Cancelar</button><button className={primaryButtonClass} disabled={form.processing}>Guardar</button></div>
             </form>
         </ModalInstitucional>

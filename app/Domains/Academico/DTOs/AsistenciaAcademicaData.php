@@ -9,7 +9,7 @@ final readonly class AsistenciaAcademicaData
         public int $grupoId,
         public int $postulanteId,
         public ?int $tutorId,
-        public string $fecha,
+        public ?string $fecha,
         public string $sesion,
         public string $estado,
         public ?string $observacion,
@@ -22,7 +22,7 @@ final readonly class AsistenciaAcademicaData
             grupoId: (int) $data['id_grupo'],
             postulanteId: (int) $data['id_post'],
             tutorId: filled($data['id_tutor'] ?? null) ? (int) $data['id_tutor'] : null,
-            fecha: $data['fecha_asist'],
+            fecha: filled($data['fecha_asist'] ?? null) ? (string) $data['fecha_asist'] : null,
             sesion: trim($data['sesion_asist'] ?? '') ?: 'General',
             estado: $data['estado_asist'] ?? 'presente',
             observacion: filled($data['observacion_asist'] ?? null)
@@ -44,6 +44,20 @@ final readonly class AsistenciaAcademicaData
             postulanteId: $this->postulanteId,
             tutorId: $tutorId,
             fecha: $this->fecha,
+            sesion: $this->sesion,
+            estado: $this->estado,
+            observacion: $this->observacion,
+        );
+    }
+
+    public function withDate(string $fecha): self
+    {
+        return new self(
+            programaId: $this->programaId,
+            grupoId: $this->grupoId,
+            postulanteId: $this->postulanteId,
+            tutorId: $this->tutorId,
+            fecha: $fecha,
             sesion: $this->sesion,
             estado: $this->estado,
             observacion: $this->observacion,

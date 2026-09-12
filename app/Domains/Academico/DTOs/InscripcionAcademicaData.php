@@ -36,4 +36,16 @@ final readonly class InscripcionAcademicaData
             'observacion_inscripcion' => $this->observacion,
         ];
     }
+
+    public function withAdministrativeValues(?string $fechaInscripcion, string $estado): self
+    {
+        return new self(
+            programaId: $this->programaId,
+            grupoId: $this->grupoId,
+            postulanteId: $this->postulanteId,
+            fechaInscripcion: $fechaInscripcion,
+            estado: $estado,
+            observacion: $this->observacion,
+        );
+    }
 }

@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'aula_grupo',
     'capacidad_grupo',
     'nivel_grupo',
+    'id_tutor_responsable',
     'tutor_responsable_grupo',
     'estado_grupo',
 ])]
@@ -38,6 +39,11 @@ class GrupoAcademico extends Model
     public function programa(): BelongsTo
     {
         return $this->belongsTo(ProgramaAcademico::class, 'id_prog', 'id_prog');
+    }
+
+    public function tutorResponsable(): BelongsTo
+    {
+        return $this->belongsTo(TutorAcademico::class, 'id_tutor_responsable', 'id_tutor')->withTrashed();
     }
 
     public function inscripciones(): HasMany

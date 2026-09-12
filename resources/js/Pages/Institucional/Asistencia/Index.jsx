@@ -1,4 +1,5 @@
 import InputError from '@/Components/InputError';
+import { formatDateLatam } from '@/lib/dateOnly';
 import { validationProps } from '@/lib/inputValidation';
 import {
     EmptyInstitutional,
@@ -49,7 +50,6 @@ const emptyAttendance = {
     id_grupo: '',
     id_post: '',
     id_tutor: '',
-    fecha_asist: '',
     sesion_asist: 'General',
     estado_asist: 'presente',
     observacion_asist: '',
@@ -85,6 +85,7 @@ export default function Index({
     sesionSeleccionada = 'General',
     filtros = {},
     permisos = {},
+    fechaHoy,
 }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
@@ -101,7 +102,6 @@ export default function Index({
         id_prog: filtros.id_prog || '',
         id_grupo: filtros.id_grupo || '',
         id_tutor: filtros.id_tutor || '',
-        fecha_asist: filtros.fecha_asist || '',
         sesion_asist: sesionSeleccionada,
         registros: [],
     });
@@ -148,7 +148,6 @@ export default function Index({
             id_prog: filtros.id_prog || '',
             id_grupo: filtros.id_grupo || '',
             id_tutor: filtros.id_tutor || '',
-            fecha_asist: filtros.fecha_asist || '',
             sesion_asist: sesionSeleccionada,
             registros: listaGrupo
                 .filter((item) => permisos.editar || !item.asistencia)
@@ -205,7 +204,6 @@ export default function Index({
                       id_grupo: String(asistencia.id_grupo),
                       id_post: String(asistencia.id_post),
                       id_tutor: String(asistencia.id_tutor || ''),
-                      fecha_asist: asistencia.fecha_asist?.slice(0, 10) || '',
                       sesion_asist: asistencia.sesion_asist || 'General',
                       estado_asist: asistencia.estado_asist,
                       observacion_asist: asistencia.observacion_asist || '',
@@ -215,7 +213,6 @@ export default function Index({
                       id_prog: filters.id_prog,
                       id_grupo: filters.id_grupo,
                       id_tutor: filters.id_tutor,
-                      fecha_asist: filters.fecha_asist,
                       sesion_asist: filters.sesion_asist || 'General',
                   },
         );
@@ -398,8 +395,8 @@ export default function Index({
                             Consolidación de la sesión
                         </h2>
                         <p className="mt-1 text-sm leading-6 text-text-muted">
-                            Seleccione grupo y fecha en los filtros para cargar a
-                            los postulantes inscritos.
+                            Seleccione un grupo para cargar sus postulantes. La
+                            fecha de hoy se asigna automáticamente.
                         </p>
                     </div>
                     {groupForm.data.registros.length > 0 && (
@@ -419,12 +416,10 @@ export default function Index({
                 </div>
 
                                 {(groupForm.errors.id_grupo ||
-                                    groupForm.errors.fecha_asist ||
                                     groupForm.errors.sesion_asist ||
                                     groupForm.errors.registros) && (
                                     <div className="mb-4 rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-3 text-sm font-medium text-brand-danger">
                                         {groupForm.errors.id_grupo ||
-                                            groupForm.errors.fecha_asist ||
                                             groupForm.errors.sesion_asist ||
                                             groupForm.errors.registros}
                                     </div>
@@ -728,16 +723,11 @@ export default function Index({
                             </option>
                         ))}
                     </SelectField>
-                    <Field {...validationProps('fecha_asist')}
-                        type="date"
-                        max={localToday()}
-                        label="Fecha"
-                        value={individual.data.fecha_asist}
-                        onChange={(event) =>
-                            individual.setData('fecha_asist', event.target.value)
-                        }
-                        error={individual.errors.fecha_asist}
-                    />
+                    <div className="rounded-xl border border-brand-border bg-brand-bg px-4 py-3">
+                        <p className="text-xs font-bold text-text-muted">Fecha de asistencia</p>
+                        <p className="mt-1 font-semibold text-text-main">{formatDateLatam((modal.asistencia?.fecha_asist || fechaHoy || '').slice(0, 10))}</p>
+                        <p className="mt-1 text-xs text-text-muted">Asignada automáticamente por el servidor.</p>
+                    </div>
                     <Field {...validationProps('sesion_asist')}
                         label="Sesión académica"
                         value={individual.data.sesion_asist}

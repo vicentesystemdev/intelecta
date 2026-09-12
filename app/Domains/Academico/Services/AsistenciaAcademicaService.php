@@ -7,6 +7,7 @@ use App\Domains\Academico\Models\AsistenciaAcademica;
 use App\Domains\Academico\Models\GrupoAcademico;
 use App\Domains\Academico\Repositories\AsistenciaAcademicaRepository;
 use App\Models\User;
+use App\Support\Validation\AcademicDatePolicy;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -26,11 +27,11 @@ class AsistenciaAcademicaService
         $sesion = trim($filters['sesion_asist'] ?? '') ?: 'General';
         $roster = collect();
 
-        if (! empty($filters['id_grupo']) && ! empty($filters['fecha_asist'])) {
+        if (! empty($filters['id_grupo'])) {
             $roster = $this->repository->roster(
                 $user,
                 (int) $filters['id_grupo'],
-                $filters['fecha_asist'],
+                AcademicDatePolicy::todayString(),
                 $sesion,
             );
         }
@@ -83,9 +84,6 @@ class AsistenciaAcademicaService
                 throw new AuthorizationException('El postulante no pertenece al ámbito académico permitido.');
             }
 
-            $tutorId = $this->tutorPermitido($user, $data->tutorId, $permission, $tutorAutoridad);
-            $normalized = $data->withContext($grupo->id_prog, $tutorId);
-
             $lockedAttendance = null;
             if ($asistencia) {
                 $lockedAttendance = AsistenciaAcademica::query()
@@ -96,6 +94,11 @@ class AsistenciaAcademicaService
                     throw new AuthorizationException('La asistencia no pertenece al ámbito académico permitido.');
                 }
             }
+
+            $tutorId = $this->tutorPermitido($user, $data->tutorId, $permission, $tutorAutoridad);
+            $fecha = $lockedAttendance?->fecha_asist?->format('Y-m-d')
+                ?? AcademicDatePolicy::todayString();
+            $normalized = $data->withContext($grupo->id_prog, $tutorId)->withDate($fecha);
 
             $duplicate = AsistenciaAcademica::withTrashed()
                 ->where('id_grupo', $normalized->grupoId)
@@ -124,6 +127,7 @@ class AsistenciaAcademicaService
         }
 
         return DB::transaction(function () use ($data, $user): Collection {
+            $data['fecha_asist'] = AcademicDatePolicy::todayString();
             $groupId = (int) $data['id_grupo'];
             $tutorAutoridad = $this->ambito->bloquearAutoridadDeGrupo(
                 $user,

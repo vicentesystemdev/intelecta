@@ -1,4 +1,4 @@
-import { validationProps } from '@/lib/inputValidation';
+import { constraintsWhenChanged, validationProps } from '@/lib/inputValidation';
 import ModalInstitucional from '@/Components/ModalInstitucional';
 import Pagination from '@/Components/Pagination';
 import {
@@ -23,21 +23,24 @@ const emptyGroup = {
     codigo_grupo: '',
     turno_grupo: '',
     aula_grupo: '',
-    capacidad_grupo: 30,
+    capacidad_grupo: 20,
     nivel_grupo: '',
-    tutor_responsable_grupo: '',
+    id_tutor_responsable: '',
     estado_grupo: 'activo',
 };
 
 const assignedTutorName = (grupo) => {
+    const responsable = grupo?.tutor_responsable;
     const tutor = grupo?.asignacion_tutor_activa?.tutor;
 
-    return tutor
+    return responsable
+        ? `${responsable.personal?.nombres} ${responsable.personal?.apellidos}`.trim()
+        : tutor
         ? `${tutor.personal?.nombres} ${tutor.personal?.apellidos}`.trim()
         : grupo?.tutor_responsable_grupo || 'Sin tutor asignado';
 };
 
-export default function Index({ grupos, programas = [], filtros = {}, permisos = {} }) {
+export default function Index({ grupos, programas = [], tutores = [], filtros = {}, permisos = {} }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
         id_prog: filtros.id_prog || '',
@@ -51,7 +54,17 @@ export default function Index({ grupos, programas = [], filtros = {}, permisos =
 
     const openForm = (grupo = null) => {
         form.clearErrors();
-        form.setData(grupo ? { ...emptyGroup, ...grupo, id_prog: String(grupo.id_prog) } : emptyGroup);
+        form.setData(grupo ? {
+            id_prog: String(grupo.id_prog),
+            nombre_grupo: grupo.nombre_grupo || '',
+            codigo_grupo: grupo.codigo_grupo || '',
+            turno_grupo: grupo.turno_grupo || '',
+            aula_grupo: grupo.aula_grupo || '',
+            capacidad_grupo: grupo.capacidad_grupo || 20,
+            nivel_grupo: grupo.nivel_grupo || '',
+            id_tutor_responsable: grupo.id_tutor_responsable ? String(grupo.id_tutor_responsable) : '',
+            estado_grupo: grupo.estado_grupo || 'activo',
+        } : emptyGroup);
         setFormModal({ open: true, grupo });
     };
 
@@ -75,8 +88,8 @@ export default function Index({ grupos, programas = [], filtros = {}, permisos =
             <FlashMessage message={flash?.success} />
             <form onSubmit={filter} className={`${cardClass} mb-5 grid gap-3 p-4 md:grid-cols-5`}>
                 <select className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main" value={filters.id_prog} onChange={(e) => setFilters({ ...filters, id_prog: e.target.value })}><option value="">Todos los programas</option>{programas.map((programa) => <option key={programa.id_prog} value={programa.id_prog}>{programa.nombre_prog}</option>)}</select>
-                <input className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main" placeholder="Turno" value={filters.turno_grupo} onChange={(e) => setFilters({ ...filters, turno_grupo: e.target.value })} />
-                <input className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main" placeholder="Nivel" value={filters.nivel_grupo} onChange={(e) => setFilters({ ...filters, nivel_grupo: e.target.value })} />
+                <select className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main" value={filters.turno_grupo} onChange={(e) => setFilters({ ...filters, turno_grupo: e.target.value })}><option value="">Todos los turnos</option>{['Mañana', 'Tarde', 'Noche', 'Fin de Semana'].map((turno) => <option key={turno} value={turno}>{turno}</option>)}</select>
+                <select className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main" value={filters.nivel_grupo} onChange={(e) => setFilters({ ...filters, nivel_grupo: e.target.value })}><option value="">Todos los niveles</option><option value="Preuniversitario">Preuniversitario</option></select>
                 <select className="rounded-xl border-brand-border bg-brand-card text-sm text-text-main" value={filters.estado_grupo} onChange={(e) => setFilters({ ...filters, estado_grupo: e.target.value })}><option value="">Todos los estados</option><option value="activo">Activos</option><option value="inactivo">Inactivos</option></select>
                 <button className={primaryButtonClass}>Filtrar</button>
             </form>
@@ -96,15 +109,30 @@ export default function Index({ grupos, programas = [], filtros = {}, permisos =
 
             <ModalInstitucional open={formModal.open} onOpenChange={(open) => setFormModal((current) => ({ ...current, open }))} title={formModal.grupo ? 'Editar grupo académico' : 'Nuevo grupo académico'} description="Defina programa, cupos, turno y tutor responsable." size="lg">
                 <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-                    <SelectField {...validationProps('id_prog', { required: true })} label="Programa académico" value={form.data.id_prog} onChange={(e) => form.setData('id_prog', e.target.value)} error={form.errors.id_prog} className="sm:col-span-2"><option value="">Seleccione un programa</option>{programas.map((programa) => <option key={programa.id_prog} value={programa.id_prog}>{programa.nombre_prog}</option>)}</SelectField>
-                    <Field {...validationProps('nombre_grupo')} label="Nombre del grupo" value={form.data.nombre_grupo} onChange={(e) => form.setData('nombre_grupo', e.target.value)} error={form.errors.nombre_grupo} />
-                    <Field {...validationProps('codigo_grupo')} label="Código" value={form.data.codigo_grupo} onChange={(e) => form.setData('codigo_grupo', e.target.value)} error={form.errors.codigo_grupo} />
-                    <Field {...validationProps('turno_grupo')} label="Turno" value={form.data.turno_grupo} onChange={(e) => form.setData('turno_grupo', e.target.value)} error={form.errors.turno_grupo} />
-                    <Field {...validationProps('aula_grupo')} label="Aula" value={form.data.aula_grupo} onChange={(e) => form.setData('aula_grupo', e.target.value)} error={form.errors.aula_grupo} />
-                    <Field {...validationProps('capacidad_grupo')} type="number" min="1" label="Capacidad" value={form.data.capacidad_grupo} onChange={(e) => form.setData('capacidad_grupo', e.target.value)} error={form.errors.capacidad_grupo} />
-                    <Field {...validationProps('nivel_grupo')} label="Nivel" value={form.data.nivel_grupo} onChange={(e) => form.setData('nivel_grupo', e.target.value)} error={form.errors.nivel_grupo} />
-                    <Field {...validationProps('tutor_responsable_grupo')} label="Tutor responsable" value={form.data.tutor_responsable_grupo} onChange={(e) => form.setData('tutor_responsable_grupo', e.target.value)} error={form.errors.tutor_responsable_grupo} />
-                    <SelectField {...validationProps('estado_grupo')} label="Estado" value={form.data.estado_grupo} onChange={(e) => form.setData('estado_grupo', e.target.value)} error={form.errors.estado_grupo}><option value="activo">Activo</option><option value="inactivo">Inactivo</option></SelectField>
+                    <SelectField {...validationProps('id_prog', { required: true })} label="Programa académico *" value={form.data.id_prog} onChange={(e) => form.setData('id_prog', e.target.value)} error={form.errors.id_prog} className="sm:col-span-2"><option value="">Seleccione un programa</option>{programas.map((programa) => <option key={programa.id_prog} value={programa.id_prog} disabled={programa.estado_prog !== 'activo' && String(formModal.grupo?.id_prog || '') !== String(programa.id_prog)}>{programa.nombre_prog}{programa.estado_prog !== 'activo' ? ' · No disponible' : ''}</option>)}</SelectField>
+                    <Field {...validationProps('nombre_grupo')} label="Nombre del grupo *" value={form.data.nombre_grupo} onChange={(e) => form.setData('nombre_grupo', e.target.value)} error={form.errors.nombre_grupo} />
+                    <Field {...validationProps('codigo_grupo', { required: !formModal.grupo || Boolean(form.data.codigo_grupo) })} label="Código *" value={form.data.codigo_grupo} onChange={(e) => form.setData('codigo_grupo', e.target.value)} error={form.errors.codigo_grupo} />
+                    <SelectField {...validationProps('turno_grupo', { required: !formModal.grupo || Boolean(form.data.turno_grupo) })} label="Turno *" value={form.data.turno_grupo} onChange={(e) => form.setData('turno_grupo', e.target.value)} error={form.errors.turno_grupo}><option value="">Seleccione un turno</option>{['Mañana', 'Tarde', 'Noche', 'Fin de Semana'].map((turno) => <option key={turno} value={turno}>{turno}</option>)}{formModal.grupo && form.data.turno_grupo && !['Mañana', 'Tarde', 'Noche', 'Fin de Semana'].includes(form.data.turno_grupo) && <option value={form.data.turno_grupo}>{form.data.turno_grupo} (legacy)</option>}</SelectField>
+                    <Field {...validationProps('aula_grupo', {
+                        required: !formModal.grupo || Boolean(form.data.aula_grupo),
+                        ...constraintsWhenChanged(formModal.grupo?.aula_grupo, form.data.aula_grupo, {
+                            maxLength: 80,
+                            inputMode: 'numeric',
+                            pattern: '[0-9]+',
+                        }),
+                    })} type="text" label="Aula *" placeholder="Ej. 214" value={form.data.aula_grupo} onChange={(e) => form.setData('aula_grupo', e.target.value)} error={form.errors.aula_grupo} />
+                    <Field {...validationProps('capacidad_grupo', {
+                        required: true,
+                        ...constraintsWhenChanged(formModal.grupo?.capacidad_grupo, form.data.capacidad_grupo, {
+                            inputMode: 'numeric',
+                            min: 1,
+                            max: 20,
+                            step: 1,
+                        }),
+                    })} type="number" label="Capacidad *" value={form.data.capacidad_grupo} onChange={(e) => form.setData('capacidad_grupo', e.target.value)} error={form.errors.capacidad_grupo} />
+                    <SelectField {...validationProps('nivel_grupo', { required: !formModal.grupo || Boolean(form.data.nivel_grupo) })} label="Nivel *" value={form.data.nivel_grupo} onChange={(e) => form.setData('nivel_grupo', e.target.value)} error={form.errors.nivel_grupo}><option value="">Seleccione un nivel</option><option value="Preuniversitario">Preuniversitario</option>{formModal.grupo && form.data.nivel_grupo && form.data.nivel_grupo !== 'Preuniversitario' && <option value={form.data.nivel_grupo}>{form.data.nivel_grupo} (legacy)</option>}</SelectField>
+                    <SelectField {...validationProps('id_tutor_responsable')} label="Tutor responsable" value={form.data.id_tutor_responsable} onChange={(e) => form.setData('id_tutor_responsable', e.target.value)} error={form.errors.id_tutor_responsable}><option value="">Sin tutor responsable</option>{tutores.map((tutor) => <option key={tutor.id_tutor} value={tutor.id_tutor}>{`${tutor.personal?.nombres || ''} ${tutor.personal?.apellidos || ''}`.trim()} · {tutor.especialidad_tutor}</option>)}</SelectField>
+                    <SelectField {...validationProps('estado_grupo')} label="Estado *" value={form.data.estado_grupo} onChange={(e) => form.setData('estado_grupo', e.target.value)} error={form.errors.estado_grupo}><option value="activo">Activo</option><option value="inactivo">Inactivo</option></SelectField>
                     <div className="flex justify-end gap-3 border-t border-brand-border pt-4 sm:col-span-2"><button type="button" className={secondaryButtonClass} onClick={() => setFormModal({ open: false, grupo: null })}>Cancelar</button><button className={primaryButtonClass} disabled={form.processing}>{formModal.grupo ? 'Guardar cambios' : 'Crear grupo'}</button></div>
                 </form>
             </ModalInstitucional>

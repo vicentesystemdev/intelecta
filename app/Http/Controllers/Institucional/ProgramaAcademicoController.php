@@ -8,6 +8,7 @@ use App\Domains\Academico\Models\ProgramaAcademico;
 use App\Domains\Academico\Services\AcademicoService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Institucional\ProgramaAcademicoRequest;
+use App\Support\Validation\AcademicDatePolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,6 +28,7 @@ class ProgramaAcademicoController extends Controller
         return Inertia::render('Institucional/Programas/Index', [
             ...$service->programas($filters),
             'filtros' => $filters,
+            'fechaMinimaPlanificacion' => AcademicDatePolicy::tomorrowString(),
         ]);
     }
 

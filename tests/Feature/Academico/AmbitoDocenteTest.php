@@ -227,7 +227,6 @@ class AmbitoDocenteTest extends TestCase
             'id_grupo' => $this->assignmentA->id_grupo,
             'id_post' => $studentA->id_post,
             'id_tutor' => $this->assignmentA->id_tutor,
-            'fecha_asist' => today()->format('Y-m-d'),
             'sesion_asist' => 'Bloque 6 - aislamiento',
             'estado_asist' => 'presente',
         ];
@@ -273,7 +272,6 @@ class AmbitoDocenteTest extends TestCase
             'id_prog' => $this->assignmentA->id_prog,
             'id_grupo' => $this->assignmentA->id_grupo,
             'id_tutor' => $this->assignmentA->id_tutor,
-            'fecha_asist' => $payload['fecha_asist'],
             'sesion_asist' => $payload['sesion_asist'],
             'registros' => [[
                 'id_post' => $studentA->id_post,

@@ -1,4 +1,5 @@
 import { validationProps } from '@/lib/inputValidation';
+import { clearInvalidEndDate, nextCivilDate } from '@/lib/academicDates';
 import {
     EmptyInstitutional,
     Field,
@@ -47,19 +48,13 @@ const formatDate = (value) =>
         ? new Date(`${String(value).slice(0, 10)}T00:00:00`).toLocaleDateString('es-BO')
         : 'Sin fecha definida';
 
-const localToday = () => {
-    const date = new Date();
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 10);
-};
-
 export default function Index({
     asignaciones,
     tutores = [],
     programas = [],
     grupos = [],
     filtros = {},
+    fechaMinimaPlanificacion,
 }) {
     const { flash } = usePage().props;
     const [filters, setFilters] = useState({
@@ -70,6 +65,9 @@ export default function Index({
     });
     const [modal, setModal] = useState({ open: false, asignacion: null });
     const form = useForm(emptyAssignment);
+    const reprogramming = !modal.asignacion
+        || form.data.fecha_inicio_asig !== modal.asignacion.fecha_inicio_asig?.slice(0, 10)
+        || form.data.fecha_fin_asig !== modal.asignacion.fecha_fin_asig?.slice(0, 10);
 
     const formGroups = useMemo(
         () =>
@@ -96,16 +94,19 @@ export default function Index({
         form.setData(
             asignacion
                 ? {
-                      ...emptyAssignment,
-                      ...asignacion,
                       id_tutor: String(asignacion.id_tutor),
                       id_prog: asignacion.id_prog ? String(asignacion.id_prog) : '',
                       id_grupo: asignacion.id_grupo
                           ? String(asignacion.id_grupo)
                           : '',
+                      materia_referencia_asig:
+                          asignacion.materia_referencia_asig || '',
+                      rol_asig: asignacion.rol_asig || '',
                       fecha_inicio_asig:
                           asignacion.fecha_inicio_asig?.slice(0, 10) || '',
                       fecha_fin_asig: asignacion.fecha_fin_asig?.slice(0, 10) || '',
+                      estado_asig: asignacion.estado_asig || 'activo',
+                      observacion_asig: asignacion.observacion_asig || '',
                   }
                 : emptyAssignment,
         );
@@ -327,7 +328,7 @@ export default function Index({
             >
                 <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
                     <SelectField {...validationProps('id_tutor', { required: true })}
-                        label="Tutor académico"
+                        label="Tutor académico *"
                         value={form.data.id_tutor}
                         onChange={(event) => form.setData('id_tutor', event.target.value)}
                         error={form.errors.id_tutor}
@@ -432,24 +433,18 @@ export default function Index({
                         }
                         error={form.errors.rol_asig}
                     />
-                    <Field {...validationProps('fecha_inicio_asig')}
+                    <Field {...validationProps('fecha_inicio_asig', { required: !modal.asignacion || Boolean(form.data.fecha_inicio_asig) })}
                         type="date"
-                        min={
-                            !modal.asignacion && form.data.estado_asig === 'activo'
-                                ? localToday()
-                                : undefined
-                        }
-                        label="Fecha de inicio"
+                        min={reprogramming ? fechaMinimaPlanificacion : undefined}
+                        label="Fecha de inicio *"
                         value={form.data.fecha_inicio_asig}
-                        onChange={(event) =>
-                            form.setData('fecha_inicio_asig', event.target.value)
-                        }
+                        onChange={(event) => form.setData({ ...form.data, fecha_inicio_asig: event.target.value, fecha_fin_asig: clearInvalidEndDate(event.target.value, form.data.fecha_fin_asig) })}
                         error={form.errors.fecha_inicio_asig}
                     />
-                    <Field {...validationProps('fecha_fin_asig')}
+                    <Field {...validationProps('fecha_fin_asig', { required: !modal.asignacion || Boolean(form.data.fecha_fin_asig) })}
                         type="date"
-                        min={form.data.fecha_inicio_asig || undefined}
-                        label="Fecha de finalización"
+                        min={reprogramming && form.data.fecha_inicio_asig ? nextCivilDate(form.data.fecha_inicio_asig) : undefined}
+                        label="Fecha de finalización *"
                         value={form.data.fecha_fin_asig}
                         onChange={(event) =>
                             form.setData('fecha_fin_asig', event.target.value)
@@ -457,7 +452,7 @@ export default function Index({
                         error={form.errors.fecha_fin_asig}
                     />
                     <SelectField {...validationProps('estado_asig')}
-                        label="Estado"
+                        label="Estado *"
                         value={form.data.estado_asig}
                         onChange={(event) =>
                             form.setData('estado_asig', event.target.value)

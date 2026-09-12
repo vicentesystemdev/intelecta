@@ -3,11 +3,13 @@
 namespace App\Http\Requests\Postulantes;
 
 use App\Domains\Academico\Enums\EstadoRegistro;
+use App\Domains\Institucional\Models\Carrera;
 use App\Domains\Postulantes\Support\BirthDate;
 use App\Http\Requests\NormalizedFormRequest;
 use App\Rules\PostulanteBirthDate;
 use App\Support\Validation\InputRules;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StorePostulanteRequest extends NormalizedFormRequest
 {
@@ -35,6 +37,13 @@ class StorePostulanteRequest extends NormalizedFormRequest
      */
     public function rules(): array
     {
+        $rawUniversidadId = $this->input('id_uni');
+        $universidadId = ! is_bool($rawUniversidadId)
+            && is_scalar($rawUniversidadId)
+            && ctype_digit((string) $rawUniversidadId)
+            ? (int) $rawUniversidadId
+            : null;
+
         return [
             'nombres_post' => ['required', ...InputRules::person(120)],
             'apellidos_post' => ['required', ...InputRules::person(120)],
@@ -46,15 +55,26 @@ class StorePostulanteRequest extends NormalizedFormRequest
             'fecha_nacimiento_post' => $this->birthDateRules(),
             // Old clients may still send this field; it is never a writable source of truth.
             'edad_post' => ['exclude'],
-            'id_col' => ['nullable', 'integer', 'exists:colegios,id_col'],
-            'id_uni' => ['nullable', 'integer', 'exists:universidades,id_uni'],
-            'id_car' => [
+            'crear_otro_colegio' => ['sometimes', 'boolean'],
+            'otro_colegio_nombre' => [Rule::requiredIf($this->boolean('crear_otro_colegio')), ...InputRules::denomination(255)],
+            'id_col' => $this->boolean('crear_otro_colegio')
+                ? ['prohibited']
+                : ['nullable', 'integer', 'exists:colegios,id_col'],
+            'crear_otra_universidad' => ['sometimes', 'boolean'],
+            'otra_universidad_nombre' => [Rule::requiredIf($this->boolean('crear_otra_universidad')), ...InputRules::denomination(255)],
+            'otra_universidad_sigla' => ['nullable', ...InputRules::code(60)],
+            'id_uni' => $this->boolean('crear_otra_universidad')
+                ? ['prohibited']
+                : ['nullable', 'integer', 'exists:universidades,id_uni'],
+            'crear_otra_carrera' => ['sometimes', 'boolean'],
+            'otra_carrera_nombre' => [Rule::requiredIf($this->boolean('crear_otra_carrera')), ...InputRules::denomination(255)],
+            'id_car' => $this->boolean('crear_otra_carrera') ? ['prohibited'] : [
                 'nullable',
                 'integer',
                 Rule::exists('carreras', 'id_car')->where(
                     fn ($query) => $query->when(
-                        $this->filled('id_uni'),
-                        fn ($query) => $query->where('id_uni', $this->integer('id_uni'))
+                        $universidadId !== null,
+                        fn ($query) => $query->where('id_uni', $universidadId)
                     )
                 ),
             ],
@@ -63,6 +83,33 @@ class StorePostulanteRequest extends NormalizedFormRequest
             'estado_post' => ['required', Rule::enum(EstadoRegistro::class)],
             'observaciones_post' => ['nullable', 'string', 'max:2000'],
         ];
+    }
+
+    public function after(): array
+    {
+        return [function (Validator $validator): void {
+            if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
+
+            $universidadIndicada = $this->filled('id_uni') || $this->boolean('crear_otra_universidad');
+            $carreraIndicada = $this->filled('id_car') || $this->boolean('crear_otra_carrera');
+            if ($universidadIndicada && ! $carreraIndicada) {
+                $validator->errors()->add('id_car', 'Seleccione o registre una carrera para la universidad postulada.');
+            }
+            if ($this->boolean('crear_otra_carrera') && ! $this->filled('id_uni') && ! $this->boolean('crear_otra_universidad')) {
+                $validator->errors()->add('id_uni', 'Seleccione o registre la universidad a la que pertenece la nueva carrera.');
+            }
+            if ($this->boolean('crear_otra_universidad') && $this->filled('id_car') && ! $this->boolean('crear_otra_carrera')) {
+                $validator->errors()->add('id_car', 'Seleccione “Otra carrera” para la nueva universidad.');
+            }
+            if ($this->filled('id_car') && $this->filled('id_uni') && ! Carrera::query()
+                ->whereKey($this->integer('id_car'))
+                ->where('id_uni', $this->integer('id_uni'))
+                ->exists()) {
+                $validator->errors()->add('id_car', 'La carrera seleccionada no pertenece a la universidad indicada.');
+            }
+        }];
     }
 
     /**
@@ -97,12 +144,18 @@ class StorePostulanteRequest extends NormalizedFormRequest
             'fecha_nacimiento_post.required' => __('validation.birth_date_required'),
             'fecha_nacimiento_post.string' => __('validation.birth_date_format'),
             'id_col.exists' => 'El colegio de procedencia seleccionado no existe.',
+            'id_col.prohibited' => 'No envíe un colegio existente cuando registre otro colegio.',
+            'otro_colegio_nombre.required' => 'Ingrese el nombre del nuevo colegio.',
             'id_uni.exists' => 'La universidad seleccionada no existe.',
+            'id_uni.prohibited' => 'No envíe una universidad existente cuando registre otra universidad.',
+            'otra_universidad_nombre.required' => 'Ingrese el nombre de la nueva universidad.',
             'id_car.exists' => 'La carrera seleccionada no pertenece a la universidad indicada.',
+            'id_car.prohibited' => 'No envíe una carrera existente cuando registre otra carrera.',
+            'otra_carrera_nombre.required' => 'Ingrese el nombre de la nueva carrera.',
             'gestion_post.required' => 'La gestión es obligatoria.',
             'gestion_post.integer' => 'La gestión debe ser un año válido.',
             'estado_post.required' => 'Seleccione el estado del postulante.',
-            'estado_post.in' => 'Seleccione un estado válido para el postulante.',
+            'estado_post.enum' => 'Seleccione un estado válido para el postulante.',
         ];
     }
 }

@@ -4,6 +4,14 @@ namespace App\Support\Validation;
 
 final class InputNormalizer
 {
+    public static function key(?string $value): string
+    {
+        $value = preg_replace('/^\s+|\s+$/u', '', (string) $value) ?? (string) $value;
+        $value = preg_replace('/\s+/u', ' ', $value) ?? $value;
+
+        return mb_strtolower($value);
+    }
+
     public static function normalize(array $data): array
     {
         foreach ($data as $key => $value) {
