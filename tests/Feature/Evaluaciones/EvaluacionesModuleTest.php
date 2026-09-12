@@ -229,9 +229,76 @@ class EvaluacionesModuleTest extends TestCase
         $this->actingAs($student)->get(route('plantillas-evaluacion.index'))->assertForbidden();
     }
 
+    public function test_question_status_only_activates_semantically_valid_questions(): void
+    {
+        $invalida = Pregunta::create([
+            'id_tem' => $this->tema->id_tem,
+            'enunciado_preg' => 'Pregunta inválida inactiva',
+            'tipo_preg' => 'opcion_multiple',
+            'puntaje_preg' => 1,
+            'estado_preg' => 'inactivo',
+        ]);
+        $this->actingAs($this->administrator)
+            ->patchJson(route('preguntas.cambiar-estado', $invalida))
+            ->assertUnprocessable();
+        $this->assertSame('inactivo', $invalida->fresh()->estado_preg);
+
+        $data = $this->validQuestionData();
+        $data['estado_preg'] = 'inactivo';
+        $data['enunciado_preg'] = 'Pregunta válida inactiva';
+        $this->postJson(route('preguntas.store'), $data)->assertRedirect();
+        $valida = Pregunta::where('enunciado_preg', $data['enunciado_preg'])->firstOrFail();
+        $this->patchJson(route('preguntas.cambiar-estado', $valida))->assertRedirect();
+        $this->assertSame('activo', $valida->fresh()->estado_preg);
+    }
+
+    public function test_template_status_validates_content_and_metadata_edit_preserves_history(): void
+    {
+        $data = $this->validQuestionData();
+        $data['enunciado_preg'] = 'Pregunta válida para estados de plantilla';
+        $this->actingAs($this->administrator)->postJson(route('preguntas.store'), $data)->assertRedirect();
+        $pregunta = Pregunta::where('enunciado_preg', $data['enunciado_preg'])->firstOrFail();
+        $plantilla = PlantillaEvaluacion::create([
+            'nombre_plan' => 'Plantilla inactiva para validar',
+            'estado_plan' => 'inactiva',
+        ]);
+        $plantilla->preguntas()->attach($pregunta->id_preg, ['orden_pp' => 1, 'puntaje_pp' => 100]);
+
+        $pregunta->update(['estado_preg' => 'inactivo']);
+        $this->patchJson(route('plantillas-evaluacion.cambiar-estado', $plantilla))
+            ->assertUnprocessable();
+        $this->assertSame('inactiva', $plantilla->fresh()->estado_plan);
+
+        $pregunta->update(['estado_preg' => 'activo']);
+        $this->patchJson(route('plantillas-evaluacion.cambiar-estado', $plantilla))->assertRedirect();
+        $this->assertSame('activa', $plantilla->fresh()->estado_plan);
+
+        $pregunta->update(['estado_preg' => 'inactivo']);
+        $this->putJson(route('plantillas-evaluacion.update', $plantilla), [
+            'nombre_plan' => 'Metadato histórico actualizado',
+            'estado_plan' => 'activa',
+            'preguntas' => [[
+                'id_preg' => $pregunta->id_preg,
+                'orden_pp' => 1,
+                'puntaje_pp' => 100,
+            ]],
+        ])->assertRedirect();
+        $this->assertSame('Metadato histórico actualizado', $plantilla->fresh()->nombre_plan);
+        $this->assertDatabaseHas('plantilla_preguntas', [
+            'id_plan' => $plantilla->id_plan,
+            'id_preg' => $pregunta->id_preg,
+        ]);
+
+        $pregunta->delete();
+        $this->get(route('plantillas-evaluacion.show', $plantilla))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('plantilla.preguntas.0.id_preg', $pregunta->id_preg));
+    }
+
     private function createQuestion(string $enunciado = 'Si 2x + 4 = 12, ¿cuál es el valor de x?'): Pregunta
     {
-        return Pregunta::create([
+        $pregunta = Pregunta::create([
             'id_tem' => $this->tema->id_tem,
             'enunciado_preg' => $enunciado,
             'tipo_preg' => 'opcion_multiple',
@@ -239,6 +306,18 @@ class EvaluacionesModuleTest extends TestCase
             'puntaje_preg' => 1,
             'estado_preg' => 'activo',
         ]);
+
+        foreach (['2', '3', '4', '5', '6'] as $index => $texto) {
+            $pregunta->alternativas()->create([
+                'texto_alt' => $texto,
+                'letra_alt' => chr(65 + $index),
+                'es_correcta_alt' => $index === 2,
+                'orden_alt' => $index + 1,
+                'estado_alt' => 'activo',
+            ]);
+        }
+
+        return $pregunta;
     }
 
     private function validQuestionData(): array

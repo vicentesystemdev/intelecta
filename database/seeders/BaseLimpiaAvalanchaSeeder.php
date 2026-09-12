@@ -564,7 +564,9 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
 
         foreach ($postulantes->values() as $index => $postulante) {
             $group = $groups[$groupDistribution[$index]];
-            $status = $index % 17 === 0 && $index > 2 ? 'inactivo' : 'activo';
+            $status = ($postulante->estado_post !== 'activo' || ($index % 17 === 0 && $index > 2))
+                ? 'inactivo'
+                : 'activo';
             $reason = match (true) {
                 $index % 29 === 0 && $index > 2 => 'Retiro académico registrado durante el ciclo.',
                 $index % 17 === 0 && $index > 2 => 'Ciclo académico finalizado.',
@@ -606,6 +608,9 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
                 'exempt' => 'exenta',
                 default => 'activa',
             };
+            if ($inscripcion->estado_inscripcion !== 'activo') {
+                $matriculaState = 'inactiva';
+            }
             $matricula = MatriculaAcademica::updateOrCreate(
                 ['id_insc' => $inscripcion->id_insc],
                 [
@@ -652,6 +657,15 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
                 'overdue' => ['restringido', false, false, true, 'Cuota vencida pendiente de regularización administrativa.'],
                 default => ['habilitado', true, true, true, 'Condición administrativa regular.'],
             };
+            if ($inscripcion->estado_inscripcion !== 'activo') {
+                $habilitation = [
+                    'restringido',
+                    false,
+                    false,
+                    true,
+                    'Inscripción académica inactiva.',
+                ];
+            }
             HabilitacionAcademica::updateOrCreate(
                 ['id_insc' => $inscripcion->id_insc],
                 [
@@ -780,6 +794,7 @@ class BaseLimpiaAvalanchaSeeder extends Seeder
                     $template,
                     $simulation?->id_sim,
                     'evaluacion_institucional',
+                    true,
                 );
                 $answers = $template->preguntas->values()->map(
                     function (Pregunta $question, int $questionIndex) use ($profile, $index) {

@@ -307,8 +307,17 @@ export default function Index({
                     >
                         <option value="">Seleccione un programa</option>
                         {programas.map((programa) => (
-                            <option key={programa.id_prog} value={programa.id_prog}>
+                            <option
+                                key={programa.id_prog}
+                                value={programa.id_prog}
+                                disabled={
+                                    programa.estado_prog !== 'activo' &&
+                                    String(formModal.simulacro?.id_prog || '') !==
+                                        String(programa.id_prog)
+                                }
+                            >
                                 {programa.nombre_prog}
+                                {programa.estado_prog !== 'activo' ? ' · No disponible' : ''}
                             </option>
                         ))}
                     </SelectField>
@@ -320,8 +329,17 @@ export default function Index({
                     >
                         <option value="">Todos los grupos</option>
                         {formGroups.map((grupo) => (
-                            <option key={grupo.id_grupo} value={grupo.id_grupo}>
+                            <option
+                                key={grupo.id_grupo}
+                                value={grupo.id_grupo}
+                                disabled={
+                                    grupo.estado_grupo !== 'activo' &&
+                                    String(formModal.simulacro?.id_grupo || '') !==
+                                        String(grupo.id_grupo)
+                                }
+                            >
                                 {grupo.codigo_grupo || grupo.nombre_grupo}
+                                {grupo.estado_grupo !== 'activo' ? ' · No disponible' : ''}
                             </option>
                         ))}
                     </SelectField>

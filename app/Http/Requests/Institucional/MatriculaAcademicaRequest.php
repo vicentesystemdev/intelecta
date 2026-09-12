@@ -22,6 +22,9 @@ class MatriculaAcademicaRequest extends NormalizedFormRequest
         $matricula = $this->route('matricula');
 
         return [
+            'id_post' => ['prohibited'],
+            'id_prog' => ['prohibited'],
+            'id_grupo' => ['prohibited'],
             'id_insc' => [
                 'required',
                 'integer',
@@ -46,6 +49,9 @@ class MatriculaAcademicaRequest extends NormalizedFormRequest
     public function messages(): array
     {
         return [
+            'id_post.prohibited' => 'El postulante se obtiene de la inscripción y no puede enviarse manualmente.',
+            'id_prog.prohibited' => 'El programa se obtiene de la inscripción y no puede enviarse manualmente.',
+            'id_grupo.prohibited' => 'El grupo se obtiene de la inscripción y no puede enviarse manualmente.',
             'id_insc.required' => 'Seleccione una inscripción académica.',
             'id_insc.exists' => 'La inscripción académica seleccionada no existe.',
             'id_insc.unique' => 'La inscripción ya tiene una matrícula académica registrada.',

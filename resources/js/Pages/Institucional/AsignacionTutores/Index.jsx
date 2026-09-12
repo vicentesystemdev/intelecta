@@ -335,11 +335,20 @@ export default function Index({
                     >
                         <option value="">Seleccione un tutor</option>
                         {tutores.map((tutor) => (
-                            <option key={tutor.id_tutor} value={tutor.id_tutor}>
+                            <option
+                                key={tutor.id_tutor}
+                                value={tutor.id_tutor}
+                                disabled={
+                                    tutor.estado_tutor !== 'activo' &&
+                                    String(modal.asignacion?.id_tutor || '') !==
+                                        String(tutor.id_tutor)
+                                }
+                            >
                                 {tutorName(tutor)}
                                 {tutor.especialidad_tutor
                                     ? ` · ${tutor.especialidad_tutor}`
                                     : ''}
+                                {tutor.estado_tutor !== 'activo' ? ' · No disponible' : ''}
                             </option>
                         ))}
                     </SelectField>
@@ -357,8 +366,17 @@ export default function Index({
                     >
                         <option value="">Sin programa específico</option>
                         {programas.map((programa) => (
-                            <option key={programa.id_prog} value={programa.id_prog}>
+                            <option
+                                key={programa.id_prog}
+                                value={programa.id_prog}
+                                disabled={
+                                    programa.estado_prog !== 'activo' &&
+                                    String(modal.asignacion?.id_prog || '') !==
+                                        String(programa.id_prog)
+                                }
+                            >
                                 {programa.nombre_prog}
+                                {programa.estado_prog !== 'activo' ? ' · No disponible' : ''}
                             </option>
                         ))}
                     </SelectField>
@@ -381,8 +399,17 @@ export default function Index({
                     >
                         <option value="">Sin grupo específico</option>
                         {formGroups.map((grupo) => (
-                            <option key={grupo.id_grupo} value={grupo.id_grupo}>
+                            <option
+                                key={grupo.id_grupo}
+                                value={grupo.id_grupo}
+                                disabled={
+                                    grupo.estado_grupo !== 'activo' &&
+                                    String(modal.asignacion?.id_grupo || '') !==
+                                        String(grupo.id_grupo)
+                                }
+                            >
                                 {grupo.nombre_grupo}
+                                {grupo.estado_grupo !== 'activo' ? ' · No disponible' : ''}
                             </option>
                         ))}
                     </SelectField>

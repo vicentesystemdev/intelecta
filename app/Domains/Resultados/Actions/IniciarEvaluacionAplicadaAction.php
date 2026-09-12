@@ -18,7 +18,8 @@ class IniciarEvaluacionAplicadaAction
         PlantillaEvaluacion $plantilla,
         ?int $simulacroId = null,
         ?string $tipo = null,
+        bool $historica = false,
     ): EvaluacionAplicada {
-        return $this->service->iniciar($postulante, $plantilla, $simulacroId, $tipo);
+        return $this->service->iniciar($postulante, $plantilla, $simulacroId, $tipo, $historica);
     }
 }

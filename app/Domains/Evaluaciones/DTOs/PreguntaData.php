@@ -5,6 +5,8 @@ namespace App\Domains\Evaluaciones\DTOs;
 final readonly class PreguntaData
 {
     public function __construct(
+        public ?int $idMateria,
+        public ?int $idArea,
         public ?int $idTem,
         public ?string $subtemaPreg,
         public string $enunciadoPreg,
@@ -23,6 +25,8 @@ final readonly class PreguntaData
     public static function fromArray(array $data): self
     {
         return new self(
+            filled($data['id_mat'] ?? null) ? (int) $data['id_mat'] : null,
+            filled($data['id_area'] ?? null) ? (int) $data['id_area'] : null,
             filled($data['id_tem'] ?? null) ? (int) $data['id_tem'] : null,
             filled($data['subtema_preg'] ?? null) ? $data['subtema_preg'] : null,
             $data['enunciado_preg'],

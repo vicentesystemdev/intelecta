@@ -3,9 +3,9 @@
 namespace App\Domains\Evaluaciones\Repositories;
 
 use App\Domains\Evaluaciones\DTOs\PlantillaEvaluacionData;
+use App\Domains\Evaluaciones\Models\Materia;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
 use App\Domains\Evaluaciones\Models\Pregunta;
-use App\Domains\Evaluaciones\Models\Materia;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -56,7 +56,14 @@ class PlantillaEvaluacionRepository
 
     public function find(int $id): PlantillaEvaluacion
     {
-        return PlantillaEvaluacion::with(['preguntas.tema.area.materia', 'preguntas.alternativas'])->findOrFail($id);
+        $plantilla = PlantillaEvaluacion::query()->findOrFail($id);
+        $plantilla->load([
+            'preguntas' => fn ($query) => $query->withTrashed(),
+            'preguntas.tema.area.materia',
+            'preguntas.alternativas',
+        ]);
+
+        return $plantilla;
     }
 
     public function questions(): Collection

@@ -114,3 +114,25 @@ test('postulante form uses the shared formatter and never submits editable age',
     assert.equal(form.includes('edad_post:'), false);
     assert.equal(form.includes('type="date"'), false);
 });
+
+test('matricula editing builds an explicit payload without derived academic ids', () => {
+    const form = fs.readFileSync(
+        new URL('../resources/js/Pages/Institucional/MatriculasCuotas/Index.jsx', import.meta.url),
+        'utf8',
+    );
+    const editor = form.slice(form.indexOf('const openMatricula'), form.indexOf('const openCuota'));
+
+    assert.doesNotMatch(editor, /\.\.\.matricula/);
+    assert.doesNotMatch(editor, /id_post|id_prog|id_grupo/);
+    for (const field of [
+        'id_insc',
+        'codigo_mat',
+        'fecha_matricula_mat',
+        'monto_matricula_mat',
+        'estado_matricula_mat',
+        'tipo_beneficio_mat',
+        'observacion_mat',
+    ]) {
+        assert.match(editor, new RegExp(`${field}:`));
+    }
+});

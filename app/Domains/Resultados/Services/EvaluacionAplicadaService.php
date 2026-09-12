@@ -2,7 +2,11 @@
 
 namespace App\Domains\Resultados\Services;
 
+use App\Domains\Academico\Models\InscripcionAcademica;
+use App\Domains\Academico\Models\SimulacroProgramado;
+use App\Domains\Academico\Services\ContextoAcademicoService;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
+use App\Domains\Evaluaciones\Services\ConsistenciaEvaluacionService;
 use App\Domains\Postulantes\Models\Postulante;
 use App\Domains\Resultados\DTOs\EnviarEvaluacionData;
 use App\Domains\Resultados\DTOs\EvaluacionAplicadaData;
@@ -18,6 +22,8 @@ class EvaluacionAplicadaService
         private readonly EvaluacionAplicadaRepository $evaluaciones,
         private readonly RespuestaEvaluacionRepository $respuestas,
         private readonly ResultadoAcademicoService $resultados,
+        private readonly ContextoAcademicoService $contexto,
+        private readonly ConsistenciaEvaluacionService $consistencia,
     ) {}
 
     public function iniciar(
@@ -25,28 +31,54 @@ class EvaluacionAplicadaService
         PlantillaEvaluacion $plantilla,
         ?int $simulacroId = null,
         ?string $tipo = null,
+        bool $historica = false,
     ): EvaluacionAplicada {
-        if ($plantilla->estado_plan !== 'activa') {
-            throw ValidationException::withMessages([
-                'plantilla' => 'La plantilla seleccionada no está disponible para aplicación.',
-            ]);
-        }
+        return DB::transaction(function () use ($postulante, $plantilla, $simulacroId, $tipo, $historica) {
+            // Orden global del contexto compartido: Simulacro -> Grupo -> Programa ->
+            // Postulante -> Plantilla. Dentro de cada tipo se bloquea por PK ascendente.
+            // Las operaciones sin alguno de estos recursos conservan el orden relativo.
+            $simulacro = $simulacroId
+                ? $this->bloquearContextoSimulacro($simulacroId, $plantilla, $historica)
+                : null;
 
-        $plantilla->load('preguntas');
+            $postulante = Postulante::query()
+                ->whereKey($postulante->getKey())
+                ->lockForUpdate()
+                ->first();
 
-        if ($plantilla->preguntas->isEmpty()) {
-            throw ValidationException::withMessages([
-                'plantilla' => 'La plantilla seleccionada no tiene preguntas evaluables.',
-            ]);
-        }
+            if (! $postulante || $postulante->estado_post !== 'activo') {
+                throw ValidationException::withMessages([
+                    'postulante' => 'El postulante no está habilitado para iniciar una evaluación.',
+                ]);
+            }
 
-        return DB::transaction(function () use ($postulante, $plantilla, $simulacroId, $tipo) {
-            $open = $this->evaluaciones->findOpen($postulante->id_post, $plantilla->id_plan);
+            $plantilla = PlantillaEvaluacion::query()
+                ->whereKey($plantilla->getKey())
+                ->lockForUpdate()
+                ->first();
+
+            if (! $plantilla) {
+                throw ValidationException::withMessages([
+                    'plantilla' => 'La plantilla seleccionada no está disponible para aplicación.',
+                ]);
+            }
+
+            $preguntas = $this->consistencia->validarPlantillaAplicable($plantilla);
+
+            if ($simulacro) {
+                $this->validarInscripcionSimulacro($simulacro, $postulante);
+            }
+
+            $open = $this->evaluaciones->findOpen(
+                $postulante->id_post,
+                $plantilla->id_plan,
+                $simulacroId,
+            );
             if ($open) {
                 return $open;
             }
 
-            $maximo = round((float) $plantilla->preguntas->sum(
+            $maximo = round((float) $preguntas->sum(
                 fn ($pregunta) => (float) ($pregunta->pivot?->puntaje_pp ?: $pregunta->puntaje_preg),
             ), 2);
 
@@ -57,7 +89,7 @@ class EvaluacionAplicadaService
                 tipo: $tipo ?: $plantilla->dificultad_plan,
                 puntajeMaximo: $maximo > 0 ? $maximo : 100,
             ));
-        });
+        }, 3);
     }
 
     public function enviar(
@@ -80,10 +112,35 @@ class EvaluacionAplicadaService
                 ]);
             }
 
-            $evaluacion->load([
-                'plantilla.preguntas.alternativas',
-            ]);
-            $preguntas = $evaluacion->plantilla->preguntas->keyBy('id_preg');
+            $plantilla = PlantillaEvaluacion::query()
+                ->whereKey($evaluacion->id_plantilla)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $preguntas = $plantilla->preguntas()
+                ->withTrashed()
+                ->with(['tema.area.materia', 'alternativas'])
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id_preg');
+            if ($plantilla->estado_plan !== 'activa'
+                || $plantilla->trashed()
+                || $preguntas->isEmpty()
+                || $preguntas->contains(fn ($pregunta) => $pregunta->estado_preg !== 'activo' || $pregunta->trashed())) {
+                throw ValidationException::withMessages([
+                    'evaluacion' => 'La evaluación cambió y no puede finalizarse de forma consistente.',
+                ]);
+            }
+
+            $maximoActual = round((float) $preguntas->sum(
+                fn ($pregunta) => (float) ($pregunta->pivot?->puntaje_pp ?: $pregunta->puntaje_preg),
+            ), 2);
+            if (abs($maximoActual - (float) $evaluacion->puntaje_maximo_eval_apl) > 0.001) {
+                throw ValidationException::withMessages([
+                    'evaluacion' => 'La evaluación cambió y no puede finalizarse de forma consistente.',
+                ]);
+            }
+
             $enviadas = collect($data->respuestas)->keyBy('preguntaId');
             $invalidas = $enviadas->keys()->diff($preguntas->keys());
 
@@ -99,11 +156,31 @@ class EvaluacionAplicadaService
                     ? $pregunta->alternativas->firstWhere('id_alt', $respuesta->alternativaId)
                     : null;
 
-                if ($respuesta?->alternativaId && ! $alternativa) {
+                if (
+                    $respuesta?->alternativaId
+                    && (! $alternativa || $alternativa->estado_alt !== 'activo')
+                ) {
                     throw ValidationException::withMessages([
-                        'respuestas' => 'Una alternativa seleccionada no pertenece a su pregunta.',
+                        'respuestas' => 'Una alternativa seleccionada no pertenece a su pregunta o ya no está activa.',
                     ]);
                 }
+            }
+
+            try {
+                foreach ($preguntas as $pregunta) {
+                    $this->consistencia->validarPreguntaAplicable($pregunta);
+                }
+            } catch (ValidationException) {
+                throw ValidationException::withMessages([
+                    'evaluacion' => 'La evaluación cambió y no puede finalizarse de forma consistente.',
+                ]);
+            }
+
+            foreach ($preguntas as $pregunta) {
+                $respuesta = $enviadas->get($pregunta->id_preg);
+                $alternativa = $respuesta?->alternativaId
+                    ? $pregunta->alternativas->firstWhere('id_alt', $respuesta->alternativaId)
+                    : null;
 
                 $puntajeMaximo = round(
                     (float) ($pregunta->pivot?->puntaje_pp ?: $pregunta->puntaje_preg),
@@ -136,5 +213,58 @@ class EvaluacionAplicadaService
 
             return $evaluacion;
         });
+    }
+
+    private function bloquearContextoSimulacro(
+        int $simulacroId,
+        PlantillaEvaluacion $plantilla,
+        bool $historica,
+    ): SimulacroProgramado {
+        $simulacro = SimulacroProgramado::query()
+            ->whereKey($simulacroId)
+            ->lockForUpdate()
+            ->first();
+
+        if (! $simulacro || (! $historica && $simulacro->estado_sim !== 'programado')) {
+            throw ValidationException::withMessages([
+                'id_sim' => 'El simulacro no está disponible para iniciar un nuevo intento.',
+            ]);
+        }
+
+        if ($simulacro->id_plantilla !== $plantilla->id_plan) {
+            throw ValidationException::withMessages([
+                'id_sim' => 'El simulacro no corresponde a la plantilla seleccionada.',
+            ]);
+        }
+
+        if ($simulacro->id_grupo) {
+            $this->contexto->grupoOperativo($simulacro->id_grupo, $simulacro->id_prog, true);
+        }
+
+        $this->contexto->programaOperativo($simulacro->id_prog, true);
+
+        return $simulacro;
+    }
+
+    private function validarInscripcionSimulacro(
+        SimulacroProgramado $simulacro,
+        Postulante $postulante,
+    ): void {
+
+        $inscrito = InscripcionAcademica::query()
+            ->where('id_post', $postulante->id_post)
+            ->where('id_prog', $simulacro->id_prog)
+            ->where('estado_inscripcion', 'activo')
+            ->when(
+                $simulacro->id_grupo,
+                fn ($query, int $grupoId) => $query->where('id_grupo', $grupoId),
+            )
+            ->exists();
+
+        if (! $inscrito) {
+            throw ValidationException::withMessages([
+                'id_sim' => 'El simulacro no pertenece al contexto académico activo del postulante.',
+            ]);
+        }
     }
 }

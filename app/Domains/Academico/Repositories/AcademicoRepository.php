@@ -178,7 +178,7 @@ class AcademicoRepository
         return ProgramaAcademico::query()
             ->when($onlyActive, fn (Builder $query) => $query->where('estado_prog', 'activo'))
             ->orderBy('nombre_prog')
-            ->get(['id_prog', 'nombre_prog', 'codigo_prog', 'universidad_objetivo_prog', 'modalidad_prog']);
+            ->get(['id_prog', 'nombre_prog', 'codigo_prog', 'universidad_objetivo_prog', 'modalidad_prog', 'estado_prog']);
     }
 
     public function programasOptionsPara(
@@ -212,7 +212,7 @@ class AcademicoRepository
             ->when($programaId, fn (Builder $query) => $query->where('id_prog', $programaId))
             ->when($onlyActive, fn (Builder $query) => $query->where('estado_grupo', 'activo'))
             ->orderBy('nombre_grupo')
-            ->get(['id_grupo', 'id_prog', 'nombre_grupo', 'codigo_grupo', 'capacidad_grupo', 'turno_grupo']);
+            ->get(['id_grupo', 'id_prog', 'nombre_grupo', 'codigo_grupo', 'capacidad_grupo', 'turno_grupo', 'estado_grupo']);
     }
 
     public function postulantesOptions(): Collection

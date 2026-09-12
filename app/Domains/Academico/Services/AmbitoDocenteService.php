@@ -265,7 +265,7 @@ class AmbitoDocenteService
 
     /**
      * Bloquea las filas que acreditan el acceso docente al grupo.
-     * La asignación se bloquea primero para serializarse con su actualización.
+     * Orden compartido con AsignacionTutorService: Tutor -> Asignación -> Grupo.
      */
     public function bloquearAutoridadDeGrupo(User $user, int $grupoId, string $capacidad): ?int
     {
@@ -283,6 +283,15 @@ class AmbitoDocenteService
             throw new AuthorizationException('El usuario no tiene un Tutor académico activo.');
         }
 
+        $tutorVigente = TutorAcademico::query()
+            ->whereKey($tutorId)
+            ->where('estado_tutor', 'activo')
+            ->lockForUpdate()
+            ->exists();
+        if (! $tutorVigente) {
+            throw new AuthorizationException('El Tutor académico ya no está activo.');
+        }
+
         $asignaciones = AsignacionTutor::query()
             ->where('id_tutor', $tutorId)
             ->where('id_grupo', $grupoId)
@@ -292,15 +301,6 @@ class AmbitoDocenteService
             ->get(['id_asig']);
         if ($asignaciones->isEmpty()) {
             throw new AuthorizationException('El grupo no pertenece al ámbito académico permitido.');
-        }
-
-        $tutorVigente = TutorAcademico::query()
-            ->whereKey($tutorId)
-            ->where('estado_tutor', 'activo')
-            ->lockForUpdate()
-            ->exists();
-        if (! $tutorVigente) {
-            throw new AuthorizationException('El Tutor académico ya no está activo.');
         }
 
         return (int) $tutorId;

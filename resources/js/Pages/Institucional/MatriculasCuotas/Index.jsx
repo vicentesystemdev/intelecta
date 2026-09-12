@@ -119,11 +119,15 @@ export default function Index({
         matriculaForm.setData(
             matricula
                 ? {
-                      ...emptyMatricula,
-                      ...matricula,
                       id_insc: String(matricula.id_insc),
+                      codigo_mat: matricula.codigo_mat || '',
                       fecha_matricula_mat:
                           matricula.fecha_matricula_mat?.slice(0, 10) || '',
+                      monto_matricula_mat: matricula.monto_matricula_mat ?? 0,
+                      estado_matricula_mat:
+                          matricula.estado_matricula_mat || 'inactiva',
+                      tipo_beneficio_mat: matricula.tipo_beneficio_mat || '',
+                      observacion_mat: matricula.observacion_mat || '',
                   }
                 : emptyMatricula,
         );
@@ -503,11 +507,22 @@ export default function Index({
                     >
                         <option value="">Seleccione una inscripción</option>
                         {inscripciones.map((inscripcion) => (
-                            <option key={inscripcion.id_insc} value={inscripcion.id_insc}>
+                            <option
+                                key={inscripcion.id_insc}
+                                value={inscripcion.id_insc}
+                                disabled={
+                                    Boolean(inscripcion.matricula_registrada) &&
+                                    String(matriculaModal.matricula?.id_insc || '') !==
+                                        String(inscripcion.id_insc)
+                                }
+                            >
                                 {studentName(inscripcion.postulante)} ·{' '}
                                 {inscripcion.programa?.nombre_prog}
                                 {inscripcion.grupo
                                     ? ` · ${inscripcion.grupo.nombre_grupo}`
+                                    : ''}
+                                {inscripcion.matricula_registrada
+                                    ? ' · Matrícula ya registrada'
                                     : ''}
                             </option>
                         ))}

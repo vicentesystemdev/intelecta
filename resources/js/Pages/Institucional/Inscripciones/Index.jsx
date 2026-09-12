@@ -381,9 +381,22 @@ export default function Index({
                     >
                         <option value="">Sin grupo asignado</option>
                         {filteredGroups.map((grupo) => (
-                            <option key={grupo.id_grupo} value={grupo.id_grupo}>
+                            <option
+                                key={grupo.id_grupo}
+                                value={grupo.id_grupo}
+                                disabled={
+                                    Number(grupo.inscritos_count) >=
+                                        Number(grupo.capacidad_grupo) &&
+                                    String(formModal.inscripcion?.id_grupo || '') !==
+                                        String(grupo.id_grupo)
+                                }
+                            >
                                 {grupo.codigo_grupo || grupo.nombre_grupo} ·{' '}
                                 {grupo.inscritos_count}/{grupo.capacidad_grupo}
+                                {Number(grupo.inscritos_count) >=
+                                Number(grupo.capacidad_grupo)
+                                    ? ' · Sin cupo'
+                                    : ''}
                             </option>
                         ))}
                     </SelectField>

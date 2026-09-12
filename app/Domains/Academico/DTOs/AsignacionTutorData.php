@@ -46,6 +46,21 @@ final readonly class AsignacionTutorData
         ];
     }
 
+    public function withProgramaId(int $programaId): self
+    {
+        return new self(
+            tutorId: $this->tutorId,
+            programaId: $programaId,
+            grupoId: $this->grupoId,
+            materiaReferencia: $this->materiaReferencia,
+            rol: $this->rol,
+            fechaInicio: $this->fechaInicio,
+            fechaFin: $this->fechaFin,
+            estado: $this->estado,
+            observacion: $this->observacion,
+        );
+    }
+
     private static function nullable(mixed $value): ?string
     {
         return filled($value) ? trim((string) $value) : null;

@@ -83,7 +83,7 @@ class EvaluacionAplicadaController extends Controller
     ): RedirectResponse {
         $this->ensureResultsSchema();
         $postulante = $request->user()->postulante;
-        $this->ensureEnabled($postulante);
+        $this->ensureEnabled($postulante, $request->filled('id_sim'));
         $evaluacion = $action->execute(
             postulante: $postulante,
             plantilla: $plantilla,
@@ -117,8 +117,11 @@ class EvaluacionAplicadaController extends Controller
     ): RedirectResponse {
         $this->ensureResultsSchema();
         $postulante = $request->user()->postulante;
-        $this->ensureEnabled($postulante);
+        if (! $postulante) {
+            $this->ensureEnabled(null);
+        }
         $evaluacion = $postulante->evaluacionesAplicadas()->findOrFail($evaluacion);
+        $this->ensureEnabled($postulante, filled($evaluacion->id_sim));
         $evaluacion = $action->execute(
             $evaluacion,
             $postulante,
@@ -163,13 +166,25 @@ class EvaluacionAplicadaController extends Controller
             ]);
     }
 
-    private function ensureEnabled(Postulante $postulante): void
+    private function ensureEnabled(?Postulante $postulante, bool $simulacro = false): void
     {
+        if (! $postulante || $postulante->estado_post !== 'activo') {
+            throw ValidationException::withMessages([
+                'postulante' => 'Tu cuenta no está vinculada a un postulante académico activo.',
+            ]);
+        }
+
         $habilitacion = $this->habilitacion($postulante);
 
         if ($habilitacion?->habilitado_evaluaciones_hab === false) {
             throw ValidationException::withMessages([
                 'habilitacion' => 'Tu acceso a evaluaciones se encuentra temporalmente restringido. Consulta con administración académica.',
+            ]);
+        }
+
+        if ($simulacro && $habilitacion?->habilitado_simulacros_hab === false) {
+            throw ValidationException::withMessages([
+                'habilitacion' => 'Tu acceso a simulacros se encuentra temporalmente restringido. Consulta con administración académica.',
             ]);
         }
     }

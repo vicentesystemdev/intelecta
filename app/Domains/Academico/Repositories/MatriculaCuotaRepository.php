@@ -96,8 +96,25 @@ class MatriculaCuotaRepository
                 'grupo:id_grupo,nombre_grupo,codigo_grupo',
             ])
             ->where('estado_inscripcion', 'activo')
+            ->whereHas('postulante', fn (Builder $query) => $query->where('estado_post', 'activo'))
+            ->whereHas('programa', fn (Builder $query) => $query->where('estado_prog', 'activo'))
+            ->where(function (Builder $query) {
+                $query->whereNull('id_grupo')
+                    ->orWhereHas('grupo', fn (Builder $query) => $query->where('estado_grupo', 'activo'));
+            })
+            ->select([
+                'id_insc',
+                'id_post',
+                'id_prog',
+                'id_grupo',
+                'fecha_inscripcion',
+            ])
+            ->selectRaw('EXISTS (
+                SELECT 1 FROM matriculas_academicas
+                WHERE matriculas_academicas.id_insc = inscripciones_academicas.id_insc
+            ) AS matricula_registrada')
             ->orderByDesc('fecha_inscripcion')
-            ->get(['id_insc', 'id_post', 'id_prog', 'id_grupo', 'fecha_inscripcion']);
+            ->get();
     }
 
     public function options(): Collection

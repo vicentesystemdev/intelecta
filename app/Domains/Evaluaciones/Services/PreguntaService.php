@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\DB;
 
 class PreguntaService
 {
-    public function __construct(private readonly PreguntaRepository $repository) {}
+    public function __construct(
+        private readonly PreguntaRepository $repository,
+        private readonly ConsistenciaEvaluacionService $consistencia,
+    ) {}
 
     public function list(array $filters): array
     {
@@ -18,19 +21,39 @@ class PreguntaService
 
     public function create(PreguntaData $data): Pregunta
     {
-        return DB::transaction(fn () => $this->repository->create($data));
+        return DB::transaction(function () use ($data): Pregunta {
+            $this->consistencia->validarTaxonomia($data);
+            $this->consistencia->validarAlternativas($data);
+
+            return $this->repository->create($data);
+        });
     }
 
     public function update(Pregunta $pregunta, PreguntaData $data): Pregunta
     {
-        return DB::transaction(fn () => $this->repository->update($pregunta, $data));
+        return DB::transaction(function () use ($pregunta, $data): Pregunta {
+            $pregunta = Pregunta::query()->lockForUpdate()->findOrFail($pregunta->getKey());
+            $this->consistencia->validarTaxonomia($data);
+            $this->consistencia->validarAlternativas($data);
+
+            return $this->repository->update($pregunta, $data);
+        });
     }
 
     public function changeStatus(Pregunta $pregunta): Pregunta
     {
-        $estado = $pregunta->estado_preg === 'activo' ? 'inactivo' : 'activo';
+        return DB::transaction(function () use ($pregunta): Pregunta {
+            $pregunta = Pregunta::query()->lockForUpdate()->findOrFail($pregunta->getKey());
+            $estado = $pregunta->estado_preg === 'activo' ? 'inactivo' : 'activo';
 
-        return $this->repository->changeStatus($pregunta, $estado);
+            if ($estado === 'activo') {
+                $this->consistencia->validarPreguntaAplicable(
+                    $pregunta->setAttribute('estado_preg', 'activo'),
+                );
+            }
+
+            return $this->repository->changeStatus($pregunta, $estado);
+        }, 3);
     }
 
     public function find(int $id): Pregunta

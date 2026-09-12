@@ -15,11 +15,15 @@ class EvaluacionAplicadaRepository
 {
     public function __construct(private readonly AmbitoDocenteService $ambito) {}
 
-    public function findOpen(int $postulanteId, int $plantillaId): ?EvaluacionAplicada
-    {
+    public function findOpen(
+        int $postulanteId,
+        int $plantillaId,
+        ?int $simulacroId = null,
+    ): ?EvaluacionAplicada {
         return EvaluacionAplicada::query()
             ->where('id_post', $postulanteId)
             ->where('id_plantilla', $plantillaId)
+            ->where('id_sim', $simulacroId)
             ->where('estado_eval_apl', 'en_progreso')
             ->latest('id_eval_apl')
             ->lockForUpdate()
@@ -52,7 +56,8 @@ class EvaluacionAplicadaRepository
     {
         return PlantillaEvaluacion::query()
             ->where('estado_plan', 'activa')
-            ->whereHas('preguntas')
+            ->whereHas('preguntas', fn (Builder $query) => $query->where('estado_preg', 'activo'))
+            ->whereDoesntHave('preguntas', fn (Builder $query) => $query->where('estado_preg', '<>', 'activo'))
             ->withCount('preguntas')
             ->withSum('preguntas as puntaje_maximo', 'plantilla_preguntas.puntaje_pp')
             ->with('preguntas.tema.area.materia:id_mat,codigo_mat,nombre_mat')

@@ -2,6 +2,10 @@
 
 namespace Tests\Feature\Resultados;
 
+use App\Domains\Academico\Models\GrupoAcademico;
+use App\Domains\Academico\Models\InscripcionAcademica;
+use App\Domains\Academico\Models\ProgramaAcademico;
+use App\Domains\Academico\Models\SimulacroProgramado;
 use App\Domains\Evaluaciones\Models\Alternativa;
 use App\Domains\Evaluaciones\Models\AreaConocimiento;
 use App\Domains\Evaluaciones\Models\Materia;
@@ -86,6 +90,20 @@ class ResultadosTrazablesTest extends TestCase
             'orden_alt' => 2,
             'estado_alt' => 'activo',
         ]);
+        foreach ([
+            ['C', '5'],
+            ['D', '2'],
+            ['E', '1'],
+        ] as $index => [$letra, $texto]) {
+            Alternativa::create([
+                'id_preg' => $this->pregunta->id_preg,
+                'texto_alt' => $texto,
+                'letra_alt' => $letra,
+                'es_correcta_alt' => false,
+                'orden_alt' => $index + 3,
+                'estado_alt' => 'activo',
+            ]);
+        }
         $this->plantilla = PlantillaEvaluacion::create([
             'nombre_plan' => 'Evaluación trazable de Matemática',
             'duracion_minutos_plan' => 30,
@@ -178,6 +196,38 @@ class ResultadosTrazablesTest extends TestCase
         $this->assertSame('en_progreso', $evaluacion->refresh()->estado_eval_apl);
     }
 
+    public function test_alternative_from_another_question_or_inactive_is_rejected(): void
+    {
+        $evaluacion = $this->createOpenEvaluation();
+        $otraPregunta = Pregunta::create([
+            'enunciado_preg' => 'Pregunta propietaria de otra alternativa',
+            'tipo_preg' => 'opcion_multiple',
+            'puntaje_preg' => 10,
+            'estado_preg' => 'activo',
+        ]);
+        $ajena = Alternativa::create([
+            'id_preg' => $otraPregunta->id_preg,
+            'texto_alt' => 'Alternativa ajena',
+            'letra_alt' => 'A',
+            'es_correcta_alt' => true,
+            'orden_alt' => 1,
+            'estado_alt' => 'activo',
+        ]);
+
+        $this->actingAs($this->student)->postJson(
+            route('estudiante.evaluaciones.enviar', $evaluacion),
+            ['respuestas' => [['id_preg' => $this->pregunta->id_preg, 'id_alt' => $ajena->id_alt]]],
+        )->assertUnprocessable()->assertJsonValidationErrors('respuestas');
+
+        $this->correcta->update(['estado_alt' => 'inactivo']);
+        $this->actingAs($this->student)->postJson(
+            route('estudiante.evaluaciones.enviar', $evaluacion),
+            ['respuestas' => [['id_preg' => $this->pregunta->id_preg, 'id_alt' => $this->correcta->id_alt]]],
+        )->assertUnprocessable()->assertJsonValidationErrors('respuestas');
+
+        $this->assertDatabaseCount('respuestas_evaluacion', 0);
+    }
+
     public function test_student_cannot_read_or_submit_another_students_evaluation(): void
     {
         $otherUser = User::factory()->create()->assignRole('Estudiante');
@@ -205,6 +255,125 @@ class ResultadosTrazablesTest extends TestCase
             ->assertRedirect();
         $this->assertDatabaseHas('evaluaciones_aplicadas', ['id_post' => $this->postulante->id_post]);
         $this->assertDatabaseMissing('evaluaciones_aplicadas', ['id_post' => $other->id_post]);
+    }
+
+    public function test_simulation_attempt_requires_students_exact_active_context(): void
+    {
+        $programa = ProgramaAcademico::create([
+            'nombre_prog' => 'Programa de simulacro',
+            'codigo_prog' => 'SIM-P',
+            'estado_prog' => 'activo',
+        ]);
+        $grupoPropio = GrupoAcademico::create([
+            'id_prog' => $programa->id_prog,
+            'nombre_grupo' => 'Grupo propio',
+            'codigo_grupo' => 'SIM-A',
+            'capacidad_grupo' => 10,
+            'estado_grupo' => 'activo',
+        ]);
+        $grupoAjeno = GrupoAcademico::create([
+            'id_prog' => $programa->id_prog,
+            'nombre_grupo' => 'Grupo ajeno',
+            'codigo_grupo' => 'SIM-B',
+            'capacidad_grupo' => 10,
+            'estado_grupo' => 'activo',
+        ]);
+        InscripcionAcademica::create([
+            'id_prog' => $programa->id_prog,
+            'id_grupo' => $grupoPropio->id_grupo,
+            'id_post' => $this->postulante->id_post,
+            'fecha_inscripcion' => today(),
+            'estado_inscripcion' => 'activo',
+        ]);
+        $ajeno = SimulacroProgramado::create([
+            'id_prog' => $programa->id_prog,
+            'id_grupo' => $grupoAjeno->id_grupo,
+            'id_plantilla' => $this->plantilla->id_plan,
+            'titulo_sim' => 'Simulacro ajeno',
+            'estado_sim' => 'programado',
+        ]);
+
+        $this->actingAs($this->student)->postJson(
+            route('estudiante.evaluaciones.iniciar', $this->plantilla),
+            ['id_sim' => $ajeno->id_sim],
+        )->assertUnprocessable()->assertJsonValidationErrors('id_sim');
+
+        $propio = SimulacroProgramado::create([
+            'id_prog' => $programa->id_prog,
+            'id_grupo' => $grupoPropio->id_grupo,
+            'id_plantilla' => $this->plantilla->id_plan,
+            'titulo_sim' => 'Simulacro propio',
+            'estado_sim' => 'programado',
+        ]);
+
+        $this->actingAs($this->student)->postJson(
+            route('estudiante.evaluaciones.iniciar', $this->plantilla),
+            ['id_sim' => $propio->id_sim],
+        )->assertRedirect();
+
+        $this->assertDatabaseHas('evaluaciones_aplicadas', [
+            'id_post' => $this->postulante->id_post,
+            'id_plantilla' => $this->plantilla->id_plan,
+            'id_sim' => $propio->id_sim,
+            'estado_eval_apl' => 'en_progreso',
+        ]);
+    }
+
+    public function test_archived_question_makes_template_unavailable_for_new_attempt(): void
+    {
+        $segunda = Pregunta::create([
+            'enunciado_preg' => 'Pregunta que será archivada antes de iniciar',
+            'tipo_preg' => 'respuesta_corta',
+            'puntaje_preg' => 1,
+            'estado_preg' => 'activo',
+        ]);
+        $this->plantilla->preguntas()->updateExistingPivot($this->pregunta->id_preg, ['puntaje_pp' => 50]);
+        $this->plantilla->preguntas()->attach($segunda->id_preg, [
+            'orden_pp' => 2,
+            'puntaje_pp' => 50,
+        ]);
+        $segunda->delete();
+
+        $this->actingAs($this->student)
+            ->postJson(route('estudiante.evaluaciones.iniciar', $this->plantilla))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('plantilla');
+
+        $this->assertDatabaseCount('evaluaciones_aplicadas', 0);
+        $this->assertDatabaseHas('plantilla_preguntas', [
+            'id_plan' => $this->plantilla->id_plan,
+            'id_preg' => $segunda->id_preg,
+            'puntaje_pp' => 50,
+        ]);
+    }
+
+    public function test_attempt_cannot_finish_if_a_required_question_was_archived(): void
+    {
+        $segunda = Pregunta::create([
+            'enunciado_preg' => 'Pregunta que será archivada durante el intento',
+            'tipo_preg' => 'respuesta_corta',
+            'puntaje_preg' => 1,
+            'estado_preg' => 'activo',
+        ]);
+        $this->plantilla->preguntas()->updateExistingPivot($this->pregunta->id_preg, ['puntaje_pp' => 50]);
+        $this->plantilla->preguntas()->attach($segunda->id_preg, [
+            'orden_pp' => 2,
+            'puntaje_pp' => 50,
+        ]);
+        $evaluacion = $this->createOpenEvaluation();
+        $segunda->delete();
+
+        $this->actingAs($this->student)->postJson(
+            route('estudiante.evaluaciones.enviar', $evaluacion),
+            ['respuestas' => [[
+                'id_preg' => $this->pregunta->id_preg,
+                'id_alt' => $this->correcta->id_alt,
+            ]]],
+        )->assertUnprocessable()->assertJsonValidationErrors('evaluacion');
+
+        $this->assertSame('en_progreso', $evaluacion->fresh()->estado_eval_apl);
+        $this->assertSame('100.00', $evaluacion->puntaje_maximo_eval_apl);
+        $this->assertDatabaseCount('respuestas_evaluacion', 0);
     }
 
     private function createOpenEvaluation(): EvaluacionAplicada
