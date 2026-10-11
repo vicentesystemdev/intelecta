@@ -16,7 +16,7 @@ No se implementó Tutor.personal_id, multirrol, redistribución global de permis
 - Inventario por PDO en transacción READ ONLY; huellas de las 39 tablas públicas para comparación posterior.
 - No se ejecutaron seeders ni altas durante el inventario.
 
-Respaldo anterior a las migraciones: [dump PostgreSQL](C:/laragon/tmp/intelecta-identity-backups/intelecta-before-block3-20260909_185856.dump).
+Respaldo anterior a las migraciones: `intelecta-before-block3-20260909_185856.dump` (archivo privado fuera del repositorio; no se publica ni se enlaza como evidencia pública).
 
 Tamaño: 196703 bytes. SHA-256: 917ad9941be0e7f57dc645a90dbfa1972167d5870d755dd08f94c5c2f4ba64e0.
 El catálogo se verificó con pg_restore --list; no se ensayó restauración completa.
@@ -348,46 +348,46 @@ Sin errores. También se comprobó ausencia de staging.
 
 40 archivos: 11 existentes modificados y 29 nuevos, incluyendo este informe.
 
-- [app/Domains/Institucional/Actions/VincularUsuarioPersonalAction.php](C:/laragon/www/intelecta/app/Domains/Institucional/Actions/VincularUsuarioPersonalAction.php)
-- [app/Domains/Institucional/Enums/EstadoCargo.php](C:/laragon/www/intelecta/app/Domains/Institucional/Enums/EstadoCargo.php)
-- [app/Domains/Institucional/Enums/EstadoPersonal.php](C:/laragon/www/intelecta/app/Domains/Institucional/Enums/EstadoPersonal.php)
-- [app/Domains/Institucional/Models/Cargo.php](C:/laragon/www/intelecta/app/Domains/Institucional/Models/Cargo.php)
-- [app/Domains/Institucional/Models/PersonalInstitucional.php](C:/laragon/www/intelecta/app/Domains/Institucional/Models/PersonalInstitucional.php)
-- [app/Domains/Institucional/Services/OrganizacionService.php](C:/laragon/www/intelecta/app/Domains/Institucional/Services/OrganizacionService.php)
-- [app/Domains/Institucional/Support/PermisosOrganizacion.php](C:/laragon/www/intelecta/app/Domains/Institucional/Support/PermisosOrganizacion.php)
-- [app/Http/Controllers/Institucional/CargoController.php](C:/laragon/www/intelecta/app/Http/Controllers/Institucional/CargoController.php)
-- [app/Http/Controllers/Institucional/PersonalInstitucionalController.php](C:/laragon/www/intelecta/app/Http/Controllers/Institucional/PersonalInstitucionalController.php)
-- [app/Http/Middleware/EnsureOrganizationAccess.php](C:/laragon/www/intelecta/app/Http/Middleware/EnsureOrganizationAccess.php)
-- [app/Http/Middleware/HandleInertiaRequests.php](C:/laragon/www/intelecta/app/Http/Middleware/HandleInertiaRequests.php)
-- [app/Http/Requests/Institucional/CargoRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/CargoRequest.php)
-- [app/Http/Requests/Institucional/EstadoOrganizacionalRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/EstadoOrganizacionalRequest.php)
-- [app/Http/Requests/Institucional/PersonalInstitucionalRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/PersonalInstitucionalRequest.php)
-- [app/Http/Requests/Institucional/VincularPersonalRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/VincularPersonalRequest.php)
-- [app/Models/User.php](C:/laragon/www/intelecta/app/Models/User.php)
-- [app/Rules/InputFormat.php](C:/laragon/www/intelecta/app/Rules/InputFormat.php)
-- [app/Support/Validation/InputRules.php](C:/laragon/www/intelecta/app/Support/Validation/InputRules.php)
-- [bootstrap/app.php](C:/laragon/www/intelecta/bootstrap/app.php)
-- [database/factories/CargoFactory.php](C:/laragon/www/intelecta/database/factories/CargoFactory.php)
-- [database/factories/PersonalInstitucionalFactory.php](C:/laragon/www/intelecta/database/factories/PersonalInstitucionalFactory.php)
-- [database/migrations/2026_09_10_000000_create_cargos_and_personal_institucional.php](C:/laragon/www/intelecta/database/migrations/2026_09_10_000000_create_cargos_and_personal_institucional.php)
-- [database/migrations/2026_09_10_000100_add_organizational_permissions.php](C:/laragon/www/intelecta/database/migrations/2026_09_10_000100_add_organizational_permissions.php)
-- [database/seeders/BaseLimpiaAvalanchaSeeder.php](C:/laragon/www/intelecta/database/seeders/BaseLimpiaAvalanchaSeeder.php)
-- [database/seeders/CargosSeeder.php](C:/laragon/www/intelecta/database/seeders/CargosSeeder.php)
-- [database/seeders/PersonalInstitucionalSeeder.php](C:/laragon/www/intelecta/database/seeders/PersonalInstitucionalSeeder.php)
-- [database/seeders/RolesAndUsersSeeder.php](C:/laragon/www/intelecta/database/seeders/RolesAndUsersSeeder.php)
-- [docs/cargos-personal-bloque-3.md](C:/laragon/www/intelecta/docs/cargos-personal-bloque-3.md)
-- [docs/test-postgres-personal-concurrency.php](C:/laragon/www/intelecta/docs/test-postgres-personal-concurrency.php)
-- [docs/test-postgres-personal-installation.php](C:/laragon/www/intelecta/docs/test-postgres-personal-installation.php)
-- [resources/js/Components/AppSidebar.jsx](C:/laragon/www/intelecta/resources/js/Components/AppSidebar.jsx)
-- [resources/js/Components/Institucional/OrganizationFilters.jsx](C:/laragon/www/intelecta/resources/js/Components/Institucional/OrganizationFilters.jsx)
-- [resources/js/Components/Institucional/VincularPersonalModal.jsx](C:/laragon/www/intelecta/resources/js/Components/Institucional/VincularPersonalModal.jsx)
-- [resources/js/Pages/Institucional/Cargos/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/Cargos/Index.jsx)
-- [resources/js/Pages/Institucional/Personal/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/Personal/Index.jsx)
-- [resources/js/lib/inputValidation.js](C:/laragon/www/intelecta/resources/js/lib/inputValidation.js)
-- [routes/web.php](C:/laragon/www/intelecta/routes/web.php)
-- [tests/Feature/Institucional/OrganizacionSeederTest.php](C:/laragon/www/intelecta/tests/Feature/Institucional/OrganizacionSeederTest.php)
-- [tests/Feature/Institucional/OrganizacionTest.php](C:/laragon/www/intelecta/tests/Feature/Institucional/OrganizacionTest.php)
-- [tests/input-validation.test.mjs](C:/laragon/www/intelecta/tests/input-validation.test.mjs)
+- [app/Domains/Institucional/Actions/VincularUsuarioPersonalAction.php](../app/Domains/Institucional/Actions/VincularUsuarioPersonalAction.php)
+- [app/Domains/Institucional/Enums/EstadoCargo.php](../app/Domains/Institucional/Enums/EstadoCargo.php)
+- [app/Domains/Institucional/Enums/EstadoPersonal.php](../app/Domains/Institucional/Enums/EstadoPersonal.php)
+- [app/Domains/Institucional/Models/Cargo.php](../app/Domains/Institucional/Models/Cargo.php)
+- [app/Domains/Institucional/Models/PersonalInstitucional.php](../app/Domains/Institucional/Models/PersonalInstitucional.php)
+- [app/Domains/Institucional/Services/OrganizacionService.php](../app/Domains/Institucional/Services/OrganizacionService.php)
+- [app/Domains/Institucional/Support/PermisosOrganizacion.php](../app/Domains/Institucional/Support/PermisosOrganizacion.php)
+- [app/Http/Controllers/Institucional/CargoController.php](../app/Http/Controllers/Institucional/CargoController.php)
+- [app/Http/Controllers/Institucional/PersonalInstitucionalController.php](../app/Http/Controllers/Institucional/PersonalInstitucionalController.php)
+- [app/Http/Middleware/EnsureOrganizationAccess.php](../app/Http/Middleware/EnsureOrganizationAccess.php)
+- [app/Http/Middleware/HandleInertiaRequests.php](../app/Http/Middleware/HandleInertiaRequests.php)
+- [app/Http/Requests/Institucional/CargoRequest.php](../app/Http/Requests/Institucional/CargoRequest.php)
+- [app/Http/Requests/Institucional/EstadoOrganizacionalRequest.php](../app/Http/Requests/Institucional/EstadoOrganizacionalRequest.php)
+- [app/Http/Requests/Institucional/PersonalInstitucionalRequest.php](../app/Http/Requests/Institucional/PersonalInstitucionalRequest.php)
+- [app/Http/Requests/Institucional/VincularPersonalRequest.php](../app/Http/Requests/Institucional/VincularPersonalRequest.php)
+- [app/Models/User.php](../app/Models/User.php)
+- [app/Rules/InputFormat.php](../app/Rules/InputFormat.php)
+- [app/Support/Validation/InputRules.php](../app/Support/Validation/InputRules.php)
+- [bootstrap/app.php](../bootstrap/app.php)
+- [database/factories/CargoFactory.php](../database/factories/CargoFactory.php)
+- [database/factories/PersonalInstitucionalFactory.php](../database/factories/PersonalInstitucionalFactory.php)
+- [database/migrations/2026_09_10_000000_create_cargos_and_personal_institucional.php](../database/migrations/2026_09_10_000000_create_cargos_and_personal_institucional.php)
+- [database/migrations/2026_09_10_000100_add_organizational_permissions.php](../database/migrations/2026_09_10_000100_add_organizational_permissions.php)
+- [database/seeders/BaseLimpiaAvalanchaSeeder.php](../database/seeders/BaseLimpiaAvalanchaSeeder.php)
+- [database/seeders/CargosSeeder.php](../database/seeders/CargosSeeder.php)
+- [database/seeders/PersonalInstitucionalSeeder.php](../database/seeders/PersonalInstitucionalSeeder.php)
+- [database/seeders/RolesAndUsersSeeder.php](../database/seeders/RolesAndUsersSeeder.php)
+- [docs/cargos-personal-bloque-3.md](cargos-personal-bloque-3.md)
+- [docs/test-postgres-personal-concurrency.php](test-postgres-personal-concurrency.php)
+- [docs/test-postgres-personal-installation.php](test-postgres-personal-installation.php)
+- [resources/js/Components/AppSidebar.jsx](../resources/js/Components/AppSidebar.jsx)
+- [resources/js/Components/Institucional/OrganizationFilters.jsx](../resources/js/Components/Institucional/OrganizationFilters.jsx)
+- [resources/js/Components/Institucional/VincularPersonalModal.jsx](../resources/js/Components/Institucional/VincularPersonalModal.jsx)
+- [resources/js/Pages/Institucional/Cargos/Index.jsx](../resources/js/Pages/Institucional/Cargos/Index.jsx)
+- [resources/js/Pages/Institucional/Personal/Index.jsx](../resources/js/Pages/Institucional/Personal/Index.jsx)
+- [resources/js/lib/inputValidation.js](../resources/js/lib/inputValidation.js)
+- [routes/web.php](../routes/web.php)
+- [tests/Feature/Institucional/OrganizacionSeederTest.php](../tests/Feature/Institucional/OrganizacionSeederTest.php)
+- [tests/Feature/Institucional/OrganizacionTest.php](../tests/Feature/Institucional/OrganizacionTest.php)
+- [tests/input-validation.test.mjs](../tests/input-validation.test.mjs)
 
 ## 29. Riesgos / pendientes
 
@@ -405,4 +405,3 @@ Sin errores. También se comprobó ausencia de staging.
 Rama develop; HEAD 49173e1 sin cambios.
 NO git add. NO commit. NO push.
 Todos los cambios permanecen sin staging para revisión.
-

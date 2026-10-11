@@ -27,6 +27,10 @@ class RolesAndUsersSeeder extends Seeder
 
     public function run(): void
     {
+        if (! app()->environment(['local', 'testing'])) {
+            throw new \RuntimeException('Las cuentas ficticias de demostración solo pueden cargarse en local o testing.');
+        }
+
         $this->studentUsers = [];
         $this->staffUsers = [];
         app(PermissionRegistrar::class)->forgetCachedPermissions();

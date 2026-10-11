@@ -469,7 +469,7 @@ export default function LearningAnalytics() {
                                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-accent text-brand-primary"><BrainCircuit className="h-6 w-6" /></span>
                                 <div><p className="text-xs font-semibold uppercase tracking-wider text-brand-accent">Estado del módulo</p><p className="mt-1 text-sm font-semibold text-white">Vista institucional referencial</p></div>
                             </div>
-                            <p className="mt-3 text-xs leading-5 text-slate-200 font-medium">Resultados referenciales para exposición. No corresponden a inferencia predictiva operativa.</p>
+                            <p className="mt-3 text-xs leading-5 text-slate-200 font-medium">Datos simulados para exposición: estos gráficos no consultan la base de datos. No corresponden a resultados operativos ni a inferencia predictiva.</p>
                         </div>
                     </div>
                 </section>

@@ -20,7 +20,7 @@ Rama `develop`, working tree limpio, HEAD `d13206e feat: incorporar cargos y per
 
 Solo dos FK apuntan a Tutor: `asignaciones_tutores.id_tutor` (CASCADE al borrar físicamente) y `asistencias_academicas.id_tutor` (SET NULL al borrar físicamente), ambas con ON UPDATE CASCADE. Se conservaron sus definiciones; el archivado utiliza soft delete.
 
-Snapshot persistido: [evidencia-tutor-bloque-4.json](C:/laragon/www/intelecta/docs/evidencia-tutor-bloque-4.json). Contiene conteos, hashes e IDs, no valores de identidad/contacto ni credenciales.
+Snapshot persistido: [evidencia-tutor-bloque-4.json](evidencia-tutor-bloque-4.json). Contiene conteos, hashes e IDs, no valores de identidad/contacto ni credenciales.
 
 # 4. Modelo final Tutor
 

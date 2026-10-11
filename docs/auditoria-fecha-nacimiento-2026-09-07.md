@@ -8,24 +8,24 @@ Se inspeccionaron código PHP/React, migraciones, seeders, factories, tests, SQL
 
 | Archivo | Uso | Acción |
 | --- | --- | --- |
-| [2026_06_08_230000_create_postulantes_table.php](C:/laragon/www/intelecta/database/migrations/2026_06_08_230000_create_postulantes_table.php) | Columna histórica nullable. | Sin cambios; no se elimina ni se modifica una migración aplicada. |
-| [2026_09_07_000000_add_basic_input_checks.php](C:/laragon/www/intelecta/database/migrations/2026_09_07_000000_add_basic_input_checks.php) | CHECK edad BETWEEN 14 AND 80. | Intacto y validado en PostgreSQL. |
-| [Postulante.php](C:/laragon/www/intelecta/app/Domains/Postulantes/Models/Postulante.php) | Fillable/cast de edad almacenada. | Se conservan para legacy; nuevo accessor edad_actual prioriza fecha. |
-| [StorePostulanteRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Postulantes/StorePostulanteRequest.php) | Entrada y reglas de edad manual. | Fecha estricta obligatoria en CREATE; edad enviada se excluye. |
-| [PostulanteData.php](C:/laragon/www/intelecta/app/Domains/Postulantes/DTOs/PostulanteData.php) | Propiedad edadPost y escritura de edad_post. | Sustituidas por fechaNacimientoPost; nunca sobrescribe edad histórica. |
-| [ReporteAcademicoController.php](C:/laragon/www/intelecta/app/Http/Controllers/ReporteAcademicoController.php) | Construcción de edad para reporte individual. | Solo cambia la fuente a edad_actual; sin corregir otras reglas del reporte. |
-| [PostulanteForm.jsx](C:/laragon/www/intelecta/resources/js/Components/Postulantes/PostulanteForm.jsx) | Edad editable y payload. | Campo controlado DD/MM/AAAA; sin edad manual en payload. |
-| [inputValidation.js](C:/laragon/www/intelecta/resources/js/lib/inputValidation.js) | Metadatos HTML de edad 14–80. | Metadatos de longitud/formato de fecha. |
-| [Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Postulantes/Index.jsx) | Edad en tabla y modal de detalle. | edad_actual; fecha latinoamericana en detalle. |
-| [Show.jsx](C:/laragon/www/intelecta/resources/js/Pages/Postulantes/Show.jsx) | Edad del detalle. | edad_actual más fecha o aviso pendiente. |
-| [Show.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/FichaAcademica/Show.jsx) | Edad en ficha académica. | edad_actual más fecha latinoamericana. |
-| [PostulantesSeeder.php](C:/laragon/www/intelecta/database/seeders/PostulantesSeeder.php) | 60 fixtures con edades explícitas. | 60 fixtures con fechas sintéticas explícitas; no completa fechas de registros preexistentes. |
-| [BaseLimpiaAvalanchaSeeder.php](C:/laragon/www/intelecta/database/seeders/BaseLimpiaAvalanchaSeeder.php) | Edades generadas para 72 fixtures. | Lista de fechas sintéticas explícitas para nuevos fixtures; no deriva fechas de edades. |
-| [PostulanteModuleTest.php](C:/laragon/www/intelecta/tests/Feature/Postulantes/PostulanteModuleTest.php) | Payload válido y rechazo de menor de edad. | Payload con fecha; conserva prueba de mínimo desde fecha relativa. |
-| [RequestValidationTest.php](C:/laragon/www/intelecta/tests/Feature/Validation/RequestValidationTest.php) | Límites/formas inválidas y bordes de edad. | Mismos límites de admisión comprobados desde fechas; validaciones ajenas intactas. |
-| [input-validation.test.mjs](C:/laragon/www/intelecta/tests/input-validation.test.mjs) | Comprobación de metadatos edad. | Metadatos y round-trip de fechas, calendario y contrato del formulario. |
-| [validation.php](C:/laragon/www/intelecta/lang/es/validation.php) | Etiqueta humana de edad. | Conservada para legacy; nueva etiqueta y mensajes de fecha en español. |
-| [auditoria-validaciones-basicas-2026-09-07.md](C:/laragon/www/intelecta/docs/auditoria-validaciones-basicas-2026-09-07.md) | Fotografía de la fase anterior (columna, reglas, metadatos). | Documento histórico preservado; este informe describe la evolución posterior. |
+| [2026_06_08_230000_create_postulantes_table.php](../database/migrations/2026_06_08_230000_create_postulantes_table.php) | Columna histórica nullable. | Sin cambios; no se elimina ni se modifica una migración aplicada. |
+| [2026_09_07_000000_add_basic_input_checks.php](../database/migrations/2026_09_07_000000_add_basic_input_checks.php) | CHECK edad BETWEEN 14 AND 80. | Intacto y validado en PostgreSQL. |
+| [Postulante.php](../app/Domains/Postulantes/Models/Postulante.php) | Fillable/cast de edad almacenada. | Se conservan para legacy; nuevo accessor edad_actual prioriza fecha. |
+| [StorePostulanteRequest.php](../app/Http/Requests/Postulantes/StorePostulanteRequest.php) | Entrada y reglas de edad manual. | Fecha estricta obligatoria en CREATE; edad enviada se excluye. |
+| [PostulanteData.php](../app/Domains/Postulantes/DTOs/PostulanteData.php) | Propiedad edadPost y escritura de edad_post. | Sustituidas por fechaNacimientoPost; nunca sobrescribe edad histórica. |
+| [ReporteAcademicoController.php](../app/Http/Controllers/ReporteAcademicoController.php) | Construcción de edad para reporte individual. | Solo cambia la fuente a edad_actual; sin corregir otras reglas del reporte. |
+| [PostulanteForm.jsx](../resources/js/Components/Postulantes/PostulanteForm.jsx) | Edad editable y payload. | Campo controlado DD/MM/AAAA; sin edad manual en payload. |
+| [inputValidation.js](../resources/js/lib/inputValidation.js) | Metadatos HTML de edad 14–80. | Metadatos de longitud/formato de fecha. |
+| [Index.jsx](../resources/js/Pages/Postulantes/Index.jsx) | Edad en tabla y modal de detalle. | edad_actual; fecha latinoamericana en detalle. |
+| [Show.jsx](../resources/js/Pages/Postulantes/Show.jsx) | Edad del detalle. | edad_actual más fecha o aviso pendiente. |
+| [Show.jsx](../resources/js/Pages/Institucional/FichaAcademica/Show.jsx) | Edad en ficha académica. | edad_actual más fecha latinoamericana. |
+| [PostulantesSeeder.php](../database/seeders/PostulantesSeeder.php) | 60 fixtures con edades explícitas. | 60 fixtures con fechas sintéticas explícitas; no completa fechas de registros preexistentes. |
+| [BaseLimpiaAvalanchaSeeder.php](../database/seeders/BaseLimpiaAvalanchaSeeder.php) | Edades generadas para 72 fixtures. | Lista de fechas sintéticas explícitas para nuevos fixtures; no deriva fechas de edades. |
+| [PostulanteModuleTest.php](../tests/Feature/Postulantes/PostulanteModuleTest.php) | Payload válido y rechazo de menor de edad. | Payload con fecha; conserva prueba de mínimo desde fecha relativa. |
+| [RequestValidationTest.php](../tests/Feature/Validation/RequestValidationTest.php) | Límites/formas inválidas y bordes de edad. | Mismos límites de admisión comprobados desde fechas; validaciones ajenas intactas. |
+| [input-validation.test.mjs](../tests/input-validation.test.mjs) | Comprobación de metadatos edad. | Metadatos y round-trip de fechas, calendario y contrato del formulario. |
+| [validation.php](../lang/es/validation.php) | Etiqueta humana de edad. | Conservada para legacy; nueva etiqueta y mensajes de fecha en español. |
+| [auditoria-validaciones-basicas-2026-09-07.md](auditoria-validaciones-basicas-2026-09-07.md) | Fotografía de la fase anterior (columna, reglas, metadatos). | Documento histórico preservado; este informe describe la evolución posterior. |
 
 Revisión de consumidores indirectos:
 
@@ -40,7 +40,7 @@ Revisión de consumidores indirectos:
 
 ## 2. Migración creada
 
-[database/migrations/2026_09_07_010000_add_fecha_nacimiento_to_postulantes.php](C:/laragon/www/intelecta/database/migrations/2026_09_07_010000_add_fecha_nacimiento_to_postulantes.php)
+[database/migrations/2026_09_07_010000_add_fecha_nacimiento_to_postulantes.php](../database/migrations/2026_09_07_010000_add_fecha_nacimiento_to_postulantes.php)
 
 Agrega exclusivamente postulantes.fecha_nacimiento_post con tipo PostgreSQL DATE y NULL permitido, sin valor por defecto ni UPDATE de datos. NULL representa una fecha exacta desconocida; una edad histórica no permite reconstruir día y mes.
 
@@ -67,13 +67,13 @@ Modelo: serialización date:Y-m-d
 formatDateLatam: 15/08/2005
 ```
 
-El formulario no utiliza input type=date ni muestra ISO o MM/DD/YYYY. La utilidad [resources/js/lib/dateOnly.js](C:/laragon/www/intelecta/resources/js/lib/dateOnly.js) centraliza ISO ↔ DD/MM/AAAA por componentes y valida el calendario sin new Date(string), timestamps ni conversión UTC. Laravel acepta también ISO canónico de aplicación; el campo visible exige DD/MM/AAAA.
+El formulario no utiliza input type=date ni muestra ISO o MM/DD/YYYY. La utilidad [resources/js/lib/dateOnly.js](../resources/js/lib/dateOnly.js) centraliza ISO ↔ DD/MM/AAAA por componentes y valida el calendario sin new Date(string), timestamps ni conversión UTC. Laravel acepta también ISO canónico de aplicación; el campo visible exige DD/MM/AAAA.
 
 El backend no corrige silenciosamente una fecha imposible. Solo normaliza una fecha de calendario válida; una entrada inválida permanece disponible para que la regla produzca el error correspondiente.
 
 ## 4. Cálculo de edad
 
-El cálculo único está en [BirthDate::age](C:/laragon/www/intelecta/app/Domains/Postulantes/Support/BirthDate.php); [Postulante::edadActual](C:/laragon/www/intelecta/app/Domains/Postulantes/Models/Postulante.php) lo expone como edad_actual y lo incluye en la serialización.
+El cálculo único está en [BirthDate::age](../app/Domains/Postulantes/Support/BirthDate.php); [Postulante::edadActual](../app/Domains/Postulantes/Models/Postulante.php) lo expone como edad_actual y lo incluye en la serialización.
 
 Calcula años completos comparando año y aniversario mes/día. No guarda una edad derivada que pueda quedar obsoleta ni duplica cálculos en React. Para nacidos el 29 de febrero, el incremento en años no bisiestos ocurre el 1 de marzo; está cubierto por tests.
 
@@ -109,7 +109,7 @@ Calcula años completos comparando año y aniversario mes/día. No guarda una ed
 | Tipos malformados | Arrays, booleanos, números y timestamps como fecha devuelven 422, no 500. |
 | Edad del navegador | Se ignora; Laravel recalcula desde la fecha. |
 
-Se reutilizaron NormalizedFormRequest, InputNormalizer, InputRules::MIN_AGE/MAX_AGE y lang/es. [app/Rules/PostulanteBirthDate.php](C:/laragon/www/intelecta/app/Rules/PostulanteBirthDate.php) concentra la validación propia del dominio. Las demás validaciones del postulante siguen activas.
+Se reutilizaron NormalizedFormRequest, InputNormalizer, InputRules::MIN_AGE/MAX_AGE y lang/es. [app/Rules/PostulanteBirthDate.php](../app/Rules/PostulanteBirthDate.php) concentra la validación propia del dominio. Las demás validaciones del postulante siguen activas.
 
 Los dos seeders usan fechas sintéticas explícitas solo para datos de demostración nuevos. No deducen fechas desde edades y no actualizan el nacimiento de registros preexistentes, incluidos soft-deleted. No se ejecutaron esos seeders sobre PostgreSQL.
 
@@ -117,38 +117,38 @@ Los dos seeders usan fechas sintéticas explícitas solo para datos de demostrac
 
 Comparación por SHA-256 contra el estado al inicio de esta tarea, no contra HEAD (que ya incluía la fase previa). Lista completa: 32 archivos, incluidos informe y evidencias.
 
-- [app/Domains/Postulantes/DTOs/PostulanteData.php](C:/laragon/www/intelecta/app/Domains/Postulantes/DTOs/PostulanteData.php)
-- [app/Domains/Postulantes/Models/Postulante.php](C:/laragon/www/intelecta/app/Domains/Postulantes/Models/Postulante.php)
-- [app/Domains/Postulantes/Support/BirthDate.php](C:/laragon/www/intelecta/app/Domains/Postulantes/Support/BirthDate.php)
-- [app/Http/Controllers/ReporteAcademicoController.php](C:/laragon/www/intelecta/app/Http/Controllers/ReporteAcademicoController.php)
-- [app/Http/Requests/Postulantes/StorePostulanteRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Postulantes/StorePostulanteRequest.php)
-- [app/Http/Requests/Postulantes/UpdatePostulanteRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Postulantes/UpdatePostulanteRequest.php)
-- [app/Rules/PostulanteBirthDate.php](C:/laragon/www/intelecta/app/Rules/PostulanteBirthDate.php)
-- [database/migrations/2026_09_07_010000_add_fecha_nacimiento_to_postulantes.php](C:/laragon/www/intelecta/database/migrations/2026_09_07_010000_add_fecha_nacimiento_to_postulantes.php)
-- [database/seeders/BaseLimpiaAvalanchaSeeder.php](C:/laragon/www/intelecta/database/seeders/BaseLimpiaAvalanchaSeeder.php)
-- [database/seeders/PostulantesSeeder.php](C:/laragon/www/intelecta/database/seeders/PostulantesSeeder.php)
-- [docs/audit-input-data.php](C:/laragon/www/intelecta/docs/audit-input-data.php)
-- [docs/auditoria-fecha-nacimiento-2026-09-07.md](C:/laragon/www/intelecta/docs/auditoria-fecha-nacimiento-2026-09-07.md)
-- [docs/evidencia-fecha-nacimiento/01-crear.png](C:/laragon/www/intelecta/docs/evidencia-fecha-nacimiento/01-crear.png)
-- [docs/evidencia-fecha-nacimiento/02-fecha-invalida.png](C:/laragon/www/intelecta/docs/evidencia-fecha-nacimiento/02-fecha-invalida.png)
-- [docs/evidencia-fecha-nacimiento/03-editar-fecha.png](C:/laragon/www/intelecta/docs/evidencia-fecha-nacimiento/03-editar-fecha.png)
-- [docs/evidencia-fecha-nacimiento/04-legacy-pendiente.png](C:/laragon/www/intelecta/docs/evidencia-fecha-nacimiento/04-legacy-pendiente.png)
-- [docs/evidencia-fecha-nacimiento/resultado.json](C:/laragon/www/intelecta/docs/evidencia-fecha-nacimiento/resultado.json)
-- [docs/fecha-nacimiento-verificacion-2026-09-07.json](C:/laragon/www/intelecta/docs/fecha-nacimiento-verificacion-2026-09-07.json)
-- [docs/test-birth-date-ui.mjs](C:/laragon/www/intelecta/docs/test-birth-date-ui.mjs)
-- [docs/test-birth-date-ui.php](C:/laragon/www/intelecta/docs/test-birth-date-ui.php)
-- [docs/test-postgres-birth-date.php](C:/laragon/www/intelecta/docs/test-postgres-birth-date.php)
-- [lang/es/validation.php](C:/laragon/www/intelecta/lang/es/validation.php)
-- [resources/js/Components/Postulantes/PostulanteForm.jsx](C:/laragon/www/intelecta/resources/js/Components/Postulantes/PostulanteForm.jsx)
-- [resources/js/Pages/Institucional/FichaAcademica/Show.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/FichaAcademica/Show.jsx)
-- [resources/js/Pages/Postulantes/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Postulantes/Index.jsx)
-- [resources/js/Pages/Postulantes/Show.jsx](C:/laragon/www/intelecta/resources/js/Pages/Postulantes/Show.jsx)
-- [resources/js/lib/dateOnly.js](C:/laragon/www/intelecta/resources/js/lib/dateOnly.js)
-- [resources/js/lib/inputValidation.js](C:/laragon/www/intelecta/resources/js/lib/inputValidation.js)
-- [tests/Feature/Postulantes/PostulanteBirthDateTest.php](C:/laragon/www/intelecta/tests/Feature/Postulantes/PostulanteBirthDateTest.php)
-- [tests/Feature/Postulantes/PostulanteModuleTest.php](C:/laragon/www/intelecta/tests/Feature/Postulantes/PostulanteModuleTest.php)
-- [tests/Feature/Validation/RequestValidationTest.php](C:/laragon/www/intelecta/tests/Feature/Validation/RequestValidationTest.php)
-- [tests/input-validation.test.mjs](C:/laragon/www/intelecta/tests/input-validation.test.mjs)
+- [app/Domains/Postulantes/DTOs/PostulanteData.php](../app/Domains/Postulantes/DTOs/PostulanteData.php)
+- [app/Domains/Postulantes/Models/Postulante.php](../app/Domains/Postulantes/Models/Postulante.php)
+- [app/Domains/Postulantes/Support/BirthDate.php](../app/Domains/Postulantes/Support/BirthDate.php)
+- [app/Http/Controllers/ReporteAcademicoController.php](../app/Http/Controllers/ReporteAcademicoController.php)
+- [app/Http/Requests/Postulantes/StorePostulanteRequest.php](../app/Http/Requests/Postulantes/StorePostulanteRequest.php)
+- [app/Http/Requests/Postulantes/UpdatePostulanteRequest.php](../app/Http/Requests/Postulantes/UpdatePostulanteRequest.php)
+- [app/Rules/PostulanteBirthDate.php](../app/Rules/PostulanteBirthDate.php)
+- [database/migrations/2026_09_07_010000_add_fecha_nacimiento_to_postulantes.php](../database/migrations/2026_09_07_010000_add_fecha_nacimiento_to_postulantes.php)
+- [database/seeders/BaseLimpiaAvalanchaSeeder.php](../database/seeders/BaseLimpiaAvalanchaSeeder.php)
+- [database/seeders/PostulantesSeeder.php](../database/seeders/PostulantesSeeder.php)
+- [docs/audit-input-data.php](audit-input-data.php)
+- [docs/auditoria-fecha-nacimiento-2026-09-07.md](auditoria-fecha-nacimiento-2026-09-07.md)
+- [docs/evidencia-fecha-nacimiento/01-crear.png](evidencia-fecha-nacimiento/01-crear.png)
+- [docs/evidencia-fecha-nacimiento/02-fecha-invalida.png](evidencia-fecha-nacimiento/02-fecha-invalida.png)
+- [docs/evidencia-fecha-nacimiento/03-editar-fecha.png](evidencia-fecha-nacimiento/03-editar-fecha.png)
+- [docs/evidencia-fecha-nacimiento/04-legacy-pendiente.png](evidencia-fecha-nacimiento/04-legacy-pendiente.png)
+- [docs/evidencia-fecha-nacimiento/resultado.json](evidencia-fecha-nacimiento/resultado.json)
+- [docs/fecha-nacimiento-verificacion-2026-09-07.json](fecha-nacimiento-verificacion-2026-09-07.json)
+- [docs/test-birth-date-ui.mjs](test-birth-date-ui.mjs)
+- [docs/test-birth-date-ui.php](test-birth-date-ui.php)
+- [docs/test-postgres-birth-date.php](test-postgres-birth-date.php)
+- [lang/es/validation.php](../lang/es/validation.php)
+- [resources/js/Components/Postulantes/PostulanteForm.jsx](../resources/js/Components/Postulantes/PostulanteForm.jsx)
+- [resources/js/Pages/Institucional/FichaAcademica/Show.jsx](../resources/js/Pages/Institucional/FichaAcademica/Show.jsx)
+- [resources/js/Pages/Postulantes/Index.jsx](../resources/js/Pages/Postulantes/Index.jsx)
+- [resources/js/Pages/Postulantes/Show.jsx](../resources/js/Pages/Postulantes/Show.jsx)
+- [resources/js/lib/dateOnly.js](../resources/js/lib/dateOnly.js)
+- [resources/js/lib/inputValidation.js](../resources/js/lib/inputValidation.js)
+- [tests/Feature/Postulantes/PostulanteBirthDateTest.php](../tests/Feature/Postulantes/PostulanteBirthDateTest.php)
+- [tests/Feature/Postulantes/PostulanteModuleTest.php](../tests/Feature/Postulantes/PostulanteModuleTest.php)
+- [tests/Feature/Validation/RequestValidationTest.php](../tests/Feature/Validation/RequestValidationTest.php)
+- [tests/input-validation.test.mjs](../tests/input-validation.test.mjs)
 
 Pint produjo además ajustes de formato en los archivos ya tocados (imports/espacios/llaves del controlador de reportes, formato de fixtures y un nombre de tipo equivalente en BaseLimpiaAvalanchaSeeder). No son cambios de reglas de negocio.
 
@@ -174,14 +174,14 @@ La prueba PostgreSQL usa un clon temporal sin defaults de secuencia y una clave 
 
 La herramienta integrada de navegador falló al iniciar su runtime; se completó la comprobación con Chrome local aislado y Playwright ya disponible, sin instalar dependencias. Se inspeccionaron visualmente las capturas de creación, edición y legacy:
 
-- [Crear: 15/08/2005 y ayuda DD/MM/AAAA](C:/laragon/www/intelecta/docs/evidencia-fecha-nacimiento/01-crear.png).
-- [Rechazo visible de fecha inexistente](C:/laragon/www/intelecta/docs/evidencia-fecha-nacimiento/02-fecha-invalida.png).
-- [Editar: precarga 15/08/2005](C:/laragon/www/intelecta/docs/evidencia-fecha-nacimiento/03-editar-fecha.png).
-- [Legacy: fecha pendiente sin bloquear el formulario](C:/laragon/www/intelecta/docs/evidencia-fecha-nacimiento/04-legacy-pendiente.png).
+- [Crear: 15/08/2005 y ayuda DD/MM/AAAA](evidencia-fecha-nacimiento/01-crear.png).
+- [Rechazo visible de fecha inexistente](evidencia-fecha-nacimiento/02-fecha-invalida.png).
+- [Editar: precarga 15/08/2005](evidencia-fecha-nacimiento/03-editar-fecha.png).
+- [Legacy: fecha pendiente sin bloquear el formulario](evidencia-fecha-nacimiento/04-legacy-pendiente.png).
 
 También se verificó envío de fecha sin edad manual, persistencia de una edición ajena con fecha NULL, posterior captura de fecha real y presentación de edad calculada. Los helpers docs/test-birth-date-ui.php y .mjs permiten repetir en un entorno de QA: nunca deben desplegarse como endpoint de producción y el inicializador se niega a sobrescribir su SQLite existente.
 
-Resultados estructurados: [docs/fecha-nacimiento-verificacion-2026-09-07.json](C:/laragon/www/intelecta/docs/fecha-nacimiento-verificacion-2026-09-07.json) y [docs/evidencia-fecha-nacimiento/resultado.json](C:/laragon/www/intelecta/docs/evidencia-fecha-nacimiento/resultado.json).
+Resultados estructurados: [docs/fecha-nacimiento-verificacion-2026-09-07.json](fecha-nacimiento-verificacion-2026-09-07.json) y [docs/evidencia-fecha-nacimiento/resultado.json](evidencia-fecha-nacimiento/resultado.json).
 
 ## 9. Estado de los registros anteriores
 

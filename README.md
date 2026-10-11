@@ -1,58 +1,125 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# INTELECTA
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Plataforma de gestión académica para la **Academia Universitaria Avalancha**, desarrollada como Proyecto Integrador de UNIFRANZ. Apoya la preparación preuniversitaria mediante registro de postulantes, organización de programas y grupos, evaluaciones y seguimiento académico.
 
-## About Laravel
+**Entrega académica Hito 5 · octubre de 2026.** El [repositorio oficial](https://github.com/vicentesystemdev/intelecta) y su rama `main` constituyen la evidencia del sistema. El alcance comprobado y las limitaciones se detallan en [Estado actual](docs/estado_actual_hito5.md).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Funcionalidades disponibles
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Autenticación, verificación de correo, recuperación de contraseña, ciclo de vida de cuentas, roles y permisos; bitácora y exportación.
+- Postulantes con fecha de nacimiento y vínculo explícito a su cuenta mediante `user_id`.
+- Cargos, personal institucional y tutores vinculados a personal; programas, grupos, inscripciones y asignaciones tutoriales.
+- Matrículas, cuotas, habilitación académica y asistencia individual o por grupo.
+- Materias, áreas, temas, preguntas con alternativas y plantillas con ponderaciones.
+- Calendario de simulacros, portal del postulante y aplicación de evaluaciones.
+- Respuestas persistidas, cálculo de puntajes, resultados por materia, ficha y ranking académico.
+- Reportes descriptivos con exportación PDF y Excel e indicadores de seguimiento.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Los resultados operativos se calculan desde `respuestas_evaluacion`: no son cifras fijadas en la interfaz. Los seeders generan **datos ficticios**, incluyendo respuestas con las que se ejecuta el mismo cálculo. La pantalla **Learning Analytics** y algunas portadas son demostraciones con datos estáticos; no constituyen analítica predictiva operativa.
 
-## Learning Laravel
+## Tecnologías y arquitectura
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Componente | Tecnología confirmada |
+| --- | --- |
+| Backend | PHP 8.3+, Laravel 13, Eloquent |
+| Interfaz | React 18, Inertia.js 2, Vite 8, Tailwind CSS 3 |
+| Base institucional | PostgreSQL; SQLite en memoria para la suite de pruebas |
+| Seguridad | Laravel Breeze y Spatie Permission 8 |
+| Exportación | Laravel Dompdf y Laravel Excel |
+| Pruebas | PHPUnit 12 y pruebas de validación con Node.js |
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Las versiones exactas están en `composer.lock` y `package-lock.json`. No se necesitan Redis ni servicios externos para la demostración con la configuración de ejemplo.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+La aplicación mantiene la estructura de Laravel y organiza el negocio en `app/Domains`: `Academico`, `Evaluaciones`, `Institucional`, `Postulantes`, `Resultados`, `Reportes` y `Seguridad`. `LearningAnalytics` reserva el espacio de evolución futura. Los adaptadores HTTP están en `app/Http` y las páginas React en `resources/js/Pages`. El flujo orientativo es Controller → FormRequest → DTO → Action → Service → Repository → Model; cada caso utiliza las capas que necesita.
 
-## Agentic Development
+Consulte [README_ARQUITECTURA.md](README_ARQUITECTURA.md) para responsabilidades y convenciones.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Instalación local desde GitHub
+
+Requisitos: Git, PHP 8.3 o superior, Composer 2, Node.js **22.12+ de la serie 22** con npm y PostgreSQL. PHP debe disponer de PDO PostgreSQL, PDO SQLite para pruebas, mbstring, XML/DOM, fileinfo, curl, zip, GD y las extensiones que comprueba Composer.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/vicentesystemdev/intelecta.git
+cd intelecta
+git switch main
+composer install
+npm ci --ignore-scripts
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Copie el ejemplo **solo si no existe `.env`**:
 
-## Contributing
+```bash
+# Linux/macOS
+cp .env.example .env
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```powershell
+# PowerShell
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+```
 
-## Code of Conduct
+Cree una base PostgreSQL **nueva y exclusiva para demostración** y un usuario con permiso para crear sus tablas. Configure en `.env` `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` y `DB_PASSWORD` con sus valores locales. El ejemplo usa `intelecta_demo` y no incluye contraseñas ni claves reales. Ajuste `APP_URL` si cambia la dirección del servidor.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan key:generate
+php artisan migrate
+php artisan db:seed
+npm run build
+php artisan serve --host=127.0.0.1 --port=8000
+```
 
-## Security Vulnerabilities
+Abra `http://127.0.0.1:8000`. Para desarrollo con recarga automática, ejecute `npm run dev` en otra terminal; puede usar también `composer run dev` para iniciar servidor, cola y Vite juntos.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+`DatabaseSeeder` carga `BaseLimpiaAvalanchaSeeder`. **Ejecute el seeder únicamente en una base de demostración**, con `APP_ENV=local` o `testing`: sincroniza roles, actualiza registros coincidentes y restablece las contraseñas de las cuentas ficticias. No es un procedimiento para actualizar una base con datos reales. No utilice `migrate:fresh` ni `db:wipe` en la base de trabajo.
 
-## License
+La [guía de instalación](docs/guia_instalacion.md) incluye creación de la base, orden del seeder, correo local y actualización de instalaciones existentes.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Roles y rutas principales
+
+| Rol técnico | Acceso de referencia |
+| --- | --- |
+| Super Administrador | Todos los módulos; usuarios, permisos y bitácora |
+| Administrador | Gestión académica e institucional; sin administración técnica de seguridad |
+| Docente | Consultas y asistencia de sus asignaciones; preguntas y resultados según permisos y ámbito |
+| Estudiante | Portal de su propio expediente y evaluaciones; requiere vínculo y habilitación |
+
+El nombre institucional del `Docente` es tutor académico y el del `Estudiante` es postulante. El menú depende de los permisos efectivos y del estado de la cuenta; un cargo institucional no otorga un rol automáticamente. Las cuentas exclusivamente ficticias están documentadas en [Usuarios de demostración](docs/usuarios_prueba_avalancha.md).
+
+| Ruta | Función |
+| --- | --- |
+| `/login` | Ingreso; no existe registro público de cuentas |
+| `/dashboard` | Panel administrativo |
+| `/postulantes` | Expedientes |
+| `/admin/institucional/programas` y `/admin/institucional/grupos` | Organización académica |
+| `/admin/institucional/personal` y `/admin/institucional/tutores` | Personal y tutoría |
+| `/preguntas` y `/plantillas-evaluacion` | Banco e instrumentos |
+| `/admin/evaluaciones/resultados` | Resultados persistidos |
+| `/reportes-academicos` | Informes y exportación |
+| `/estudiante/evaluaciones` | Aplicación de evaluaciones |
+
+Más rutas y funciones por rol en el [manual de usuario](docs/manual_usuario.md). Inventario exacto: `php artisan route:list`.
+
+## Verificación
+
+```bash
+composer validate
+php artisan route:list
+npm run build
+php artisan test
+node --test tests/input-validation.test.mjs
+```
+
+Espere a que termine el build antes de ejecutar las pruebas HTTP; no reconstruya los assets mientras la suite está en curso. `phpunit.xml` configura SQLite en memoria, correo y sesiones en memoria. Antes de probar, compruebe que no hay una configuración cacheada que apunte a una base real (`bootstrap/cache/config.php`), ni variables del shell que sobrescriban la conexión de pruebas. Las pruebas de concurrencia PostgreSQL se omiten por defecto y requieren un entorno expresamente aislado. Consulte [Verificación del Hito 5](docs/verificacion_hito5.md) para los resultados de esta entrega.
+
+## Limitaciones y documentación
+
+Learning Analytics es conceptual; no se implementan predicción validada, TRI 3PL, EAP ni CAT. El laboratorio independiente `intelecta_lab` queda fuera de esta entrega. La habilitación recalculada desde cuotas puede sustituir un ajuste manual; el rendimiento general agrega las evaluaciones finalizadas del postulante y se asocia a la inscripción más reciente. Estos límites requieren revisión antes de un uso institucional con múltiples cohortes.
+
+- [Guía de instalación](docs/guia_instalacion.md)
+- [Manual de usuario](docs/manual_usuario.md)
+- [Estado real y pendientes del Hito 5](docs/estado_actual_hito5.md)
+- [Recorrido para la defensa](docs/guia_demostracion.md)
+- [Pruebas y evidencia de la entrega](docs/verificacion_hito5.md)
+- [Índice técnico y auditorías históricas](docs/README.md)
+
+Las auditorías anteriores se conservan como evidencia histórica; el estado de octubre se describe en los documentos del Hito 5 y se sustenta en el código y las pruebas.

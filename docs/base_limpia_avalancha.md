@@ -93,16 +93,23 @@ La información es ficticia, institucional y no identifica a personas reales. Lo
 
 ## Ejecución
 
-Para reconstruir toda la base:
+Para una base de demostración nueva y exclusiva, configure primero `.env` según la
+[guía de instalación](guia_instalacion.md). Luego ejecute:
 
 ```bash
-php artisan migrate:fresh --seed
+php artisan migrate
+php artisan db:seed
 ```
 
-Para ejecutar solamente el escenario Avalancha sobre una estructura ya migrada:
+Para cargar solamente el escenario Avalancha en una base demo ya migrada y vacía:
 
 ```bash
 php artisan db:seed --class=BaseLimpiaAvalanchaSeeder
 ```
 
 El seeder usa claves naturales, `updateOrCreate`, `firstOrCreate` y sincronización de relaciones. No usa `truncate` ni elimina registros.
+
+Esto no impide que actualice registros coincidentes, sincronice permisos o restablezca
+contraseñas demo. No lo ejecute en la base de trabajo. Las cuentas ficticias solo se
+cargan con `APP_ENV=local` o `testing`. No utilice reconstrucciones destructivas para
+preparar la defensa sobre una instalación con datos existentes.

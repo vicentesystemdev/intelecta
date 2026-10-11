@@ -56,17 +56,17 @@ No se ejecutó una limpieza de datos reales.
 
 ## 4. Reglas reutilizables creadas
 
-- [app/Http/Requests/NormalizedFormRequest.php](C:/laragon/www/intelecta/app/Http/Requests/NormalizedFormRequest.php): prepareForValidation, bail, rechazo de controles y booleanos en enteros.
-- [app/Support/Validation/InputNormalizer.php](C:/laragon/www/intelecta/app/Support/Validation/InputNormalizer.php): normalización recursiva.
-- [app/Support/Validation/InputRules.php](C:/laragon/www/intelecta/app/Support/Validation/InputRules.php): reglas comunes, edades, límites de listas y comparación defensiva de fechas.
-- [app/Rules/InputFormat.php](C:/laragon/www/intelecta/app/Rules/InputFormat.php): formatos Unicode, documento, teléfono, código, dominio completo y límite de bytes de contraseña.
-- [resources/js/lib/inputValidation.js](C:/laragon/www/intelecta/resources/js/lib/inputValidation.js): ayudas HTML compartidas; overrides para campos requeridos según contexto.
-- [resources/input-options.json](C:/laragon/www/intelecta/resources/input-options.json): opciones de turno y clasificación compartidas por Laravel y React.
+- [app/Http/Requests/NormalizedFormRequest.php](../app/Http/Requests/NormalizedFormRequest.php): prepareForValidation, bail, rechazo de controles y booleanos en enteros.
+- [app/Support/Validation/InputNormalizer.php](../app/Support/Validation/InputNormalizer.php): normalización recursiva.
+- [app/Support/Validation/InputRules.php](../app/Support/Validation/InputRules.php): reglas comunes, edades, límites de listas y comparación defensiva de fechas.
+- [app/Rules/InputFormat.php](../app/Rules/InputFormat.php): formatos Unicode, documento, teléfono, código, dominio completo y límite de bytes de contraseña.
+- [resources/js/lib/inputValidation.js](../resources/js/lib/inputValidation.js): ayudas HTML compartidas; overrides para campos requeridos según contexto.
+- [resources/input-options.json](../resources/input-options.json): opciones de turno y clasificación compartidas por Laravel y React.
 - Reutilizados los enums EstadoRegistro y EstadoSimulacro. UpdatePostulante, UpdateTema y UpdateAreaConocimiento heredan las reglas de creación, manteniendo su autorización e ignore de unicidad.
 
 ## 5. PostgreSQL
 
-Aplicada únicamente [database/migrations/2026_09_07_000000_add_basic_input_checks.php](C:/laragon/www/intelecta/database/migrations/2026_09_07_000000_add_basic_input_checks.php). Los 18 CHECK aparecen con `convalidated = true`. La migración comprueba IDs incompatibles antes de crear restricciones y falla sin corregir registros. PostgreSQL ejecuta la migración transaccionalmente; SQLite omite estos CHECK específicos. La reversión elimina solo estos CHECK.
+Aplicada únicamente [database/migrations/2026_09_07_000000_add_basic_input_checks.php](../database/migrations/2026_09_07_000000_add_basic_input_checks.php). Los 18 CHECK aparecen con `convalidated = true`. La migración comprueba IDs incompatibles antes de crear restricciones y falla sin corregir registros. PostgreSQL ejecuta la migración transaccionalmente; SQLite omite estos CHECK específicos. La reversión elimina solo estos CHECK.
 
 | Tabla | CHECK | Condición |
 | --- | --- | --- |
@@ -119,7 +119,7 @@ La primera suite falló en páginas por ausencia de public/build/manifest.json; 
 
 ## 7. Datos existentes incompatibles
 
-La evidencia final está en [docs/validaciones-datos-2026-09-07.json](C:/laragon/www/intelecta/docs/validaciones-datos-2026-09-07.json). La revisión de formatos cubre 1.268 registros en 16 tablas; las 18 condiciones SQL se comprobaron en sus tablas completas. Cero incompatibilidades pendientes y cero registros que requieran la normalización evaluada.
+La evidencia final está en [docs/validaciones-datos-2026-09-07.json](validaciones-datos-2026-09-07.json). La revisión de formatos cubre 1.268 registros en 16 tablas; las 18 condiciones SQL se comprobaron en sus tablas completas. Cero incompatibilidades pendientes y cero registros que requieran la normalización evaluada.
 
 Se detectaron incompatibilidades anteriores entre catálogo real y opciones de entrada, resueltas conservando valores legítimos:
 
@@ -136,93 +136,93 @@ Permanecen para fases posteriores: apropiación/vinculación de identidad por co
 
 Lista completa de archivos de esta tarea, incluidos nuevos archivos y el .env local:
 
-- [.env](C:/laragon/www/intelecta/.env)
-- [.env.example](C:/laragon/www/intelecta/.env.example)
-- [app/Http/Controllers/Auth/ConfirmablePasswordController.php](C:/laragon/www/intelecta/app/Http/Controllers/Auth/ConfirmablePasswordController.php)
-- [app/Http/Controllers/Auth/NewPasswordController.php](C:/laragon/www/intelecta/app/Http/Controllers/Auth/NewPasswordController.php)
-- [app/Http/Controllers/Auth/PasswordController.php](C:/laragon/www/intelecta/app/Http/Controllers/Auth/PasswordController.php)
-- [app/Http/Controllers/Auth/PasswordResetLinkController.php](C:/laragon/www/intelecta/app/Http/Controllers/Auth/PasswordResetLinkController.php)
-- [app/Http/Controllers/Auth/RegisteredUserController.php](C:/laragon/www/intelecta/app/Http/Controllers/Auth/RegisteredUserController.php)
-- [app/Http/Controllers/ProfileController.php](C:/laragon/www/intelecta/app/Http/Controllers/ProfileController.php)
-- [app/Http/Requests/Admin/StoreUsuarioRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Admin/StoreUsuarioRequest.php)
-- [app/Http/Requests/Admin/UpdateRolPermisosRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Admin/UpdateRolPermisosRequest.php)
-- [app/Http/Requests/Admin/UpdateUsuarioRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Admin/UpdateUsuarioRequest.php)
-- [app/Http/Requests/Auth/LoginRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Auth/LoginRequest.php)
-- [app/Http/Requests/Auth/PasswordEmailRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Auth/PasswordEmailRequest.php)
-- [app/Http/Requests/Auth/RegisterRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Auth/RegisterRequest.php)
-- [app/Http/Requests/Auth/ResetPasswordRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Auth/ResetPasswordRequest.php)
-- [app/Http/Requests/Auth/UpdatePasswordRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Auth/UpdatePasswordRequest.php)
-- [app/Http/Requests/Evaluaciones/StoreAreaConocimientoRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Evaluaciones/StoreAreaConocimientoRequest.php)
-- [app/Http/Requests/Evaluaciones/StorePlantillaEvaluacionRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Evaluaciones/StorePlantillaEvaluacionRequest.php)
-- [app/Http/Requests/Evaluaciones/StorePreguntaRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Evaluaciones/StorePreguntaRequest.php)
-- [app/Http/Requests/Evaluaciones/StoreTemaRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Evaluaciones/StoreTemaRequest.php)
-- [app/Http/Requests/Evaluaciones/UpdateAreaConocimientoRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Evaluaciones/UpdateAreaConocimientoRequest.php)
-- [app/Http/Requests/Evaluaciones/UpdateTemaRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Evaluaciones/UpdateTemaRequest.php)
-- [app/Http/Requests/Institucional/AsignacionTutorRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/AsignacionTutorRequest.php)
-- [app/Http/Requests/Institucional/AsistenciaAcademicaRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/AsistenciaAcademicaRequest.php)
-- [app/Http/Requests/Institucional/AsistenciaGrupoRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/AsistenciaGrupoRequest.php)
-- [app/Http/Requests/Institucional/CuotaAcademicaRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/CuotaAcademicaRequest.php)
-- [app/Http/Requests/Institucional/GrupoAcademicoRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/GrupoAcademicoRequest.php)
-- [app/Http/Requests/Institucional/HabilitacionAcademicaRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/HabilitacionAcademicaRequest.php)
-- [app/Http/Requests/Institucional/InscripcionAcademicaRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/InscripcionAcademicaRequest.php)
-- [app/Http/Requests/Institucional/MatriculaAcademicaRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/MatriculaAcademicaRequest.php)
-- [app/Http/Requests/Institucional/ProgramaAcademicoRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/ProgramaAcademicoRequest.php)
-- [app/Http/Requests/Institucional/SimulacroProgramadoRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/SimulacroProgramadoRequest.php)
-- [app/Http/Requests/Institucional/TutorAcademicoRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Institucional/TutorAcademicoRequest.php)
-- [app/Http/Requests/NormalizedFormRequest.php](C:/laragon/www/intelecta/app/Http/Requests/NormalizedFormRequest.php)
-- [app/Http/Requests/Postulantes/StorePostulanteRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Postulantes/StorePostulanteRequest.php)
-- [app/Http/Requests/Postulantes/UpdatePostulanteRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Postulantes/UpdatePostulanteRequest.php)
-- [app/Http/Requests/ProfileUpdateRequest.php](C:/laragon/www/intelecta/app/Http/Requests/ProfileUpdateRequest.php)
-- [app/Http/Requests/Resultados/EnviarRespuestasEvaluacionRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Resultados/EnviarRespuestasEvaluacionRequest.php)
-- [app/Http/Requests/Resultados/IniciarEvaluacionAplicadaRequest.php](C:/laragon/www/intelecta/app/Http/Requests/Resultados/IniciarEvaluacionAplicadaRequest.php)
-- [app/Rules/InputFormat.php](C:/laragon/www/intelecta/app/Rules/InputFormat.php)
-- [app/Support/Validation/InputNormalizer.php](C:/laragon/www/intelecta/app/Support/Validation/InputNormalizer.php)
-- [app/Support/Validation/InputRules.php](C:/laragon/www/intelecta/app/Support/Validation/InputRules.php)
-- [config/app.php](C:/laragon/www/intelecta/config/app.php)
-- [database/migrations/2026_09_07_000000_add_basic_input_checks.php](C:/laragon/www/intelecta/database/migrations/2026_09_07_000000_add_basic_input_checks.php)
-- [docs/audit-input-data.php](C:/laragon/www/intelecta/docs/audit-input-data.php)
-- [docs/auditoria-validaciones-basicas-2026-09-07.md](C:/laragon/www/intelecta/docs/auditoria-validaciones-basicas-2026-09-07.md)
-- [docs/test-postgres-input-checks.php](C:/laragon/www/intelecta/docs/test-postgres-input-checks.php)
-- [docs/validaciones-datos-2026-09-07.json](C:/laragon/www/intelecta/docs/validaciones-datos-2026-09-07.json)
-- [lang/es/auth.php](C:/laragon/www/intelecta/lang/es/auth.php)
-- [lang/es/passwords.php](C:/laragon/www/intelecta/lang/es/passwords.php)
-- [lang/es/validation.php](C:/laragon/www/intelecta/lang/es/validation.php)
-- [resources/input-options.json](C:/laragon/www/intelecta/resources/input-options.json)
-- [resources/js/Components/Evaluaciones/AlternativasEditor.jsx](C:/laragon/www/intelecta/resources/js/Components/Evaluaciones/AlternativasEditor.jsx)
-- [resources/js/Components/Evaluaciones/PlantillaEvaluacionForm.jsx](C:/laragon/www/intelecta/resources/js/Components/Evaluaciones/PlantillaEvaluacionForm.jsx)
-- [resources/js/Components/Evaluaciones/PreguntaForm.jsx](C:/laragon/www/intelecta/resources/js/Components/Evaluaciones/PreguntaForm.jsx)
-- [resources/js/Components/Postulantes/PostulanteForm.jsx](C:/laragon/www/intelecta/resources/js/Components/Postulantes/PostulanteForm.jsx)
-- [resources/js/Components/Sistema/UsuarioForm.jsx](C:/laragon/www/intelecta/resources/js/Components/Sistema/UsuarioForm.jsx)
-- [resources/js/Pages/Auth/ConfirmPassword.jsx](C:/laragon/www/intelecta/resources/js/Pages/Auth/ConfirmPassword.jsx)
-- [resources/js/Pages/Auth/ForgotPassword.jsx](C:/laragon/www/intelecta/resources/js/Pages/Auth/ForgotPassword.jsx)
-- [resources/js/Pages/Auth/Login.jsx](C:/laragon/www/intelecta/resources/js/Pages/Auth/Login.jsx)
-- [resources/js/Pages/Auth/Register.jsx](C:/laragon/www/intelecta/resources/js/Pages/Auth/Register.jsx)
-- [resources/js/Pages/Auth/ResetPassword.jsx](C:/laragon/www/intelecta/resources/js/Pages/Auth/ResetPassword.jsx)
-- [resources/js/Pages/Estudiante/Evaluaciones.jsx](C:/laragon/www/intelecta/resources/js/Pages/Estudiante/Evaluaciones.jsx)
-- [resources/js/Pages/Evaluaciones/Areas/Create.jsx](C:/laragon/www/intelecta/resources/js/Pages/Evaluaciones/Areas/Create.jsx)
-- [resources/js/Pages/Evaluaciones/Areas/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Evaluaciones/Areas/Index.jsx)
-- [resources/js/Pages/Evaluaciones/Temas/Create.jsx](C:/laragon/www/intelecta/resources/js/Pages/Evaluaciones/Temas/Create.jsx)
-- [resources/js/Pages/Evaluaciones/Temas/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Evaluaciones/Temas/Index.jsx)
-- [resources/js/Pages/Institucional/AsignacionTutores/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/AsignacionTutores/Index.jsx)
-- [resources/js/Pages/Institucional/Asistencia/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/Asistencia/Index.jsx)
-- [resources/js/Pages/Institucional/Grupos/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/Grupos/Index.jsx)
-- [resources/js/Pages/Institucional/HabilitacionAcademica/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/HabilitacionAcademica/Index.jsx)
-- [resources/js/Pages/Institucional/Inscripciones/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/Inscripciones/Index.jsx)
-- [resources/js/Pages/Institucional/MatriculasCuotas/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/MatriculasCuotas/Index.jsx)
-- [resources/js/Pages/Institucional/Programas/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/Programas/Index.jsx)
-- [resources/js/Pages/Institucional/Simulacros/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/Simulacros/Index.jsx)
-- [resources/js/Pages/Institucional/Tutores/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Institucional/Tutores/Index.jsx)
-- [resources/js/Pages/Profile/Partials/DeleteUserForm.jsx](C:/laragon/www/intelecta/resources/js/Pages/Profile/Partials/DeleteUserForm.jsx)
-- [resources/js/Pages/Profile/Partials/UpdatePasswordForm.jsx](C:/laragon/www/intelecta/resources/js/Pages/Profile/Partials/UpdatePasswordForm.jsx)
-- [resources/js/Pages/Profile/Partials/UpdateProfileInformationForm.jsx](C:/laragon/www/intelecta/resources/js/Pages/Profile/Partials/UpdateProfileInformationForm.jsx)
-- [resources/js/Pages/Sistema/RolesPermisos/Index.jsx](C:/laragon/www/intelecta/resources/js/Pages/Sistema/RolesPermisos/Index.jsx)
-- [resources/js/lib/inputValidation.js](C:/laragon/www/intelecta/resources/js/lib/inputValidation.js)
-- [tests/Feature/Validation/AuthInputValidationTest.php](C:/laragon/www/intelecta/tests/Feature/Validation/AuthInputValidationTest.php)
-- [tests/Feature/Validation/InputRulesTest.php](C:/laragon/www/intelecta/tests/Feature/Validation/InputRulesTest.php)
-- [tests/Feature/Validation/RequestValidationTest.php](C:/laragon/www/intelecta/tests/Feature/Validation/RequestValidationTest.php)
-- [tests/input-validation.test.mjs](C:/laragon/www/intelecta/tests/input-validation.test.mjs)
+- [.env](../.env)
+- [.env.example](../.env.example)
+- [app/Http/Controllers/Auth/ConfirmablePasswordController.php](../app/Http/Controllers/Auth/ConfirmablePasswordController.php)
+- [app/Http/Controllers/Auth/NewPasswordController.php](../app/Http/Controllers/Auth/NewPasswordController.php)
+- [app/Http/Controllers/Auth/PasswordController.php](../app/Http/Controllers/Auth/PasswordController.php)
+- [app/Http/Controllers/Auth/PasswordResetLinkController.php](../app/Http/Controllers/Auth/PasswordResetLinkController.php)
+- [app/Http/Controllers/Auth/RegisteredUserController.php](../app/Http/Controllers/Auth/RegisteredUserController.php)
+- [app/Http/Controllers/ProfileController.php](../app/Http/Controllers/ProfileController.php)
+- [app/Http/Requests/Admin/StoreUsuarioRequest.php](../app/Http/Requests/Admin/StoreUsuarioRequest.php)
+- [app/Http/Requests/Admin/UpdateRolPermisosRequest.php](../app/Http/Requests/Admin/UpdateRolPermisosRequest.php)
+- [app/Http/Requests/Admin/UpdateUsuarioRequest.php](../app/Http/Requests/Admin/UpdateUsuarioRequest.php)
+- [app/Http/Requests/Auth/LoginRequest.php](../app/Http/Requests/Auth/LoginRequest.php)
+- [app/Http/Requests/Auth/PasswordEmailRequest.php](../app/Http/Requests/Auth/PasswordEmailRequest.php)
+- [app/Http/Requests/Auth/RegisterRequest.php](../app/Http/Requests/Auth/RegisterRequest.php)
+- [app/Http/Requests/Auth/ResetPasswordRequest.php](../app/Http/Requests/Auth/ResetPasswordRequest.php)
+- [app/Http/Requests/Auth/UpdatePasswordRequest.php](../app/Http/Requests/Auth/UpdatePasswordRequest.php)
+- [app/Http/Requests/Evaluaciones/StoreAreaConocimientoRequest.php](../app/Http/Requests/Evaluaciones/StoreAreaConocimientoRequest.php)
+- [app/Http/Requests/Evaluaciones/StorePlantillaEvaluacionRequest.php](../app/Http/Requests/Evaluaciones/StorePlantillaEvaluacionRequest.php)
+- [app/Http/Requests/Evaluaciones/StorePreguntaRequest.php](../app/Http/Requests/Evaluaciones/StorePreguntaRequest.php)
+- [app/Http/Requests/Evaluaciones/StoreTemaRequest.php](../app/Http/Requests/Evaluaciones/StoreTemaRequest.php)
+- [app/Http/Requests/Evaluaciones/UpdateAreaConocimientoRequest.php](../app/Http/Requests/Evaluaciones/UpdateAreaConocimientoRequest.php)
+- [app/Http/Requests/Evaluaciones/UpdateTemaRequest.php](../app/Http/Requests/Evaluaciones/UpdateTemaRequest.php)
+- [app/Http/Requests/Institucional/AsignacionTutorRequest.php](../app/Http/Requests/Institucional/AsignacionTutorRequest.php)
+- [app/Http/Requests/Institucional/AsistenciaAcademicaRequest.php](../app/Http/Requests/Institucional/AsistenciaAcademicaRequest.php)
+- [app/Http/Requests/Institucional/AsistenciaGrupoRequest.php](../app/Http/Requests/Institucional/AsistenciaGrupoRequest.php)
+- [app/Http/Requests/Institucional/CuotaAcademicaRequest.php](../app/Http/Requests/Institucional/CuotaAcademicaRequest.php)
+- [app/Http/Requests/Institucional/GrupoAcademicoRequest.php](../app/Http/Requests/Institucional/GrupoAcademicoRequest.php)
+- [app/Http/Requests/Institucional/HabilitacionAcademicaRequest.php](../app/Http/Requests/Institucional/HabilitacionAcademicaRequest.php)
+- [app/Http/Requests/Institucional/InscripcionAcademicaRequest.php](../app/Http/Requests/Institucional/InscripcionAcademicaRequest.php)
+- [app/Http/Requests/Institucional/MatriculaAcademicaRequest.php](../app/Http/Requests/Institucional/MatriculaAcademicaRequest.php)
+- [app/Http/Requests/Institucional/ProgramaAcademicoRequest.php](../app/Http/Requests/Institucional/ProgramaAcademicoRequest.php)
+- [app/Http/Requests/Institucional/SimulacroProgramadoRequest.php](../app/Http/Requests/Institucional/SimulacroProgramadoRequest.php)
+- [app/Http/Requests/Institucional/TutorAcademicoRequest.php](../app/Http/Requests/Institucional/TutorAcademicoRequest.php)
+- [app/Http/Requests/NormalizedFormRequest.php](../app/Http/Requests/NormalizedFormRequest.php)
+- [app/Http/Requests/Postulantes/StorePostulanteRequest.php](../app/Http/Requests/Postulantes/StorePostulanteRequest.php)
+- [app/Http/Requests/Postulantes/UpdatePostulanteRequest.php](../app/Http/Requests/Postulantes/UpdatePostulanteRequest.php)
+- [app/Http/Requests/ProfileUpdateRequest.php](../app/Http/Requests/ProfileUpdateRequest.php)
+- [app/Http/Requests/Resultados/EnviarRespuestasEvaluacionRequest.php](../app/Http/Requests/Resultados/EnviarRespuestasEvaluacionRequest.php)
+- [app/Http/Requests/Resultados/IniciarEvaluacionAplicadaRequest.php](../app/Http/Requests/Resultados/IniciarEvaluacionAplicadaRequest.php)
+- [app/Rules/InputFormat.php](../app/Rules/InputFormat.php)
+- [app/Support/Validation/InputNormalizer.php](../app/Support/Validation/InputNormalizer.php)
+- [app/Support/Validation/InputRules.php](../app/Support/Validation/InputRules.php)
+- [config/app.php](../config/app.php)
+- [database/migrations/2026_09_07_000000_add_basic_input_checks.php](../database/migrations/2026_09_07_000000_add_basic_input_checks.php)
+- [docs/audit-input-data.php](audit-input-data.php)
+- [docs/auditoria-validaciones-basicas-2026-09-07.md](auditoria-validaciones-basicas-2026-09-07.md)
+- [docs/test-postgres-input-checks.php](test-postgres-input-checks.php)
+- [docs/validaciones-datos-2026-09-07.json](validaciones-datos-2026-09-07.json)
+- [lang/es/auth.php](../lang/es/auth.php)
+- [lang/es/passwords.php](../lang/es/passwords.php)
+- [lang/es/validation.php](../lang/es/validation.php)
+- [resources/input-options.json](../resources/input-options.json)
+- [resources/js/Components/Evaluaciones/AlternativasEditor.jsx](../resources/js/Components/Evaluaciones/AlternativasEditor.jsx)
+- [resources/js/Components/Evaluaciones/PlantillaEvaluacionForm.jsx](../resources/js/Components/Evaluaciones/PlantillaEvaluacionForm.jsx)
+- [resources/js/Components/Evaluaciones/PreguntaForm.jsx](../resources/js/Components/Evaluaciones/PreguntaForm.jsx)
+- [resources/js/Components/Postulantes/PostulanteForm.jsx](../resources/js/Components/Postulantes/PostulanteForm.jsx)
+- [resources/js/Components/Sistema/UsuarioForm.jsx](../resources/js/Components/Sistema/UsuarioForm.jsx)
+- [resources/js/Pages/Auth/ConfirmPassword.jsx](../resources/js/Pages/Auth/ConfirmPassword.jsx)
+- [resources/js/Pages/Auth/ForgotPassword.jsx](../resources/js/Pages/Auth/ForgotPassword.jsx)
+- [resources/js/Pages/Auth/Login.jsx](../resources/js/Pages/Auth/Login.jsx)
+- [resources/js/Pages/Auth/Register.jsx](../resources/js/Pages/Auth/Register.jsx)
+- [resources/js/Pages/Auth/ResetPassword.jsx](../resources/js/Pages/Auth/ResetPassword.jsx)
+- [resources/js/Pages/Estudiante/Evaluaciones.jsx](../resources/js/Pages/Estudiante/Evaluaciones.jsx)
+- [resources/js/Pages/Evaluaciones/Areas/Create.jsx](../resources/js/Pages/Evaluaciones/Areas/Create.jsx)
+- [resources/js/Pages/Evaluaciones/Areas/Index.jsx](../resources/js/Pages/Evaluaciones/Areas/Index.jsx)
+- [resources/js/Pages/Evaluaciones/Temas/Create.jsx](../resources/js/Pages/Evaluaciones/Temas/Create.jsx)
+- [resources/js/Pages/Evaluaciones/Temas/Index.jsx](../resources/js/Pages/Evaluaciones/Temas/Index.jsx)
+- [resources/js/Pages/Institucional/AsignacionTutores/Index.jsx](../resources/js/Pages/Institucional/AsignacionTutores/Index.jsx)
+- [resources/js/Pages/Institucional/Asistencia/Index.jsx](../resources/js/Pages/Institucional/Asistencia/Index.jsx)
+- [resources/js/Pages/Institucional/Grupos/Index.jsx](../resources/js/Pages/Institucional/Grupos/Index.jsx)
+- [resources/js/Pages/Institucional/HabilitacionAcademica/Index.jsx](../resources/js/Pages/Institucional/HabilitacionAcademica/Index.jsx)
+- [resources/js/Pages/Institucional/Inscripciones/Index.jsx](../resources/js/Pages/Institucional/Inscripciones/Index.jsx)
+- [resources/js/Pages/Institucional/MatriculasCuotas/Index.jsx](../resources/js/Pages/Institucional/MatriculasCuotas/Index.jsx)
+- [resources/js/Pages/Institucional/Programas/Index.jsx](../resources/js/Pages/Institucional/Programas/Index.jsx)
+- [resources/js/Pages/Institucional/Simulacros/Index.jsx](../resources/js/Pages/Institucional/Simulacros/Index.jsx)
+- [resources/js/Pages/Institucional/Tutores/Index.jsx](../resources/js/Pages/Institucional/Tutores/Index.jsx)
+- [resources/js/Pages/Profile/Partials/DeleteUserForm.jsx](../resources/js/Pages/Profile/Partials/DeleteUserForm.jsx)
+- [resources/js/Pages/Profile/Partials/UpdatePasswordForm.jsx](../resources/js/Pages/Profile/Partials/UpdatePasswordForm.jsx)
+- [resources/js/Pages/Profile/Partials/UpdateProfileInformationForm.jsx](../resources/js/Pages/Profile/Partials/UpdateProfileInformationForm.jsx)
+- [resources/js/Pages/Sistema/RolesPermisos/Index.jsx](../resources/js/Pages/Sistema/RolesPermisos/Index.jsx)
+- [resources/js/lib/inputValidation.js](../resources/js/lib/inputValidation.js)
+- [tests/Feature/Validation/AuthInputValidationTest.php](../tests/Feature/Validation/AuthInputValidationTest.php)
+- [tests/Feature/Validation/InputRulesTest.php](../tests/Feature/Validation/InputRulesTest.php)
+- [tests/Feature/Validation/RequestValidationTest.php](../tests/Feature/Validation/RequestValidationTest.php)
+- [tests/input-validation.test.mjs](../tests/input-validation.test.mjs)
 
-Cambio anterior preservado, fuera de esta tarea: [composer.json](C:/laragon/www/intelecta/composer.json) (retirada de Pail del script dev). No fue editado por esta implementación.
+Cambio anterior preservado, fuera de esta tarea: [composer.json](../composer.json) (retirada de Pail del script dev). No fue editado por esta implementación.
 
 Artefactos de ejecución no versionados: public/build y caches habituales de pruebas/formato. Se inició PostgreSQL de Laragon con autorización; el registro de arranque está en C:/laragon/data/postgresql/validation-startup.log. La migración añadió restricciones y su entrada en migrations, no actualizó datos académicos/personales.
 

@@ -3,6 +3,15 @@
 .env
 .env.backup
 .env.production
+.env.*
+!.env.example
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+/backups/
+/dumps/
 .phpactor.json
 .phpunit.result.cache
 /.codex

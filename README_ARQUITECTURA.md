@@ -86,6 +86,18 @@ responsabilidades. `App\Models\User` se conserva como modelo existente.
 Representa la estructura del instituto: carreras, colegios de procedencia, periodos
 académicos, sedes y parámetros institucionales relacionados con admisiones.
 
+El código actual incorpora además cargos y personal institucional. Las referencias a
+periodos, sedes y parámetros expresan responsabilidades previstas, no módulos CRUD
+completos disponibles en esta entrega.
+
+### Academico
+
+Gestiona programas, grupos, inscripciones, simulacros programados, tutores vinculados a
+personal, asignaciones, asistencia, matrículas, cuotas, habilitación y rendimiento.
+La aplicación y persistencia de respuestas de evaluaciones pertenece a `Resultados`;
+`Evaluaciones` administra el banco y las plantillas. La separación se confirma en las
+clases existentes de `app/Domains` y no exige moverlas.
+
 ### Postulantes
 
 Gestiona el registro académico del postulante, su información de admisión, carrera
@@ -93,8 +105,9 @@ postulada, procedencia y estado dentro del proceso preuniversitario.
 
 ### Evaluaciones
 
-Organiza plantillas, banco de preguntas, instrumentos lógico-matemáticos, programación,
-aplicación y ciclo de estados de cada evaluación.
+Organiza materias, áreas, temas, plantillas, banco de preguntas e instrumentos
+multiasignatura. La programación institucional reside en `Academico` y la aplicación
+con respuestas persistidas en `Resultados`.
 
 ### Resultados
 
@@ -110,8 +123,14 @@ no modificar el proceso académico de origen.
 ### LearningAnalytics
 
 Interpreta datos académicos para generar indicadores, patrones, alertas y recomendaciones.
-En su primera etapa consume resultados consolidados; posteriormente podrá incorporar
+Su diseño prevé consumir resultados consolidados; posteriormente podrá incorporar
 modelos predictivos, trazabilidad longitudinal y evaluación de riesgo académico.
+
+En octubre de 2026 la pantalla `Analisis/LearningAnalytics.jsx` contiene datos estáticos
+de demostración y su ruta no consulta la base. Los indicadores operativos de riesgo
+se calculan descriptivamente en `Resultados` y se muestran en otra ruta. El espacio
+del dominio no implica un motor predictivo implementado. Consulte el
+[estado del Hito 5](docs/estado_actual_hito5.md).
 
 ## Alcance del MVP
 

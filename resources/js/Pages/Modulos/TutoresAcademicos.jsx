@@ -48,7 +48,7 @@ export default function TutoresAcademicos() {
                     <div className="relative z-10 space-y-4">
                         <div className="inline-flex items-center gap-2 rounded-full bg-brand-accent/10 px-3 py-1 text-xs font-semibold text-brand-accent ring-1 ring-brand-accent/25">
                             <Sparkles className="h-3.5 w-3.5" />
-                            Elite Prep Institute
+                            Academia Universitaria Avalancha
                         </div>
                         
                         <h2 className="text-3xl font-black tracking-tight sm:text-4xl text-white">
@@ -56,7 +56,7 @@ export default function TutoresAcademicos() {
                         </h2>
                         
                         <p className="max-w-3xl text-sm sm:text-base leading-relaxed text-slate-200">
-                            Equipo tutorial enfocado en el alto rendimiento preuniversitario. Coordina la asignación de carga horaria, seguimiento de grupos y la calibración psicométrica de reactivos.
+                            Vista con datos simulados para presentación. Consulte Gestión Institucional → Tutores Académicos para revisar el personal y las asignaciones registrados en el sistema.
                         </p>
                     </div>
                 </section>

@@ -1,5 +1,9 @@
 # Auditoría Final del Sistema INTELECTA
 
+> Documento histórico. Para el código vigente de octubre de 2026, incluidos los
+> resultados calculados desde respuestas persistidas, consulte el
+> [estado del Hito 5](estado_actual_hito5.md).
+
 **Sistema auditado:** INTELECTA  
 **Caso institucional:** Academia Universitaria Avalancha  
 **Fecha de revisión:** 14 de junio de 2026  
@@ -351,4 +355,3 @@ No obstante, requiere correcciones antes del cierre:
 - coherencia de fechas, cupos y estados.
 
 Después de resolver los cuatro hallazgos críticos y los controles medios de mayor impacto, el sistema podrá entrar en estabilización funcional. Learning Analytics debe continuar identificado como arquitectura conceptual y lectura referencial hasta disponer de resultados históricos reales, metodología validada y métricas de desempeño verificables.
-

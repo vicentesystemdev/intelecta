@@ -50,7 +50,7 @@ export default function CentroEvaluaciones() {
                     <div className="relative z-10 space-y-4">
                         <div className="inline-flex items-center gap-2 rounded-full bg-brand-accent/10 px-3 py-1 text-xs font-semibold text-brand-accent ring-1 ring-brand-accent/25">
                             <Sparkles className="h-3.5 w-3.5" />
-                            Elite Prep Institute
+                            Academia Universitaria Avalancha
                         </div>
                         
                         <h2 className="text-3xl font-black tracking-tight sm:text-4xl text-white">
@@ -58,7 +58,7 @@ export default function CentroEvaluaciones() {
                         </h2>
                         
                         <p className="max-w-3xl text-sm sm:text-base leading-relaxed text-slate-200">
-                            Plataforma central para la calendarización, supervisión y evaluación del desempeño de los postulantes. Estructure reactivos, calibre plantillas de examen y consolide la información psicométrica.
+                            Administre preguntas y plantillas desde los enlaces de acceso rápido. Las tarjetas de esta portada contienen ejemplos de presentación; consulte el calendario institucional para ver los simulacros registrados.
                         </p>
                     </div>
                 </section>
