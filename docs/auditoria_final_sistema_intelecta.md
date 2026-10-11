@@ -2,7 +2,7 @@
 
 > Documento histórico. Para el código vigente de octubre de 2026, incluidos los
 > resultados calculados desde respuestas persistidas, consulte el
-> [estado del Hito 5](estado_actual_hito5.md).
+> [estado actual](estado_actual.md).
 
 **Sistema auditado:** INTELECTA  
 **Caso institucional:** Academia Universitaria Avalancha  

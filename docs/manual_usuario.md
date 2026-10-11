@@ -1,6 +1,6 @@
 # Manual de usuario — INTELECTA
 
-Alcance comprobado para el Hito 5, octubre de 2026. La interfaz muestra únicamente opciones permitidas para la cuenta; una URL directa también se valida en el servidor.
+Alcance comprobado en octubre de 2026. La interfaz muestra únicamente opciones permitidas para la cuenta; una URL directa también se valida en el servidor.
 
 ## Ingreso y navegación
 
@@ -61,4 +61,4 @@ El banco sigue Materia → Área → Tema → Pregunta. Materias: `/admin/evalua
 
 `/admin/analisis/riesgo-academico` consulta rendimientos guardados y limita la vista a 24 registros. Sus categorías son reglas descriptivas. `/admin/analisis/learning-analytics` muestra gráficos simulados; no consulta la base ni genera predicciones. Configuración y catálogos de consulta conservan funciones limitadas; no deben presentarse como módulos completos de edición.
 
-Para una exposición organizada consulte la [guía de demostración](guia_demostracion.md) y los [pendientes conocidos](estado_actual_hito5.md).
+Para una exposición organizada consulte la [guía de demostración](guia_demostracion.md) y los [pendientes conocidos](estado_actual.md).

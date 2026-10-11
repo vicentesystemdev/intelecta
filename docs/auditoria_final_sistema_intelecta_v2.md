@@ -2,7 +2,7 @@
 
 > Documento histórico del 14 de junio de 2026. Sus pendientes describen esa revisión.
 > Los resultados trazables, el vínculo estudiantil explícito y otras mejoras posteriores
-> se documentan con evidencia de código en el [estado del Hito 5](estado_actual_hito5.md).
+> se documentan con evidencia de código en el [estado actual](estado_actual.md).
 
 **Sistema auditado:** INTELECTA  
 **Caso institucional:** Academia Universitaria Avalancha  

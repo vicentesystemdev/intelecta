@@ -1,4 +1,4 @@
-# Verificación de la entrega — Hito 5
+# Verificación de INTELECTA
 
 Fecha: **11 de octubre de 2026**. Los resultados de esta página corresponden a la consolidación de octubre; los JSON de septiembre permanecen como evidencia histórica.
 
@@ -7,7 +7,7 @@ Fecha: **11 de octubre de 2026**. Los resultados de esta página corresponden a 
 - Windows / PowerShell, PHP 8.3.33, Node.js 22.23.2, npm 10.9.8.
 - Laravel 13.16.1 e Inertia Laravel 2.0.24, según `composer.lock`; React 18.3.1 y Vite 8.0.16, según `package-lock.json`.
 - Suite normal con SQLite `:memory:`, caché/sesiones en memoria, cola síncrona y correo en memoria. Las variables de conexión se establecieron explícitamente para no utilizar la base de trabajo; no había configuración Laravel cacheada.
-- PostgreSQL 17.2 temporal, escuchando solo en loopback, en el puerto 55439 y con directorio de datos separado de la instalación habitual. Se creó una base exclusiva cuyo nombre empieza por `intelecta_hito5_isolated_`. No se modificó `.env` ni la base PostgreSQL de trabajo.
+- PostgreSQL 17.2 temporal, escuchando solo en loopback, en el puerto 55439 y con directorio de datos separado de la instalación habitual. Se creó una base exclusiva de pruebas. No se modificó `.env` ni la base PostgreSQL de trabajo.
 
 ## Comprobaciones ejecutadas
 
@@ -68,4 +68,4 @@ Se conservan los archivos de bloqueo y las auditorías. GitHub confirmó reposit
 
 ## Límites
 
-No se realizó una auditoría de despliegues externos ni una prueba de correo SMTP real. La suite y las verificaciones de instalación no sustituyen una evaluación de producción. Consulte los [pendientes del estado actual](estado_actual_hito5.md) para la habilitación manual, consolidación entre cohortes e instrumentos históricos.
+No se realizó una auditoría de despliegues externos ni una prueba de correo SMTP real. La suite y las verificaciones de instalación no sustituyen una evaluación de producción. Consulte los [pendientes del estado actual](estado_actual.md) para la habilitación manual, consolidación entre cohortes e instrumentos históricos.

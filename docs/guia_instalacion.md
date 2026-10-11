@@ -1,6 +1,6 @@
 # Guía de instalación de INTELECTA
 
-Entrega Hito 5, 11 de octubre de 2026. Instalación local sobre una base nueva; para datos existentes consulte la última sección.
+Actualizado el 11 de octubre de 2026. Instalación local sobre una base nueva; para datos existentes consulte la última sección.
 
 ## Requisitos
 
@@ -80,7 +80,7 @@ Las migraciones crean también tablas para sesiones, caché y trabajos. No se ne
 7. Asistencia y calendario de simulacros.
 8. Evaluaciones aplicadas, respuestas, resultados derivados y asistencia en rendimiento.
 
-El escenario prepara 72 postulantes y nueve cuentas. Los nombres, identificaciones y respuestas son fixtures ficticios; los dominios de correo del escenario no implican cuentas institucionales reales. Los períodos, plantillas y fechas son definidos por el seeder y algunas fechas dependen del día de ejecución; compruebe el calendario antes de la defensa.
+El escenario prepara 72 postulantes y nueve cuentas. Los nombres, identificaciones y respuestas son fixtures ficticios; los dominios de correo del escenario no implican cuentas institucionales reales. Los períodos, plantillas y fechas son definidos por el seeder y algunas fechas dependen del día de ejecución; compruebe el calendario antes de la demostración.
 
 El seeder utiliza `updateOrCreate`, `firstOrCreate`, sincronización de roles y relaciones. **Puede sobrescribir registros coincidentes y restablece la contraseña de las cuentas de demostración**: úselo una sola vez en una base dedicada. No es una carga inocua sobre datos reales ni garantiza una restauración exacta después de operaciones manuales. Las cuentas demo se bloquean fuera de entornos `local` y `testing`. No ejecute los seeders históricos adicionales sobre este escenario sin revisar sus diferencias.
 

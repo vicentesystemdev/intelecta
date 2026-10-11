@@ -1,4 +1,4 @@
-# Estado actual de INTELECTA — Hito 5
+# Estado actual de INTELECTA
 
 Fecha: **11 de octubre de 2026**. Repositorio oficial: [vicentesystemdev/intelecta](https://github.com/vicentesystemdev/intelecta). Esta revisión consolida el desarrollo existente; no implementa un nuevo motor académico ni actualiza dependencias.
 
@@ -56,13 +56,13 @@ No se ejecutan migraciones ni seeders contra la base local de trabajo y no se ca
 
 | Prioridad | Pendiente comprobado | Implicación |
 | --- | --- | --- |
-| Alta antes de producción | Revisar vulnerabilidades de dependencias | `npm audit` reporta 28 avisos, incluidos 3 críticos, en el árbol bloqueado; se requiere evaluación y actualización controlada con pruebas, sin ejecutar correcciones masivas antes de la defensa |
+| Alta antes de producción | Revisar vulnerabilidades de dependencias | `npm audit` reporta 28 avisos, incluidos 3 críticos, en el árbol bloqueado; se requiere evaluación y actualización controlada con pruebas |
 | Alta antes de producción | Separar estado automático y ajuste manual de habilitación | `syncForMatricula()` actualiza el mismo registro después de modificar cuotas y puede sustituir ajustes manuales; exige diseño e historial, fuera de esta entrega |
 | Alta antes de múltiples cohortes reales | Revisar alcance del rendimiento consolidado | `updatePerformance()` agrega todas las evaluaciones finalizadas del postulante y las asocia a la inscripción más reciente; no separa todos los períodos/programas de origen |
 | Media antes de exigir inmutabilidad histórica | Versionar preguntas, alternativas y plantillas aplicadas | Se validan cambios de estado y puntaje, pero el intento no conserva una copia completa e inmutable del instrumento |
 | Media | Validación PostgreSQL completa y concurrencia en CI aislada | SQLite no demuestra los bloqueos ni todos los CHECK de PostgreSQL; las pruebas omitidas deben identificarse como tales |
 | Media | Conciliar identidades legacy antes de actualizar bases antiguas | La migración final Tutor → Personal exige vínculos consistentes; la instalación nueva evita esta precondición histórica |
-| Baja para esta defensa | Completar portadas, configuración y catálogos con flujos operativos | Exponerlos según su alcance real; usar las rutas funcionales documentadas |
+| Baja para la demostración | Completar portadas, configuración y catálogos con flujos operativos | Exponerlos según su alcance real; usar las rutas funcionales documentadas |
 | Evolución futura | Learning Analytics con datos persistidos y modelos validados | Requiere diseño, datos y validación; actualmente es una demostración conceptual |
 
-Los [resultados de las pruebas](verificacion_hito5.md) distinguen verificaciones actuales de las evidencias históricas. El [recorrido de defensa](guia_demostracion.md) prioriza los módulos operativos y declara las limitaciones.
+Los [resultados de las pruebas](verificacion.md) distinguen verificaciones actuales de las evidencias históricas. El [recorrido de demostración](guia_demostracion.md) prioriza los módulos operativos y declara las limitaciones.

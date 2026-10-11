@@ -130,7 +130,7 @@ En octubre de 2026 la pantalla `Analisis/LearningAnalytics.jsx` contiene datos e
 de demostración y su ruta no consulta la base. Los indicadores operativos de riesgo
 se calculan descriptivamente en `Resultados` y se muestran en otra ruta. El espacio
 del dominio no implica un motor predictivo implementado. Consulte el
-[estado del Hito 5](docs/estado_actual_hito5.md).
+[estado actual](docs/estado_actual.md).
 
 ## Alcance del MVP
 

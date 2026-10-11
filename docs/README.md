@@ -1,19 +1,19 @@
 # Documentación técnica de INTELECTA
 
-## Entrega vigente: Hito 5, octubre de 2026
+## Documentación actualizada: octubre de 2026
 
 - [Instalación y ejecución](guia_instalacion.md)
 - [Manual de usuario por rol](manual_usuario.md)
-- [Estado actual, evidencia y pendientes](estado_actual_hito5.md)
+- [Estado actual, evidencia y pendientes](estado_actual.md)
 - [Guía de demostración](guia_demostracion.md)
-- [Verificación de la entrega](verificacion_hito5.md)
+- [Verificación del sistema](verificacion.md)
 - [Arquitectura principal](../README_ARQUITECTURA.md)
 - [Escenario ficticio Avalancha](base_limpia_avalancha.md)
 - [Cuentas exclusivamente demo](usuarios_prueba_avalancha.md)
 
 ## Auditorías y decisiones históricas
 
-Estos documentos conservan el contexto y las comprobaciones de su fecha. Sus hallazgos pueden haber sido resueltos posteriormente; para el alcance vigente consulte el estado del Hito 5.
+Estos documentos conservan el contexto y las comprobaciones de su fecha. Sus hallazgos pueden haber sido resueltos posteriormente; para el alcance vigente consulte el estado actual.
 
 - [Auditoría inicial](auditoria_final_sistema_intelecta.md) y [auditoría v2](auditoria_final_sistema_intelecta_v2.md)
 - [Base de datos y tercera forma normal](auditoria_base_datos_3fn_intelecta.md)

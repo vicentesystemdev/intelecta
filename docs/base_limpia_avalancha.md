@@ -112,4 +112,4 @@ El seeder usa claves naturales, `updateOrCreate`, `firstOrCreate` y sincronizaci
 Esto no impide que actualice registros coincidentes, sincronice permisos o restablezca
 contraseñas demo. No lo ejecute en la base de trabajo. Las cuentas ficticias solo se
 cargan con `APP_ENV=local` o `testing`. No utilice reconstrucciones destructivas para
-preparar la defensa sobre una instalación con datos existentes.
+preparar la demostración sobre una instalación con datos existentes.

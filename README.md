@@ -1,8 +1,8 @@
 # INTELECTA
 
-Plataforma de gestión académica para la **Academia Universitaria Avalancha**, desarrollada como Proyecto Integrador de UNIFRANZ. Apoya la preparación preuniversitaria mediante registro de postulantes, organización de programas y grupos, evaluaciones y seguimiento académico.
+Plataforma de gestión académica para la **Academia Universitaria Avalancha**. Apoya la preparación preuniversitaria mediante registro de postulantes, organización de programas y grupos, evaluaciones y seguimiento académico.
 
-**Entrega académica Hito 5 · octubre de 2026.** El [repositorio oficial](https://github.com/vicentesystemdev/intelecta) y su rama `main` constituyen la evidencia del sistema. El alcance comprobado y las limitaciones se detallan en [Estado actual](docs/estado_actual_hito5.md).
+**Actualizado en octubre de 2026.** El [repositorio oficial](https://github.com/vicentesystemdev/intelecta) mantiene la versión actual del sistema en la rama `main`. El alcance comprobado y las limitaciones se detallan en [Estado actual](docs/estado_actual.md).
 
 ## Funcionalidades disponibles
 
@@ -109,7 +109,7 @@ php artisan test
 node --test tests/input-validation.test.mjs
 ```
 
-Espere a que termine el build antes de ejecutar las pruebas HTTP; no reconstruya los assets mientras la suite está en curso. `phpunit.xml` configura SQLite en memoria, correo y sesiones en memoria. Antes de probar, compruebe que no hay una configuración cacheada que apunte a una base real (`bootstrap/cache/config.php`), ni variables del shell que sobrescriban la conexión de pruebas. Las pruebas de concurrencia PostgreSQL se omiten por defecto y requieren un entorno expresamente aislado. Consulte [Verificación del Hito 5](docs/verificacion_hito5.md) para los resultados de esta entrega.
+Espere a que termine el build antes de ejecutar las pruebas HTTP; no reconstruya los assets mientras la suite está en curso. `phpunit.xml` configura SQLite en memoria, correo y sesiones en memoria. Antes de probar, compruebe que no hay una configuración cacheada que apunte a una base real (`bootstrap/cache/config.php`), ni variables del shell que sobrescriban la conexión de pruebas. Las pruebas de concurrencia PostgreSQL se omiten por defecto y requieren un entorno expresamente aislado. Consulte [Verificación de INTELECTA](docs/verificacion.md) para los resultados de la actualización.
 
 ## Limitaciones y documentación
 
@@ -117,9 +117,9 @@ Learning Analytics es conceptual; no se implementan predicción validada, TRI 3P
 
 - [Guía de instalación](docs/guia_instalacion.md)
 - [Manual de usuario](docs/manual_usuario.md)
-- [Estado real y pendientes del Hito 5](docs/estado_actual_hito5.md)
-- [Recorrido para la defensa](docs/guia_demostracion.md)
-- [Pruebas y evidencia de la entrega](docs/verificacion_hito5.md)
+- [Estado actual y pendientes](docs/estado_actual.md)
+- [Recorrido de demostración](docs/guia_demostracion.md)
+- [Pruebas y verificaciones](docs/verificacion.md)
 - [Índice técnico y auditorías históricas](docs/README.md)
 
-Las auditorías anteriores se conservan como evidencia histórica; el estado de octubre se describe en los documentos del Hito 5 y se sustenta en el código y las pruebas.
+Las auditorías anteriores se conservan como evidencia histórica; el estado de octubre se describe en los documentos actuales y se sustenta en el código y las pruebas.
