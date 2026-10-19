@@ -34,7 +34,7 @@ const formatDate = (value) =>
 
 export default function Evaluaciones({
     postulanteVinculado = false,
-    habilitacionAcademica = null,
+    accesoEvaluaciones = null,
     estructuraResultadosDisponible = false,
     plantillas = [],
     evaluacionActiva = null,
@@ -53,7 +53,7 @@ export default function Evaluaciones({
         evaluacionActiva?.segundos_restantes ?? durationSeconds,
     );
     const accessRestricted =
-        habilitacionAcademica?.habilitado_evaluaciones_hab === false;
+        accesoEvaluaciones?.permitido === false;
     const selected = useMemo(
         () =>
             plantillas.find(
@@ -111,7 +111,7 @@ export default function Evaluaciones({
     };
 
     const submit = () => {
-        if (!evaluacionActiva || processing) {
+        if (!evaluacionActiva || processing || accessRestricted) {
             return;
         }
 
@@ -184,9 +184,7 @@ export default function Evaluaciones({
                                 Habilitación académica temporalmente restringida
                             </p>
                             <p className="mt-1 text-xs leading-5">
-                                Tu acceso a evaluaciones se encuentra temporalmente
-                                restringido. Consulta con administración académica
-                                para regularizar tu habilitación.
+                                {accesoEvaluaciones?.motivo}
                             </p>
                         </div>
                     </div>
@@ -453,6 +451,7 @@ export default function Evaluaciones({
                                 onClick={submit}
                                 disabled={
                                     processing ||
+                                    accessRestricted ||
                                     answeredCount < totalQuestions
                                 }
                                 className="inline-flex items-center gap-2 rounded-xl bg-brand-secondary px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-secondary/90 disabled:cursor-not-allowed disabled:opacity-50"

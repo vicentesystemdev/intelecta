@@ -5,6 +5,7 @@ namespace App\Domains\Seguridad\Services;
 use App\Domains\Seguridad\Enums\EstadoCuenta;
 use App\Domains\Seguridad\Support\MatrizRbac;
 use App\Models\User;
+use App\Support\Validation\InputRules;
 use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\PasswordReset;
@@ -96,6 +97,34 @@ class CuentaService
         $this->sendAccess($actor, $user->id);
 
         return $user;
+    }
+
+    /** Alta excepcional de fixture DEMO: nunca envía tokens a un mailer log. */
+    public function createDemo(User $actor, array $data): User
+    {
+        if (! app()->environment('local', 'testing') || auth()->id() !== $actor->id) {
+            throw new AuthorizationException('El alta DEMO requiere entorno local y contexto explícito del SA autorizado.');
+        }
+        $this->rejectEmbeddedRoles($data);
+        $validated = Validator::make($data, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', ...InputRules::email()],
+        ])->validate();
+
+        return $this->transaction(function () use ($actor, $validated): User {
+            $actor = $this->authorize($actor);
+            $user = User::create([...$validated, 'password' => Str::random(64)]);
+            // Activación administrativa ficticia, NO una verificación de un buzón real.
+            // La contraseña aleatoria no se entrega: el titular debe establecerla
+            // mediante un token nativo caducable y de un solo uso, entregado aparte.
+            $user->forceFill(['estado_cuenta' => EstadoCuenta::ACTIVA, 'email_verified_at' => now()])->save();
+            $this->audit('crear_demo_controlado', $actor, $user->id, [
+                'estado' => EstadoCuenta::ACTIVA->value, 'roles' => [], 'verificacion' => 'fixture_demo_autorizado',
+                'notificacion_enviada' => false,
+            ]);
+
+            return $user;
+        });
     }
 
     public function update(User $actor, int $id, array $data): User

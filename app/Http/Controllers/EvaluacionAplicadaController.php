@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Domains\Academico\Models\HabilitacionAcademica;
+use App\Domains\Academico\Services\AccesoEvaluacionService;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
-use App\Domains\Postulantes\Models\Postulante;
 use App\Domains\Resultados\Actions\EnviarRespuestasEvaluacionAction;
 use App\Domains\Resultados\Actions\IniciarEvaluacionAplicadaAction;
 use App\Domains\Resultados\DTOs\EnviarEvaluacionData;
@@ -22,15 +21,17 @@ use Inertia\Response;
 
 class EvaluacionAplicadaController extends Controller
 {
+    public function __construct(private readonly AccesoEvaluacionService $acceso) {}
+
     public function index(
         Request $request,
         EvaluacionAplicadaRepository $repository,
     ): Response {
         $postulante = $request->user()->postulante;
-        $habilitacion = $this->habilitacion($postulante);
         $schemaReady = Schema::hasTable('evaluaciones_aplicadas')
             && Schema::hasTable('respuestas_evaluacion');
         $evaluacion = null;
+        $simulacroEvaluacion = null;
         $resultado = null;
         $historial = collect();
 
@@ -56,6 +57,7 @@ class EvaluacionAplicadaController extends Controller
                 ->first();
 
             $historial = $repository->recentForPostulante($postulante->id_post);
+            $simulacroEvaluacion = $evaluacion?->simulacro;
             $evaluacion = $evaluacion
                 ? $repository->portalEvaluation($evaluacion)
                 : null;
@@ -64,9 +66,12 @@ class EvaluacionAplicadaController extends Controller
                 : null;
         }
 
+        $decision = $this->acceso->evaluar($postulante, $simulacroEvaluacion);
+
         return Inertia::render('Estudiante/Evaluaciones', [
             'postulanteVinculado' => (bool) $postulante,
-            'habilitacionAcademica' => $habilitacion,
+            'habilitacionAcademica' => $decision['habilitacion'],
+            'accesoEvaluaciones' => ['permitido' => $decision['permitido'], 'motivo' => $decision['motivo']],
             'estructuraResultadosDisponible' => $schemaReady,
             'plantillas' => $repository->availableTemplates(),
             'evaluacionActiva' => $evaluacion,
@@ -83,7 +88,6 @@ class EvaluacionAplicadaController extends Controller
     ): RedirectResponse {
         $this->ensureResultsSchema();
         $postulante = $request->user()->postulante;
-        $this->ensureEnabled($postulante, $request->filled('id_sim'));
         $evaluacion = $action->execute(
             postulante: $postulante,
             plantilla: $plantilla,
@@ -118,10 +122,10 @@ class EvaluacionAplicadaController extends Controller
         $this->ensureResultsSchema();
         $postulante = $request->user()->postulante;
         if (! $postulante) {
-            $this->ensureEnabled(null);
+            $this->acceso->validar(null);
         }
         $evaluacion = $postulante->evaluacionesAplicadas()->findOrFail($evaluacion);
-        $this->ensureEnabled($postulante, filled($evaluacion->id_sim));
+        $this->acceso->validar($postulante, $evaluacion->simulacro);
         $evaluacion = $action->execute(
             $evaluacion,
             $postulante,
@@ -146,47 +150,6 @@ class EvaluacionAplicadaController extends Controller
         return to_route('estudiante.evaluaciones', [
             'resultado' => $evaluacion->id_eval_apl,
         ])->with('success', 'La evaluación fue finalizada y calificada correctamente.');
-    }
-
-    private function habilitacion(?Postulante $postulante): ?HabilitacionAcademica
-    {
-        if (! $postulante || ! Schema::hasTable('habilitaciones_academicas')) {
-            return null;
-        }
-
-        return HabilitacionAcademica::query()
-            ->where('id_post', $postulante->id_post)
-            ->latest('id_hab')
-            ->first([
-                'estado_hab',
-                'motivo_hab',
-                'habilitado_evaluaciones_hab',
-                'habilitado_simulacros_hab',
-                'habilitado_reportes_hab',
-            ]);
-    }
-
-    private function ensureEnabled(?Postulante $postulante, bool $simulacro = false): void
-    {
-        if (! $postulante || $postulante->estado_post !== 'activo') {
-            throw ValidationException::withMessages([
-                'postulante' => 'Tu cuenta no está vinculada a un postulante académico activo.',
-            ]);
-        }
-
-        $habilitacion = $this->habilitacion($postulante);
-
-        if ($habilitacion?->habilitado_evaluaciones_hab === false) {
-            throw ValidationException::withMessages([
-                'habilitacion' => 'Tu acceso a evaluaciones se encuentra temporalmente restringido. Consulta con administración académica.',
-            ]);
-        }
-
-        if ($simulacro && $habilitacion?->habilitado_simulacros_hab === false) {
-            throw ValidationException::withMessages([
-                'habilitacion' => 'Tu acceso a simulacros se encuentra temporalmente restringido. Consulta con administración académica.',
-            ]);
-        }
     }
 
     private function ensureResultsSchema(): void

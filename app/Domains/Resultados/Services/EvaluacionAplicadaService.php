@@ -4,6 +4,7 @@ namespace App\Domains\Resultados\Services;
 
 use App\Domains\Academico\Models\InscripcionAcademica;
 use App\Domains\Academico\Models\SimulacroProgramado;
+use App\Domains\Academico\Services\AccesoEvaluacionService;
 use App\Domains\Academico\Services\ContextoAcademicoService;
 use App\Domains\Evaluaciones\Models\PlantillaEvaluacion;
 use App\Domains\Evaluaciones\Services\ConsistenciaEvaluacionService;
@@ -24,6 +25,7 @@ class EvaluacionAplicadaService
         private readonly ResultadoAcademicoService $resultados,
         private readonly ContextoAcademicoService $contexto,
         private readonly ConsistenciaEvaluacionService $consistencia,
+        private readonly AccesoEvaluacionService $acceso,
     ) {}
 
     public function iniciar(
@@ -50,6 +52,10 @@ class EvaluacionAplicadaService
                 throw ValidationException::withMessages([
                     'postulante' => 'El postulante no está habilitado para iniciar una evaluación.',
                 ]);
+            }
+
+            if (! $historica) {
+                $this->acceso->validar($postulante, $simulacro);
             }
 
             $plantilla = PlantillaEvaluacion::query()
