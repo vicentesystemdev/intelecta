@@ -221,6 +221,47 @@ class CatDemoTest extends TestCase
             ->where('intento.estado', 'vencida')->where('intento.pregunta', null)->where('intento.resultado_cat', null));
     }
 
+    public function test_inertia_expiry_reload_preserves_accepted_pending_response_and_is_idempotent(): void
+    {
+        $intento = $this->iniciar();
+        $this->motor->interceptar = function () {
+            throw new MotorCatNoDisponible;
+        };
+        $this->postJson(route('estudiante.cat.responder', $intento->id_intento_cat), $this->respuesta($intento))->assertRedirect();
+        $this->assertTrue($intento->fresh()->calculo_pendiente);
+        $respuestas = $intento->respuestas()->get()->toJson();
+        $plazo = $intento->fresh()->getRawOriginal('vence_en');
+        $version = $this->get(route('estudiante.cat.show', $intento->id_intento_cat))->assertOk()->viewData('page')['version'];
+        $llamadas = 0;
+        $this->motor->interceptar = function () use (&$llamadas) {
+            $llamadas++;
+            throw new MotorCatNoDisponible;
+        };
+        $this->travelTo($intento->vence_en);
+        try {
+            foreach (range(1, 2) as $n) {
+                $response = $this->get(route('estudiante.cat.show', $intento->id_intento_cat), [
+                    'X-Inertia' => 'true', 'X-Inertia-Partial-Component' => 'Estudiante/CatDemo',
+                    'X-Inertia-Partial-Data' => 'intento,acceso', 'X-Inertia-Version' => $version ?? '',
+                ])->assertOk()->assertHeader('X-Inertia', 'true')
+                    ->assertJsonPath('props.intento.id_intento_cat', $intento->id_intento_cat)
+                    ->assertJsonPath('props.intento.estado', 'vencida')->assertJsonPath('props.intento.revision', 1)
+                    ->assertJsonPath('props.intento.calculo_pendiente', false)->assertJsonPath('props.intento.segundos_restantes', 0)
+                    ->assertJsonPath('props.intento.pregunta', null)->assertJsonPath('props.intento.resultado_cat', null)
+                    ->assertJsonMissingPath('props.intento.snapshot')->assertJsonMissingPath('props.intento.respuestas')
+                    ->assertJsonMissingPath('props.intento.parametros');
+                $this->assertArrayNotHasKey('instrumentos', $response->json('props'));
+                $this->assertArrayNotHasKey('historial', $response->json('props'));
+            }
+            $this->assertSame(0, $llamadas);
+            $this->assertDatabaseCount('intentos_cat', 1);
+            $this->assertSame($respuestas, $intento->respuestas()->get()->toJson());
+            $this->assertSame($plazo, $intento->fresh()->getRawOriginal('vence_en'));
+        } finally {
+            $this->travelBack();
+        }
+    }
+
     public function test_habilitation_is_rechecked_before_submission_and_recovery(): void
     {
         $intento = $this->iniciar();

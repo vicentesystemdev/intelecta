@@ -1,27 +1,43 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import StudentTrackingNav from '@/Components/Estudiante/StudentTrackingNav';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { crearRelojCat } from '@/Utils/relojCat.mjs';
 
 export default function CatDemo({ disponible, acceso, instrumentos = [], historial = [], intento }) {
     const { errors } = usePage().props;
     const [seleccion, setSeleccion] = useState(null);
     const [ocupado, setOcupado] = useState(false);
-    const [segundos, setSegundos] = useState(intento?.segundos_restantes ?? 0);
+    const ocupadoRef = useRef(false);
+    const vencimientosConsultados = useRef(new Set());
+    const [segundos, setSegundos] = useState(() => intento ? crearRelojCat(intento.vence_en, intento.servidor_ahora)() : 0);
     useEffect(() => {
         setSeleccion(null);
-        setSegundos(intento?.segundos_restantes ?? 0);
-    }, [intento?.id_intento_cat, intento?.revision, intento?.segundos_restantes]);
+    }, [intento?.id_intento_cat, intento?.revision]);
     useEffect(() => {
         if (intento?.estado !== 'en_progreso') return undefined;
         const restante = crearRelojCat(intento.vence_en, intento.servidor_ahora);
-        setSegundos(restante());
-        const timer = setInterval(() => setSegundos(restante()), 250);
+        const actualizar = () => {
+            const valor = restante();
+            setSegundos(valor);
+            if (valor !== 0 || ocupadoRef.current || vencimientosConsultados.current.has(intento.id_intento_cat)) return;
+            // Una sola consulta por intento; nunca iniciar ni reenviar respuestas.
+            // Esperar a cualquier POST evita cancelar una respuesta ya aceptada.
+            vencimientosConsultados.current.add(intento.id_intento_cat);
+            router.reload({
+                only: ['intento', 'acceso'], preserveScroll: true,
+                onStart: () => { ocupadoRef.current = true; setOcupado(true); },
+                onFinish: () => { ocupadoRef.current = false; setOcupado(false); },
+            });
+        };
+        actualizar();
+        const timer = setInterval(actualizar, 250);
         return () => clearInterval(timer);
     }, [intento?.id_intento_cat, intento?.revision, intento?.vence_en, intento?.servidor_ahora, intento?.estado]);
     const enviar = (url, data = {}) => router.post(url, data, {
-        preserveScroll: true, onStart: () => setOcupado(true), onFinish: () => setOcupado(false),
+        preserveScroll: true,
+        onStart: () => { ocupadoRef.current = true; setOcupado(true); },
+        onFinish: () => { ocupadoRef.current = false; setOcupado(false); },
     });
     const boton = 'rounded-xl bg-brand-secondary px-5 py-3 font-bold text-white disabled:opacity-50';
     const card = 'rounded-2xl border border-brand-border bg-brand-card p-6';
@@ -43,7 +59,9 @@ export default function CatDemo({ disponible, acceso, instrumentos = [], histori
                 <h1 className="text-xl font-bold">{intento.nombre}</h1>
                 <p className="my-3">Respuestas guardadas: {intento.revision} / {intento.maximum} · Estado: {intento.estado}</p>
                 {intento.estado === 'en_progreso' && <p className="mb-4 font-bold" aria-live="off">Tiempo restante: {Math.floor(segundos / 60)}:{String(segundos % 60).padStart(2, '0')}</p>}
-                {intento.estado === 'en_progreso' && segundos === 0 && <p role="alert">El plazo terminó. Recarga para consultar el estado del intento.</p>}
+                {intento.estado === 'en_progreso' && segundos === 0 && <p role="status">{ocupado
+                    ? 'Consultando el estado del intento con el servidor…'
+                    : 'El plazo terminó. Si el estado no se actualiza, recarga para consultarlo.'}</p>}
                 {intento.estado === 'en_progreso' && intento.calculo_pendiente && <div role="status">
                     <p className="mb-4">El cálculo del siguiente paso está pendiente. Tu progreso está guardado; podrás continuar cuando el motor esté disponible.</p>
                     <button className={boton} disabled={ocupado || !acceso?.permitido || segundos === 0} onClick={() => enviar(route('estudiante.cat.recuperar', intento.id_intento_cat))}>Reintentar cálculo</button>
@@ -53,8 +71,10 @@ export default function CatDemo({ disponible, acceso, instrumentos = [], histori
                     <h2 className="my-4 whitespace-pre-line text-lg font-semibold">{intento.pregunta.enunciado}</h2>
                     <fieldset disabled={ocupado || segundos === 0 || !acceso?.permitido} className="space-y-3">
                         <legend className="sr-only">Selecciona una alternativa</legend>
-                        {intento.pregunta.alternativas.map(a => <label key={a.id_alt} className="flex cursor-pointer gap-3 rounded-xl border border-brand-border p-4">
-                            <input type="radio" name="alternativa-cat" value={a.id_alt} checked={seleccion === a.id_alt} onChange={() => setSeleccion(a.id_alt)} />
+                        {intento.pregunta.alternativas.map(a => <label key={a.id_alt} className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 text-text-main focus-within:ring-2 focus-within:ring-brand-secondary focus-within:ring-offset-2 focus-within:ring-offset-brand-card ${seleccion === a.id_alt
+                            ? 'border-brand-secondary bg-brand-secondary/10'
+                            : 'border-brand-border bg-brand-card'}`}>
+                            <input type="radio" name="alternativa-cat" className="mt-1 shrink-0 text-brand-secondary focus:ring-brand-secondary" value={a.id_alt} checked={seleccion === a.id_alt} onChange={() => setSeleccion(a.id_alt)} />
                             <span>{a.letra}. {a.texto}</span>
                         </label>)}
                     </fieldset>

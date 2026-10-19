@@ -7,5 +7,6 @@ export function crearRelojCat(venceEn, servidorAhora, monotono = () => performan
     const duracion = Number.isFinite(restante) ? Math.max(0, restante) : 0;
     const inicio = monotono();
 
-    return () => Math.max(0, Math.floor((duracion - Math.max(0, monotono() - inicio)) / 1000));
+    // Cero solo al alcanzar el instante real; no disparar la consulta hasta 999 ms antes.
+    return () => Math.max(0, Math.ceil((duracion - Math.max(0, monotono() - inicio)) / 1000));
 }

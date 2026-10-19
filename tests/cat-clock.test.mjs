@@ -2,6 +2,18 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { crearRelojCat } from '../resources/js/Utils/relojCat.mjs';
 
+test('zero is reached at the actual deadline, never in the preceding fraction of a second', () => {
+    let monotono = 0;
+    const restante = crearRelojCat('2026-10-19T17:51:02Z', '2026-10-19T17:51:01.500Z', () => monotono);
+    assert.equal(restante(), 1);
+    monotono = 499;
+    assert.equal(restante(), 1);
+    monotono = 500;
+    assert.equal(restante(), 0);
+    monotono = 1000;
+    assert.equal(restante(), 0);
+});
+
 for (const zone of ['UTC', 'America/La_Paz']) {
     test(`30 minutes and reload keep the same deadline in ${zone}`, () => {
         const previous = process.env.TZ;
