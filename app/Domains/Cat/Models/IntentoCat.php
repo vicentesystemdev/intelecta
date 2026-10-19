@@ -2,6 +2,7 @@
 
 namespace App\Domains\Cat\Models;
 
+use App\Domains\Cat\Casts\InstanteCat;
 use App\Domains\Postulantes\Models\Postulante;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,8 +22,8 @@ class IntentoCat extends Model
     protected function casts(): array
     {
         return ['snapshot' => 'array', 'resultado_cat' => 'array', 'calculo_pendiente' => 'boolean',
-            'revision' => 'integer', 'id_preg_actual' => 'integer', 'iniciado_en' => 'immutable_datetime',
-            'vence_en' => 'immutable_datetime', 'finalizado_en' => 'immutable_datetime'];
+            'revision' => 'integer', 'id_preg_actual' => 'integer', 'iniciado_en' => InstanteCat::class,
+            'vence_en' => InstanteCat::class, 'finalizado_en' => InstanteCat::class];
     }
 
     protected static function booted(): void

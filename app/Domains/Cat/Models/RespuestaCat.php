@@ -2,6 +2,7 @@
 
 namespace App\Domains\Cat\Models;
 
+use App\Domains\Cat\Casts\InstanteCat;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -17,7 +18,7 @@ class RespuestaCat extends Model
 
     protected function casts(): array
     {
-        return ['correcta' => 'boolean', 'revision' => 'integer', 'metricas_cat' => 'array', 'respondida_en' => 'immutable_datetime'];
+        return ['correcta' => 'boolean', 'revision' => 'integer', 'metricas_cat' => 'array', 'respondida_en' => InstanteCat::class];
     }
 
     public function intento(): BelongsTo

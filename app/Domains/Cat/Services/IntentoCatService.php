@@ -67,9 +67,11 @@ class IntentoCatService
                 'version_parametros' => $instrumento->version_parametros, 'configuracion' => $instrumento->configuracion,
                 'demo' => true, 'items' => $items];
 
+            $inicio = now()->toImmutable();
+
             return IntentoCat::create(['id_instrumento_cat' => $instrumentoId, 'id_post' => $postulante->id_post,
                 'snapshot' => $snapshot, 'huella_snapshot' => hash('sha256', json_encode($this->ordenarSnapshot($snapshot), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)),
-                'iniciado_en' => now(), 'vence_en' => now()->addMinutes($instrumento->duracion_minutos),
+                'iniciado_en' => $inicio, 'vence_en' => $inicio->addMinutes($instrumento->duracion_minutos),
                 'estado' => 'en_progreso', 'revision' => 0, 'calculo_pendiente' => true]);
         }, 3);
 

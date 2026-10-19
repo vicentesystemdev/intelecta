@@ -41,11 +41,13 @@ class CatDemoController extends Controller
         // Lista explícita: nunca serializar snapshot, clave o parámetros hacia Inertia.
         $publico = $item ? ['id_preg' => $item['id_preg'], 'enunciado' => $item['enunciado'], 'tema' => $item['tema'],
             'alternativas' => array_map(fn ($a) => ['id_alt' => $a['id_alt'], 'letra' => $a['letra'], 'texto' => $a['texto']], $item['alternativas'])] : null;
+        $ahora = now()->toImmutable();
 
         return Inertia::render('Estudiante/CatDemo', ['disponible' => true, 'acceso' => $acceso, 'instrumentos' => [], 'historial' => [],
             'intento' => ['id_intento_cat' => $intento->id_intento_cat, 'nombre' => $intento->snapshot['nombre'], 'estado' => $intento->estado,
                 'revision' => $intento->revision, 'calculo_pendiente' => $intento->calculo_pendiente,
-                'vence_en' => $intento->vence_en->toIso8601String(), 'segundos_restantes' => max(0, (int) now()->diffInSeconds($intento->vence_en, false)),
+                'vence_en' => $intento->vence_en->utc()->toISOString(), 'servidor_ahora' => $ahora->utc()->toISOString(),
+                'segundos_restantes' => max(0, (int) $ahora->diffInSeconds($intento->vence_en, false)),
                 'minimum' => $intento->snapshot['configuracion']['minimum'], 'maximum' => $intento->snapshot['configuracion']['maximum'],
                 'pregunta' => $publico, 'resultado_cat' => $intento->estado === 'finalizada' ? $intento->resultado_cat : null,
                 'aciertos' => $intento->estado === 'en_progreso' ? null : $intento->respuestas()->where('correcta', true)->count()]]);

@@ -18,6 +18,7 @@ use App\Domains\Evaluaciones\Models\Pregunta;
 use App\Domains\Evaluaciones\Models\Tema;
 use App\Domains\Postulantes\Models\Postulante;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -86,6 +87,54 @@ class CatDemoTest extends TestCase
         $item = collect($intento->snapshot['items'])->firstWhere('id_preg', $intento->id_preg_actual);
 
         return ['id_preg' => $item['id_preg'], 'id_alt' => $item['alternativas'][0]['id_alt'], 'revision' => $intento->revision];
+    }
+
+    public function test_deadline_is_an_explicit_instant_and_reload_does_not_extend_it_in_la_paz(): void
+    {
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('America/La_Paz');
+        try {
+            $this->travelTo(CarbonImmutable::parse('2026-10-19T17:21:02Z'));
+            $intento = $this->iniciar();
+            $plazo = $intento->getRawOriginal('vence_en');
+            $this->assertStringEndsWith('+00:00', $plazo);
+            $this->assertSame(1800.0, $intento->iniciado_en->diffInSeconds($intento->vence_en));
+            $this->travel(9)->seconds();
+            $this->get(route('estudiante.cat.show', $intento->id_intento_cat))->assertInertia(fn (Assert $page) => $page
+                ->where('intento.vence_en', '2026-10-19T17:51:02.000000Z')
+                ->where('intento.servidor_ahora', '2026-10-19T17:21:11.000000Z')
+                ->where('intento.segundos_restantes', 1791));
+            $this->travel(60)->seconds();
+            $this->post(route('estudiante.cat.recuperar', $intento->id_intento_cat))->assertRedirect();
+            $this->get(route('estudiante.cat.show', $intento->id_intento_cat))->assertInertia(fn (Assert $page) => $page
+                ->where('intento.segundos_restantes', 1731));
+            $this->assertSame($plazo, $intento->fresh()->getRawOriginal('vence_en'));
+            $this->assertDatabaseCount('intentos_cat', 1);
+        } finally {
+            $this->travelBack();
+            date_default_timezone_set($timezone);
+        }
+    }
+
+    public function test_la_paz_late_answer_and_recovery_cannot_extend_expiry_or_lose_accepted_answers(): void
+    {
+        $this->travelTo(CarbonImmutable::parse('2026-10-19T13:21:02-04:00'));
+        try {
+            $intento = $this->iniciar();
+            $url = route('estudiante.cat.responder', $intento->id_intento_cat);
+            $this->postJson($url, $this->respuesta($intento))->assertRedirect();
+            $siguiente = $this->respuesta($intento);
+            $this->travelTo(CarbonImmutable::parse('2026-10-19T13:51:02-04:00'));
+            $this->postJson($url, $siguiente)->assertRedirect();
+            $this->post(route('estudiante.cat.recuperar', $intento->id_intento_cat))->assertRedirect();
+            $this->get(route('estudiante.cat.show', $intento->id_intento_cat))->assertInertia(fn (Assert $page) => $page
+                ->where('intento.estado', 'vencida')->where('intento.segundos_restantes', 0)
+                ->where('intento.revision', 1)->where('intento.pregunta', null));
+            $this->assertDatabaseCount('respuestas_cat', 1);
+            $this->assertTrue($intento->fresh()->finalizado_en->equalTo($intento->vence_en));
+        } finally {
+            $this->travelBack();
+        }
     }
 
     public function test_instrument_is_idempotent_exact_and_does_not_modify_academic_tables(): void
