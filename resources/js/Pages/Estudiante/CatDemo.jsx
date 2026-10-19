@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import StudentTrackingNav from '@/Components/Estudiante/StudentTrackingNav';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { crearRelojCat } from '@/Utils/relojCat.mjs';
 
 export default function CatDemo({ disponible, acceso, instrumentos = [], historial = [], intento }) {
     const { errors } = usePage().props;
@@ -14,10 +15,11 @@ export default function CatDemo({ disponible, acceso, instrumentos = [], histori
     }, [intento?.id_intento_cat, intento?.revision, intento?.segundos_restantes]);
     useEffect(() => {
         if (intento?.estado !== 'en_progreso') return undefined;
-        const hasta = Date.now() + (intento.segundos_restantes ?? 0) * 1000;
-        const timer = setInterval(() => setSegundos(Math.max(0, Math.ceil((hasta - Date.now()) / 1000))), 1000);
+        const restante = crearRelojCat(intento.vence_en, intento.servidor_ahora);
+        setSegundos(restante());
+        const timer = setInterval(() => setSegundos(restante()), 250);
         return () => clearInterval(timer);
-    }, [intento?.id_intento_cat, intento?.revision, intento?.segundos_restantes, intento?.estado]);
+    }, [intento?.id_intento_cat, intento?.revision, intento?.vence_en, intento?.servidor_ahora, intento?.estado]);
     const enviar = (url, data = {}) => router.post(url, data, {
         preserveScroll: true, onStart: () => setOcupado(true), onFinish: () => setOcupado(false),
     });
