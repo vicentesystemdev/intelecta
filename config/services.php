@@ -2,6 +2,13 @@
 
 return [
 
+    'cat' => [
+        'url' => env('CAT_SERVICE_URL', 'http://127.0.0.1:8010'),
+        'token' => env('CAT_SERVICE_TOKEN'),
+        'connect_timeout' => (int) env('CAT_CONNECT_TIMEOUT', 2),
+        'timeout' => (int) env('CAT_TIMEOUT', 10),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

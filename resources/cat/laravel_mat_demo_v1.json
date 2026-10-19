@@ -1,0 +1,130 @@
+{
+  "manifest_version": 2,
+  "banco_id": "MAT-CAT-DEMO-v1",
+  "parametros_version": "simulados-demo-v1",
+  "instrumento": "Matemática CAT DEMO",
+  "experimental": true,
+  "calibrado": false,
+  "D": 1,
+  "origen": "simulado",
+  "advertencia": "Parámetros simulados de demostración, sin calibración ni respaldo empírico. No usar theta como decisión académica.",
+  "metodo": {
+    "a": "a = 1.0 + ((id_preg - 1) % 4) * 0.2",
+    "b": "b = -2 + (id_preg - 1) * 4 / 15",
+    "c": "c = 0.15 fijo",
+    "precision": "IEEE-754 doble; a y b redondeados a 6 decimales (los valores guardados ya son múltiplos de 1e-6); ningún generador aleatorio",
+    "independencia": "No derivan de las etiquetas de dificultad de Laravel"
+  },
+  "hash": {
+    "campo": "parametros_hash",
+    "identifica": "solo los parámetros psicométricos; no es la huella de contenido del instrumento (banco.banco_version)",
+    "algoritmo": "SHA-256 hexadecimal en minúsculas sobre los bytes UTF-8 de la cadena canónica",
+    "incluye": [
+      "D",
+      "calibrado",
+      "experimental",
+      "items",
+      "parametros_version"
+    ],
+    "referencia": "docs/contrato_integracion.md"
+  },
+  "parametros_hash": "f1abb3f562696e7a15d0a2e894bd8916bb2661fd263334f281a549f06c13d6c8",
+  "items": [
+    {
+      "id_preg": 1,
+      "a": 1.0,
+      "b": -2.0,
+      "c": 0.15
+    },
+    {
+      "id_preg": 2,
+      "a": 1.2,
+      "b": -1.733333,
+      "c": 0.15
+    },
+    {
+      "id_preg": 3,
+      "a": 1.4,
+      "b": -1.466667,
+      "c": 0.15
+    },
+    {
+      "id_preg": 4,
+      "a": 1.6,
+      "b": -1.2,
+      "c": 0.15
+    },
+    {
+      "id_preg": 5,
+      "a": 1.0,
+      "b": -0.933333,
+      "c": 0.15
+    },
+    {
+      "id_preg": 6,
+      "a": 1.2,
+      "b": -0.666667,
+      "c": 0.15
+    },
+    {
+      "id_preg": 7,
+      "a": 1.4,
+      "b": -0.4,
+      "c": 0.15
+    },
+    {
+      "id_preg": 8,
+      "a": 1.6,
+      "b": -0.133333,
+      "c": 0.15
+    },
+    {
+      "id_preg": 9,
+      "a": 1.0,
+      "b": 0.133333,
+      "c": 0.15
+    },
+    {
+      "id_preg": 10,
+      "a": 1.2,
+      "b": 0.4,
+      "c": 0.15
+    },
+    {
+      "id_preg": 11,
+      "a": 1.4,
+      "b": 0.666667,
+      "c": 0.15
+    },
+    {
+      "id_preg": 12,
+      "a": 1.6,
+      "b": 0.933333,
+      "c": 0.15
+    },
+    {
+      "id_preg": 13,
+      "a": 1.0,
+      "b": 1.2,
+      "c": 0.15
+    },
+    {
+      "id_preg": 14,
+      "a": 1.2,
+      "b": 1.466667,
+      "c": 0.15
+    },
+    {
+      "id_preg": 15,
+      "a": 1.4,
+      "b": 1.733333,
+      "c": 0.15
+    },
+    {
+      "id_preg": 16,
+      "a": 1.6,
+      "b": 2.0,
+      "c": 0.15
+    }
+  ]
+}

@@ -162,9 +162,9 @@ class IntentoCatService
         }
         try {
             $decision = $this->motor->calcular($contexto);
-        } catch (MotorCatNoDisponible) {
+        } catch (MotorCatNoDisponible $exception) {
             IntentoCat::whereKey($intento->id_intento_cat)->where('estado', 'en_progreso')->where('revision', $contexto->revision)
-                ->where('calculo_pendiente', true)->update(['error_motor' => 'no_disponible']);
+                ->where('calculo_pendiente', true)->update(['error_motor' => $exception->codigo]);
 
             return $intento->refresh();
         }
