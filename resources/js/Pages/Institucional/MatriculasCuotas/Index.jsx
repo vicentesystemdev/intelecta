@@ -129,12 +129,16 @@ export default function Index({
         cuotaForm.setData(
             cuota
                 ? {
-                      ...emptyCuota,
-                      ...cuota,
                       id_mat: String(cuota.id_mat),
+                      nro_cuota: cuota.nro_cuota ?? '',
+                      concepto_cuota: cuota.concepto_cuota ?? '',
+                      monto_cuota: cuota.monto_cuota ?? 0,
                       fecha_vencimiento_cuota:
                           cuota.fecha_vencimiento_cuota?.slice(0, 10) || '',
                       fecha_pago_cuota: cuota.fecha_pago_cuota?.slice(0, 10) || '',
+                      metodo_pago_cuota: cuota.metodo_pago_cuota ?? '',
+                      estado_cuota: cuota.estado_cuota ?? 'pendiente',
+                      observacion_cuota: cuota.observacion_cuota ?? '',
                   }
                 : { ...emptyCuota, id_mat: String(matricula.id_mat) },
         );
@@ -677,7 +681,7 @@ export default function Index({
                     <Field {...validationProps('fecha_pago_cuota', { required: cuotaForm.data.estado_cuota === 'pagada' })}
                         type="date"
                         label="Fecha de pago"
-                        max={localToday()}
+                        max={fechaHoy}
                         value={cuotaForm.data.fecha_pago_cuota}
                         onChange={(event) =>
                             cuotaForm.setData('fecha_pago_cuota', event.target.value)
