@@ -3,6 +3,12 @@ import { BookOpenCheck, FileChartColumn, Trophy } from 'lucide-react';
 
 const items = [
     {
+        label: 'Matemática CAT DEMO',
+        description: 'Evaluación experimental',
+        icon: BookOpenCheck,
+        route: 'estudiante.cat.index',
+    },
+    {
         label: 'Mis Evaluaciones',
         description: 'Instrumentos y resultados',
         icon: BookOpenCheck,
@@ -33,7 +39,7 @@ export default function StudentTrackingNav() {
                     Accede a tus evaluaciones, ficha consolidada y posición académica referencial.
                 </p>
             </div>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
                 {items.map(({ label, description, icon: Icon, route: routeName }) => {
                     const active = route().current(routeName);
 
